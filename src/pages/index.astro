@@ -19,9 +19,6 @@ import TerminalWindow from '../components/content/TerminalWindow.astro';
 import SkillBar from '../components/content/SkillBar.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
 
-// Images
-import cashmunkHero from '../assets/images/cashmunk-hero.svg';
-import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
 ---
 
 <Layout title="Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS" description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS.">
@@ -133,8 +130,6 @@ import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
         <ProjectCard
           title="cashmunk"
           description="// privacy-first envelope budgeting app for ios. your data stays on your device, pay once, own forever."
-          image={cashmunkHero}
-          imageAlt="Cashmunk - privacy-first envelope budgeting app"
           link="https://cashmunk.app/"
           tags={['swift', 'ios', 'privacy']}
         />
@@ -143,8 +138,6 @@ import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
         <ProjectCard
           title="ddev-claude"
           description="// ddev plugin for running claude code in sandboxed, firewalled containers"
-          image={ddevClaudeHero}
-          imageAlt="ddev-claude - sandboxed Claude Code in DDEV containers"
           link="https://github.com/FlorianRiquelme/ddev-claude"
           tags={['ddev', 'docker', 'claude']}
         />
