@@ -21,7 +21,7 @@ const formatStars = (n: number): string => {
 };
 ---
 
-<div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
+<div class="flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
   <!-- Image area -->
   <div class="h-[180px] w-full overflow-hidden bg-bg-input">
     <Picture
@@ -36,7 +36,7 @@ const formatStars = (n: number): string => {
     />
   </div>
   <!-- Body -->
-  <div class="flex flex-col gap-3 p-5">
+  <div class="flex flex-1 flex-col gap-3 p-5">
     <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
     <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
     {tags.length > 0 && (
@@ -46,7 +46,7 @@ const formatStars = (n: number): string => {
         ))}
       </div>
     )}
-    <div class="flex items-center justify-between">
+    <div class="mt-auto flex items-center justify-between">
       {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
       <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition">
         view_repo →
