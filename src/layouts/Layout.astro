@@ -26,5 +26,38 @@ const { title = 'Portfolio' } = Astro.props;
   </head>
   <body class="bg-bg-page text-text-primary font-mono antialiased">
     <slot />
+    <script>
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduced) {
+        document.querySelectorAll<HTMLElement>('[data-animate]').forEach((el) => {
+          el.classList.add('is-visible');
+        });
+        document.querySelectorAll<HTMLElement>('[data-animate-skill]').forEach((el) => {
+          el.style.width = el.dataset.targetWidth + '%';
+        });
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              const el = entry.target as HTMLElement;
+              if (el.hasAttribute('data-animate')) {
+                el.classList.add('is-visible');
+              }
+              if (el.hasAttribute('data-animate-skill')) {
+                el.style.width = el.dataset.targetWidth + '%';
+              }
+              observer.unobserve(el);
+            });
+          },
+          { threshold: 0.15, rootMargin: '-50px' }
+        );
+
+        document.querySelectorAll('[data-animate], [data-animate-skill]').forEach((el) => {
+          observer.observe(el);
+        });
+      }
+    </script>
   </body>
 </html>

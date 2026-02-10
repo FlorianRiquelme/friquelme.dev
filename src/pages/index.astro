@@ -37,29 +37,31 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <section id="about" class="flex flex-col items-center gap-10 bg-bg-page px-16 pt-[120px] pb-[100px]">
     <div class="w-full max-w-[900px]">
       <TerminalWindow title="~/alex_dev — bash">
-        <p class="text-sm font-medium text-green-primary">$ whoami</p>
-        <p class="text-sm text-text-primary">alex rodriguez — full-stack developer</p>
-        <div class="h-3"></div>
-        <p class="text-sm font-medium text-green-primary">$ cat intro.txt</p>
-        <p class="text-sm text-text-secondary">i build things for the web. passionate about clean code,</p>
-        <p class="text-sm text-text-secondary">open source, and developer experience. currently crafting</p>
-        <p class="text-sm text-text-secondary">performant interfaces at startup.io</p>
-        <div class="h-3"></div>
-        <p class="text-sm font-medium text-green-primary">$ echo $current_stack</p>
-        <p class="text-sm text-text-primary">typescript · react · node.js · postgresql · rust</p>
-        <div class="h-3"></div>
-        <p class="text-sm font-medium text-green-primary">$ echo $experience</p>
-        <p class="text-sm text-text-primary">5+ years · 40+ projects · 12k+ github stars</p>
-        <div class="h-4"></div>
-        <div class="flex items-center">
-          <span class="text-sm font-medium text-green-primary">$ </span>
-          <span class="h-[18px] w-[9px] bg-green-primary animate-blink"></span>
+        <div id="hero-terminal">
+          <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ whoami</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">alex rodriguez — full-stack developer</p>
+          <div data-type="out" class="h-3 hidden"></div>
+          <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ cat intro.txt</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">i build things for the web. passionate about clean code,</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">open source, and developer experience. currently crafting</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">performant interfaces at startup.io</p>
+          <div data-type="out" class="h-3 hidden"></div>
+          <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ echo $current_stack</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">typescript · react · node.js · postgresql · rust</p>
+          <div data-type="out" class="h-3 hidden"></div>
+          <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ echo $experience</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">5+ years · 40+ projects · 12k+ github stars</p>
+          <div data-type="out" class="h-4 hidden"></div>
+          <div id="hero-cursor" class="flex items-center hidden">
+            <span class="text-sm font-medium text-green-primary">$ </span>
+            <span class="h-[18px] w-[9px] bg-green-primary animate-blink"></span>
+          </div>
         </div>
       </TerminalWindow>
     </div>
 
     <!-- Hero Bottom -->
-    <div class="flex flex-col items-center gap-8 w-full max-w-[900px]">
+    <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
       <h1 class="text-4xl font-semibold text-text-primary text-center">
         building the future, one commit at a time.
       </h1>
@@ -83,21 +85,21 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     />
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <!-- Frontend -->
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 stagger-1" data-animate>
         <span class="text-sm font-medium text-text-primary">frontend:</span>
         <SkillBar name="react / next.js" percentage={95} />
         <SkillBar name="typescript" percentage={90} />
         <SkillBar name="tailwind css" percentage={88} />
       </div>
       <!-- Backend -->
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 stagger-2" data-animate>
         <span class="text-sm font-medium text-text-primary">backend:</span>
         <SkillBar name="node.js / express" percentage={92} />
         <SkillBar name="postgresql / redis" percentage={85} />
         <SkillBar name="rust / wasm" percentage={72} />
       </div>
       <!-- DevOps -->
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 stagger-3" data-animate>
         <span class="text-sm font-medium text-text-primary">devops:</span>
         <SkillBar name="docker / k8s" percentage={80} />
         <SkillBar name="aws / vercel" percentage={85} />
@@ -118,33 +120,39 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       <span class="text-xs text-text-muted">total: 6 projects</span>
     </div>
     <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-      <ProjectCard
-        title="flux_engine"
-        description="// real-time data processing pipeline built with rust and webassembly for edge computing"
-        stars={2400}
-        link="#"
-        tags={['rust', 'wasm', 'edge']}
-      >
-        <div slot="image" class="h-full w-full bg-gradient-to-br from-green-primary/20 to-bg-surface"></div>
-      </ProjectCard>
-      <ProjectCard
-        title="vex_cli"
-        description="// developer toolkit cli that scaffolds, lints, and deploys full-stack applications"
-        stars={5100}
-        link="#"
-        tags={['node', 'cli', 'oss']}
-      >
-        <div slot="image" class="h-full w-full bg-gradient-to-br from-blue-info/20 to-bg-surface"></div>
-      </ProjectCard>
-      <ProjectCard
-        title="signal_mesh"
-        description="// p2p encrypted messaging protocol with zero-knowledge proof authentication"
-        stars={4700}
-        link="#"
-        tags={['typescript', 'webrtc', 'crypto']}
-      >
-        <div slot="image" class="h-full w-full bg-gradient-to-br from-amber-warning/20 to-bg-surface"></div>
-      </ProjectCard>
+      <div data-animate class="stagger-1">
+        <ProjectCard
+          title="flux_engine"
+          description="// real-time data processing pipeline built with rust and webassembly for edge computing"
+          stars={2400}
+          link="#"
+          tags={['rust', 'wasm', 'edge']}
+        >
+          <div slot="image" class="h-full w-full bg-gradient-to-br from-green-primary/20 to-bg-surface"></div>
+        </ProjectCard>
+      </div>
+      <div data-animate class="stagger-2">
+        <ProjectCard
+          title="vex_cli"
+          description="// developer toolkit cli that scaffolds, lints, and deploys full-stack applications"
+          stars={5100}
+          link="#"
+          tags={['node', 'cli', 'oss']}
+        >
+          <div slot="image" class="h-full w-full bg-gradient-to-br from-blue-info/20 to-bg-surface"></div>
+        </ProjectCard>
+      </div>
+      <div data-animate class="stagger-3">
+        <ProjectCard
+          title="signal_mesh"
+          description="// p2p encrypted messaging protocol with zero-knowledge proof authentication"
+          stars={4700}
+          link="#"
+          tags={['typescript', 'webrtc', 'crypto']}
+        >
+          <div slot="image" class="h-full w-full bg-gradient-to-br from-amber-warning/20 to-bg-surface"></div>
+        </ProjectCard>
+      </div>
     </div>
   </section>
 
@@ -159,20 +167,22 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       </p>
     </div>
 
-    <div class="w-full max-w-[700px]">
+    <div id="contact-terminal-wrapper" class="w-full max-w-[700px]">
       <TerminalWindow title="~/contact — bash">
-        <p class="text-[13px] font-medium text-green-primary">$ cat contact_info.json</p>
-        <p class="text-[13px] text-text-muted whitespace-pre">{"{"}</p>
-        <p class="text-[13px] text-text-secondary whitespace-pre">  "email":    "alex@rodriguez.dev",</p>
-        <p class="text-[13px] text-text-secondary whitespace-pre">  "github":   "github.com/alexrodriguez",</p>
-        <p class="text-[13px] text-text-secondary whitespace-pre">  "twitter":  "@alex_codes",</p>
-        <p class="text-[13px] text-text-secondary whitespace-pre">  "linkedin": "linkedin.com/in/alexrodriguez",</p>
-        <p class="text-[13px] text-text-secondary whitespace-pre">  "location": "san francisco, ca"</p>
-        <p class="text-[13px] text-text-muted whitespace-pre">{"}"}</p>
-        <div class="h-2"></div>
-        <div class="flex items-center">
-          <span class="text-[13px] font-medium text-green-primary">$ </span>
-          <span class="h-4 w-[9px] bg-green-primary animate-blink"></span>
+        <div id="contact-terminal">
+          <p data-type="cmd" class="text-[13px] font-medium text-green-primary hidden">$ cat contact_info.json</p>
+          <p data-type="out" class="text-[13px] text-text-muted whitespace-pre hidden">{"{"}</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "email":    "alex@rodriguez.dev",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "github":   "github.com/alexrodriguez",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "twitter":  "@alex_codes",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "linkedin": "linkedin.com/in/alexrodriguez",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "location": "san francisco, ca"</p>
+          <p data-type="out" class="text-[13px] text-text-muted whitespace-pre hidden">{"}"}</p>
+          <div data-type="out" class="h-2 hidden"></div>
+          <div id="contact-cursor" class="flex items-center hidden">
+            <span class="text-[13px] font-medium text-green-primary">$ </span>
+            <span class="h-4 w-[9px] bg-green-primary animate-blink"></span>
+          </div>
         </div>
       </TerminalWindow>
     </div>
@@ -192,3 +202,73 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     </Fragment>
   </Footer>
 </Layout>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function sleep(ms: number) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  async function typeText(el: HTMLElement) {
+    const text = el.textContent || '';
+    el.textContent = '';
+    el.classList.remove('hidden');
+    for (const char of text) {
+      el.textContent += char;
+      await sleep(40);
+    }
+  }
+
+  async function runTerminalSequence(containerId: string, cursorId: string) {
+    const lines = document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`);
+    const cursor = document.getElementById(cursorId);
+
+    for (const line of lines) {
+      if (line.dataset.type === 'cmd') {
+        await typeText(line);
+        await sleep(200);
+      } else {
+        line.classList.remove('hidden');
+        await sleep(50);
+      }
+    }
+    cursor?.classList.remove('hidden');
+  }
+
+  function showTerminalAll(containerId: string, cursorId: string) {
+    document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`)
+      .forEach((el) => el.classList.remove('hidden'));
+    document.getElementById(cursorId)?.classList.remove('hidden');
+  }
+
+  // Hero terminal — runs immediately on load
+  const heroBottom = document.getElementById('hero-bottom');
+
+  if (reduced) {
+    showTerminalAll('hero-terminal', 'hero-cursor');
+    showTerminalAll('contact-terminal', 'contact-cursor');
+    if (heroBottom) heroBottom.style.opacity = '1';
+  } else {
+    runTerminalSequence('hero-terminal', 'hero-cursor').then(async () => {
+      await sleep(300);
+      if (heroBottom) heroBottom.style.opacity = '1';
+    });
+
+    // Contact terminal — triggered on scroll
+    const contactWrapper = document.getElementById('contact-terminal-wrapper');
+    if (contactWrapper) {
+      const contactObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            contactObserver.unobserve(entry.target);
+            runTerminalSequence('contact-terminal', 'contact-cursor');
+          });
+        },
+        { threshold: 0.3 }
+      );
+      contactObserver.observe(contactWrapper);
+    }
+  }
+</script>

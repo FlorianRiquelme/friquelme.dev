@@ -17,7 +17,7 @@ const formatStars = (n: number): string => {
 };
 ---
 
-<div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary">
+<div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
   <!-- Image slot -->
   <div class="h-[180px] w-full bg-bg-input">
     <slot name="image" />

@@ -14,8 +14,10 @@ const { name, percentage } = Astro.props;
   </div>
   <div class="h-1 w-full rounded-sm bg-border-primary">
     <div
-      class="h-1 rounded-sm bg-green-primary"
-      style={`width: ${percentage}%`}
+      class="h-1 rounded-sm bg-green-primary transition-all duration-1000 ease-out"
+      style="width: 0%"
+      data-animate-skill
+      data-target-width={percentage}
     ></div>
   </div>
 </div>
