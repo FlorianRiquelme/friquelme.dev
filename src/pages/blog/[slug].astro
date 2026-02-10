@@ -49,7 +49,13 @@ const allPosts = (await getCollection('blog'))
   }));
 ---
 
-<Layout title={`${post.data.title} — friquelme.dev`} description={post.data.description}>
+<Layout
+  title={`${post.data.title} — friquelme.dev`}
+  description={post.data.description}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
+  image={post.data.heroImage ? new URL(post.data.heroImage.src, Astro.url.origin).href : undefined}
+>
   <!-- Header -->
   <HeaderBar>
     <Logo name="friquelme.dev" slot="logo" />
@@ -103,4 +109,29 @@ const allPosts = (await getCollection('blog'))
       <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
     </Fragment>
   </Footer>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate && { "dateModified": post.data.updatedDate.toISOString() }),
+  "author": {
+    "@type": "Person",
+    "name": post.data.author,
+    "url": "https://friquelme.dev"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Florian Riquelme",
+    "url": "https://friquelme.dev"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": new URL(`/blog/${post.id}/`, "https://friquelme.dev").href
+  },
+  ...(post.data.heroImage && { "image": new URL(post.data.heroImage.src, "https://friquelme.dev").href }),
+  "keywords": post.data.tags.join(", ")
+})} />
 </Layout>

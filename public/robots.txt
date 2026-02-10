@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://friquelme.dev/sitemap-index.xml

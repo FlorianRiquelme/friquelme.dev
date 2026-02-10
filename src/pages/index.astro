@@ -24,7 +24,7 @@ import cashmunkHero from '../assets/images/cashmunk-hero.svg';
 import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
 ---
 
-<Layout title="friquelme.dev — portfolio" description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS.">
+<Layout title="Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS" description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS.">
   <!-- Header -->
   <HeaderBar>
     <Logo name="friquelme.dev" slot="logo" />
@@ -68,6 +68,9 @@ import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
 
     <!-- Hero Bottom -->
     <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
+      <div class="sr-only">
+        <p>Florian Riquelme — Senior Software Engineer. Product-focused engineer with 9+ years of building web platforms. Current stack: PHP, React, TypeScript, Go. Embraces AI-powered workflows. Currently at digital-masters in Hamburg, Germany.</p>
+      </div>
       <h1 class="text-2xl font-semibold text-text-primary text-center md:text-4xl">
         building the future, one commit at a time.
       </h1>
@@ -263,3 +266,25 @@ import ddevClaudeHero from '../assets/images/ddev-claude-hero.svg';
     }
   }
 </script>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "friquelme.dev",
+      "url": "https://friquelme.dev"
+    },
+    {
+      "@type": "Person",
+      "name": "Florian Riquelme",
+      "url": "https://friquelme.dev",
+      "jobTitle": "Senior Software Engineer",
+      "sameAs": [
+        "https://github.com/FlorianRiquelme",
+        "https://linkedin.com/in/florian-riquelme"
+      ],
+      "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS"]
+    }
+  ]
+})} />
