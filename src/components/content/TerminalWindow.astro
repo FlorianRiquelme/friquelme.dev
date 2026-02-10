@@ -15,7 +15,7 @@ const { title = '~/directory — bash' } = Astro.props;
     <span class="ml-2 text-xs text-text-muted font-mono">{title}</span>
   </div>
   <!-- Content -->
-  <div class="flex flex-col gap-1.5 overflow-x-auto p-4 md:p-6">
+  <div class="flex flex-col gap-1.5 overflow-hidden p-4 md:p-6">
     <slot>
       <p class="text-[13px] font-medium text-green-primary font-mono">$ echo 'hello world'</p>
       <p class="text-[13px] text-text-primary font-mono">hello world</p>
