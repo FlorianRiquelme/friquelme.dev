@@ -1,0 +1,330 @@
+---
+title: "seo for astro sites — what actually matters"
+description: "a practical walkthrough of the seo setup behind this site — sitemap, og meta, json-ld, rss, canonical urls. no seo plugins, no guesswork, just the fundamentals that move the needle."
+pubDate: 2025-02-17
+author: "florian riquelme"
+heroImage: "../assets/images/blog/seo-astro-hero.svg"
+heroImageAlt: "Diagram showing SEO artifacts flowing from an Astro site to search engine results"
+tags: ["astro", "seo", "web"]
+---
+
+import Callout from '../components/blog/Callout.astro';
+
+<Callout>
+**tldr:** sitemap, open graph, json-ld, rss, canonical urls — all built into the astro layout with two dependencies. no seo plugins needed. the full source is at [github.com/FlorianRiquelme/friquelme.dev](https://github.com/FlorianRiquelme/friquelme.dev).
+</Callout>
+
+## The Goal
+
+Make the site discoverable by search engines, shareable on social platforms, and subscribable via RSS — without adding a bloated SEO plugin or framework. Everything should be automatic: add a page or blog post, and the SEO artifacts follow.
+
+This post walks through the exact SEO setup behind [friquelme.dev](https://friquelme.dev).
+
+## What We're Building
+
+The SEO layer has five parts:
+
+1. **Sitemap** — auto-generated XML for crawlers
+2. **Meta tags** — open graph and twitter cards for social sharing
+3. **Canonical URLs** — one true URL per page
+4. **JSON-LD** — structured data for rich search results
+5. **RSS** — feed for subscribers and aggregators
+
+Two packages handle the heavy lifting: `@astrojs/sitemap` for the sitemap and `@astrojs/rss` for the feed. Everything else is hand-written in the layout.
+
+## The Foundation: `site` in Astro Config
+
+Before anything else, set the `site` property in your Astro config. Every SEO feature depends on this — it's how Astro constructs absolute URLs for sitemaps, canonical links, and RSS feeds.
+
+```javascript
+// astro.config.mjs
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://friquelme.dev',
+  integrations: [mdx(), sitemap()],
+});
+```
+
+That's it for the sitemap. The `@astrojs/sitemap` integration generates `sitemap-index.xml` at build time, including every static page and blog post. No configuration, no manual URL lists.
+
+## Robots.txt
+
+A `robots.txt` in `public/` tells crawlers where the sitemap lives:
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://friquelme.dev/sitemap-index.xml
+```
+
+This file is static and copied directly to the build output. It's the first thing search engines look for when they visit your domain.
+
+## Meta Tags That Matter
+
+The base layout accepts SEO props and renders them as meta tags. Here's the interface:
+
+```typescript
+// src/layouts/Layout.astro
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+}
+
+const {
+  title = 'Portfolio',
+  description,
+  image,
+  type = 'website',
+  publishedTime,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+```
+
+The canonical URL is constructed dynamically from the current page's pathname. This prevents duplicate content issues — if someone links to your page with query params or a trailing slash variation, search engines know which version is authoritative.
+
+### Open Graph
+
+```html
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalURL.href} />
+<meta property="og:title" content={title} />
+{description && <meta property="og:description" content={description} />}
+{image && <meta property="og:image" content={image} />}
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+```
+
+The `type` prop switches between `website` (for the homepage) and `article` (for blog posts). When a blog post has a hero image, it becomes the OG image. When shared on LinkedIn, Slack, or Discord, the preview card shows the title, description, and image automatically.
+
+### Twitter Cards
+
+```html
+<meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={title} />
+{description && <meta name="twitter:description" content={description} />}
+{image && <meta name="twitter:image" content={image} />}
+```
+
+If there's an image, we get the large card format. Otherwise, the compact summary card. This is a one-line decision that significantly affects how your content appears when shared.
+
+<Callout>
+**why conditional meta tags?** some pages don't have descriptions or images. rendering empty meta tags (`content=""`) is worse than omitting them — crawlers may treat empty values as intentional and display blank snippets. conditional rendering with `{value && ...}` avoids this.
+</Callout>
+
+### RSS Autodiscovery
+
+```html
+<link rel="alternate" type="application/rss+xml" title="friquelme.dev blog" href="/rss.xml" />
+```
+
+This goes in every page's `<head>`. RSS readers and browser extensions pick it up automatically — visitors don't need to know the feed URL exists.
+
+## Blog Posts: Dynamic SEO Props
+
+Each blog post passes its frontmatter to the layout:
+
+```astro
+<Layout
+  title={`${post.data.title} — friquelme.dev`}
+  description={post.data.description}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
+  image={post.data.heroImage
+    ? new URL(post.data.heroImage.src, Astro.url.origin).href
+    : undefined}
+>
+```
+
+This means every post gets unique, accurate meta tags without any manual work. The frontmatter is the single source of truth:
+
+```yaml
+---
+title: "deploying an astro site to aws — the full pipeline"
+description: "how this portfolio goes from git push to production..."
+pubDate: 2025-02-10
+heroImage: "../assets/images/blog/deploying-astro-aws-hero.svg"
+tags: ["aws", "astro", "devops", "github-actions"]
+---
+```
+
+Write the title and description once in frontmatter. They flow into the page `<title>`, the meta description, OG tags, Twitter cards, RSS entries, and JSON-LD — all from the same values.
+
+## JSON-LD Structured Data
+
+JSON-LD tells search engines *what* your content is, not just what it says. It's the difference between Google treating your page as a generic result and showing it as a rich snippet with author info, publish date, and article metadata.
+
+### Homepage: Person + WebSite
+
+The homepage uses a `@graph` to declare both the site and the person behind it:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "friquelme.dev",
+      "url": "https://friquelme.dev"
+    },
+    {
+      "@type": "Person",
+      "name": "Florian Riquelme",
+      "url": "https://friquelme.dev",
+      "jobTitle": "Senior Software Engineer",
+      "sameAs": [
+        "https://github.com/FlorianRiquelme",
+        "https://linkedin.com/in/florian-riquelme"
+      ],
+      "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS"]
+    }
+  ]
+}
+```
+
+The `sameAs` array links your site to your social profiles. Google uses this for the knowledge panel — that sidebar card that appears when someone searches your name. The `knowsAbout` field reinforces your expertise for E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) signals.
+
+### Blog Posts: BlogPosting
+
+Each blog post gets a `BlogPosting` schema:
+
+```typescript
+// In [slug].astro
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate && {
+    "dateModified": post.data.updatedDate.toISOString()
+  }),
+  "author": {
+    "@type": "Person",
+    "name": post.data.author,
+    "url": "https://friquelme.dev"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Florian Riquelme",
+    "url": "https://friquelme.dev"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://friquelme.dev/blog/${post.id}/`
+  },
+  ...(post.data.heroImage && {
+    "image": new URL(post.data.heroImage.src, "https://friquelme.dev").href
+  }),
+  "keywords": post.data.tags.join(", ")
+})} />
+```
+
+A few things worth noting:
+
+- **`dateModified`** is conditionally included — only when the post has an `updatedDate`. This tells Google the content has been refreshed, which can improve rankings for time-sensitive topics.
+- **`set:html`** is Astro's way of injecting raw content into a `<script>` tag without escaping.
+- **Spread syntax** (`...`) keeps the JSON clean — no `null` or `undefined` values in the output.
+
+<Callout>
+**validating structured data:** paste any page URL into [Google's Rich Results Test](https://search.google.com/test/rich-results) to verify your JSON-LD is correct. it'll show you exactly what Google extracts from your markup.
+</Callout>
+
+## RSS Feed
+
+The RSS feed is a standalone Astro endpoint at `src/pages/rss.xml.ts`:
+
+```typescript
+import rss from '@astrojs/rss';
+import { getCollection } from 'astro:content';
+import type { APIContext } from 'astro';
+
+export async function GET(context: APIContext) {
+  const posts = (await getCollection('blog'))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+  return rss({
+    title: 'friquelme.dev blog',
+    description: 'Thoughts on code, systems, and building things that work',
+    site: context.site!,
+    items: posts.map((post) => ({
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.pubDate,
+      link: `/blog/${post.id}/`,
+    })),
+  });
+}
+```
+
+Draft posts are filtered out. The feed is sorted newest-first. The `context.site` pulls from the `site` property in `astro.config.mjs` — same source of truth as everything else.
+
+RSS might feel old-school, but it's still how many developers consume content. It's also picked up by aggregators, and some search engines use feeds to discover new content faster than waiting for crawl cycles.
+
+## Screen-Reader Content for SEO
+
+There's one more technique worth mentioning. The homepage has a `sr-only` block that provides crawlers with a text-rich summary:
+
+```html
+<div class="sr-only">
+  <p>Florian Riquelme — Senior Software Engineer. Product-focused
+  engineer with 9+ years of building web platforms. Current stack:
+  PHP, React, TypeScript, Go. Embraces AI-powered workflows.
+  Currently at digital-masters in Hamburg, Germany.</p>
+</div>
+```
+
+The terminal animation on the homepage types out content character by character — but crawlers don't execute JavaScript animations. This hidden paragraph ensures the same information is available as static text. It's also picked up by screen readers, which is a win for accessibility.
+
+<Callout>
+**important:** `sr-only` content should summarize what's already visible on the page. using it to stuff keywords that aren't represented in the visual content is a violation of Google's guidelines and can result in penalties.
+</Callout>
+
+## Keyword-Rich Page Titles
+
+Page titles are the single most impactful on-page SEO factor. The titles on this site are structured to include relevant keywords naturally:
+
+```
+Homepage: "Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS"
+Blog:     "Blog — Florian Riquelme | Code, Systems & DevOps"
+Post:     "deploying an astro site to aws — the full pipeline — friquelme.dev"
+```
+
+The pattern is: **primary keyword — secondary context | supporting keywords**. The homepage title includes the job title and key technologies. Blog post titles use the post's own title followed by the site name for brand consistency.
+
+## The Checklist
+
+Here's what this setup gives you out of the box for every page:
+
+| Feature | Source | Benefit |
+|---|---|---|
+| `<title>` | Layout prop | Search result headline |
+| `<meta description>` | Layout prop | Search result snippet |
+| Canonical URL | `Astro.url` + `Astro.site` | No duplicate content |
+| Open Graph | Layout props | Social sharing previews |
+| Twitter Cards | Layout props | Twitter/X previews |
+| JSON-LD (Person) | Homepage | Knowledge panel, E-E-A-T |
+| JSON-LD (BlogPosting) | Blog posts | Rich snippets, article info |
+| Sitemap | `@astrojs/sitemap` | Crawl discovery |
+| RSS | `@astrojs/rss` | Feed readers, fast indexing |
+| robots.txt | `public/` | Crawl directives |
+| RSS autodiscovery | Layout `<head>` | Feed reader detection |
+
+## What This Doesn't Cover
+
+This is the foundation. There are SEO layers beyond this that might matter depending on your goals:
+
+- **OG image generation** — dynamically creating social preview images per page (Astro has community solutions for this, or you can use Satori/Sharp)
+- **Performance optimization** — Core Web Vitals matter for ranking. self-hosted fonts, image optimization, and HTML compression are separate concerns covered in the [deployment post](/blog/deploying-astro-to-aws/)
+- **Content strategy** — no amount of meta tags will help if the content doesn't match search intent
+- **Google Search Console** — submit your sitemap, monitor indexing issues, track which queries bring traffic
+- **Internal linking** — connecting related posts helps both users and crawlers navigate your content graph
+
+---
+
+*The SEO setup for this site is two dependencies, one layout file, and about 40 lines of structured data. It's not flashy, but it covers the fundamentals that actually affect discoverability. The full source is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*
