@@ -34,7 +34,7 @@ export class GitHubOidcStack extends cdk.Stack {
           'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
         },
         StringLike: {
-          'token.actions.githubusercontent.com:sub': `repo:${GITHUB_REPO}:ref:refs/heads/main`,
+          'token.actions.githubusercontent.com:sub': `repo:${GITHUB_REPO}:environment:production`,
         },
       }),
       description: 'Role assumed by GitHub Actions to deploy the portfolio site',
