@@ -19,10 +19,10 @@ import AuthorCard from '../../components/blog/AuthorCard.astro';
 import RelatedPosts from '../../components/blog/RelatedPosts.astro';
 import PostNavigation from '../../components/blog/PostNavigation.astro';
 
+import { getPublishedPosts } from '../../utils/blog';
+
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog'))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const posts = getPublishedPosts(await getCollection('blog'));
 
   return posts.map((post, i) => ({
     params: { slug: post.id },
@@ -37,9 +37,8 @@ export async function getStaticPaths() {
 const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
 
-const allPosts = (await getCollection('blog'))
-  .filter((p) => !p.data.draft && p.id !== post.id)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+const allPosts = getPublishedPosts(await getCollection('blog'))
+  .filter((p) => p.id !== post.id)
   .slice(0, 3)
   .map((p) => ({
     id: p.id,

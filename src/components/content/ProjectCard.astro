@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Tag from '../ui/Tag.astro';
+import { formatStars } from '../../utils/blog';
 
 interface Props {
   title: string;
@@ -14,11 +15,6 @@ interface Props {
 }
 
 const { title, description, image, imageAlt, stars = 0, link = '#', tags = [] } = Astro.props;
-
-const formatStars = (n: number): string => {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
-  return String(n);
-};
 ---
 
 <div class="flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">

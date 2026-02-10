@@ -18,9 +18,9 @@ import SectionHeader from '../../components/content/SectionHeader.astro';
 import BlogFeaturedCard from '../../components/blog/BlogFeaturedCard.astro';
 import BlogPostCard from '../../components/blog/BlogPostCard.astro';
 
-const posts = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+import { getPublishedPosts } from '../../utils/blog';
+
+const posts = getPublishedPosts(await getCollection('blog'));
 
 // Get reading times for all posts
 const postsWithReadingTime = await Promise.all(
