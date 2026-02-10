@@ -74,7 +74,7 @@ export class StaticSiteStack extends cdk.Stack {
       domainNames: [DOMAIN_NAME, `www.${DOMAIN_NAME}`],
       certificate,
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
-      priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
     });
 
     // Route 53 A record → CloudFront

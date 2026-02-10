@@ -178,7 +178,7 @@ this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
   domainNames: [DOMAIN_NAME, `www.${DOMAIN_NAME}`],
   certificate,
   httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
-  priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
+  priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
 });
 ```
 
@@ -187,7 +187,7 @@ Key decisions:
 - **`S3StaticWebsiteOrigin`** — connects CloudFront to S3's website hosting endpoint, which handles index document resolution natively
 - **No `defaultRootObject`** — S3 website hosting handles this; setting it on CloudFront would only apply to the root path anyway
 - **HTTP/2 and HTTP/3** — HTTP/3 uses QUIC (UDP-based), which eliminates head-of-line blocking and reduces connection setup latency
-- **Price Class 100** — edge locations in North America and Europe only, keeps costs low for a personal site
+- **Price Class All** — uses all CloudFront edge locations globally for the lowest latency everywhere, since the free tier covers most personal site traffic anyway
 - **REDIRECT_TO_HTTPS** — all HTTP requests are upgraded, no mixed content possible
 
 ### The OAC Trap — Why Your Subpages Break
