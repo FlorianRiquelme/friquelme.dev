@@ -26,3 +26,6 @@ pnpm-debug.log*
 # CDK
 infra/node_modules/
 infra/cdk.out/
+
+# docs
+docs/
