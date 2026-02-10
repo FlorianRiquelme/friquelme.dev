@@ -2,7 +2,7 @@
 
 ## Quick Context
 
-Astro 5 static site, single page (`src/pages/index.astro`), Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev
+Astro 5 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
 
 ## Commands
 
@@ -12,13 +12,17 @@ Astro 5 static site, single page (`src/pages/index.astro`), Tailwind CSS 4, depl
 
 ## Architecture
 
-Single-page portfolio with four scroll sections: hero (#about), skills (#skills), projects (#projects), contact (#contact).
+Multi-page static site with two main areas:
 
-All components are `.astro` files (no client-side framework). Client-side JS is minimal and inline in the page — a typing animation in the hero and an IntersectionObserver for scroll-triggered animations.
+- **Portfolio** (`src/pages/index.astro`) — four scroll sections: hero (#about), skills (#skills), projects (#projects), contact (#contact)
+- **Blog** (`src/pages/blog/`) — listing page (`index.astro`) and dynamic post pages (`[slug].astro`). Posts are MDX files in `src/blog/` using Astro content collections.
+
+All components are `.astro` files (no client-side framework). Client-side JS is minimal and inline — a typing animation in the hero and an IntersectionObserver for scroll-triggered animations.
 
 ### Component Organization
 
 - `src/components/content/` — domain components (ProjectCard, SkillBar, TerminalWindow, SectionHeader)
+- `src/components/blog/` — blog components (BlogPostCard, BlogFeaturedCard, ArticleHero, Callout, TableOfContents, AuthorCard, PostNavigation, RelatedPosts)
 - `src/components/ui/` — generic primitives (Badge, ButtonPrimary, ButtonSecondary, ButtonGhost, ButtonSmall, Tag, Divider, StatusIndicator)
 - `src/components/nav/` — navigation (HeaderBar, Footer, Logo, NavItem)
 - `src/components/forms/` — form inputs (InputGroup, SearchField, TextareaGroup)
@@ -64,4 +68,5 @@ CDK changes are deployed manually, not through CI. Don't modify infra unless exp
 - Astro components use TypeScript for props interfaces
 - Images go through Astro's `<Picture>` component for automatic optimization (AVIF/WebP)
 - Project images are SVGs in `src/assets/images/`
+- Blog posts are `.mdx` files in `src/blog/` with frontmatter (title, description, pubDate, author, heroImage, tags)
 - No testing framework — validate with `pnpm build`
