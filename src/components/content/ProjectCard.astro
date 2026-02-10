@@ -34,7 +34,7 @@ const formatStars = (n: number): string => {
       </div>
     )}
     <div class="flex items-center justify-between">
-      <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>
+      {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
       <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition">
         view_repo →
       </a>

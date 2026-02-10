@@ -20,37 +20,38 @@ import SkillBar from '../components/content/SkillBar.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
 ---
 
-<Layout title="alex_dev — portfolio">
+<Layout title="florian_dev — portfolio">
   <!-- Header -->
   <HeaderBar>
-    <Logo name="alex_dev" slot="logo" />
+    <Logo name="florian_dev" slot="logo" />
     <Fragment slot="nav">
       <NavItem label="about" href="#about" active />
       <NavItem label="projects" href="#projects" />
       <NavItem label="skills" href="#skills" />
       <NavItem label="contact" href="#contact" />
     </Fragment>
-    <StatusIndicator text="available for hire" slot="status" />
+    <StatusIndicator text="building things" slot="status" />
   </HeaderBar>
 
   <!-- Hero Section -->
   <section id="about" class="flex flex-col items-center gap-10 bg-bg-page px-16 pt-[120px] pb-[100px]">
     <div class="w-full max-w-[900px]">
-      <TerminalWindow title="~/alex_dev — bash">
+      <TerminalWindow title="~/florian_dev — bash">
         <div id="hero-terminal">
           <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ whoami</p>
-          <p data-type="out" class="text-sm text-text-primary hidden">alex rodriguez — full-stack developer</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">florian riquelme — senior software engineer</p>
           <div data-type="out" class="h-3 hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ cat intro.txt</p>
-          <p data-type="out" class="text-sm text-text-secondary hidden">i build things for the web. passionate about clean code,</p>
-          <p data-type="out" class="text-sm text-text-secondary hidden">open source, and developer experience. currently crafting</p>
-          <p data-type="out" class="text-sm text-text-secondary hidden">performant interfaces at startup.io</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">Product-focused engineer with 9+ years of building web platforms</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">I embrace ai-powered workflows to move fast without compromise.</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">Focus on what matters: products people actually enjoy using.</p>
+          <p data-type="out" class="text-sm text-text-secondary hidden">Currently crafting digital products at digital-masters.</p>
           <div data-type="out" class="h-3 hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ echo $current_stack</p>
-          <p data-type="out" class="text-sm text-text-primary hidden">typescript · react · node.js · postgresql · rust</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">php · react · typescript · go</p>
           <div data-type="out" class="h-3 hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary hidden">$ echo $experience</p>
-          <p data-type="out" class="text-sm text-text-primary hidden">5+ years · 40+ projects · 12k+ github stars</p>
+          <p data-type="out" class="text-sm text-text-primary hidden">9+ years of experience</p>
           <div data-type="out" class="h-4 hidden"></div>
           <div id="hero-cursor" class="flex items-center hidden">
             <span class="text-sm font-medium text-green-primary">$ </span>
@@ -66,11 +67,11 @@ import ProjectCard from '../components/content/ProjectCard.astro';
         building the future, one commit at a time.
       </h1>
       <p class="text-sm text-text-tertiary text-center">
-        // full-stack developer specializing in scalable systems and beautiful interfaces
+        // senior software engineer · product-focused · ai-driven development
       </p>
       <div class="flex items-center gap-4">
         <ButtonPrimary label="view_projects" icon="lucide:terminal" href="#projects" />
-        <ButtonSecondary label="github_profile" icon="lucide:github" href="#" />
+        <ButtonSecondary label="github_profile" icon="lucide:github" href="https://github.com/FlorianRiquelme" />
       </div>
     </div>
   </section>
@@ -88,22 +89,22 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       <div class="flex flex-col gap-4 stagger-1" data-animate>
         <span class="text-sm font-medium text-text-primary">frontend:</span>
         <SkillBar name="react / next.js" percentage={95} />
-        <SkillBar name="typescript" percentage={90} />
-        <SkillBar name="tailwind css" percentage={88} />
+        <SkillBar name="typescript" percentage={100} />
+        <SkillBar name="tailwind css" percentage={90} />
       </div>
       <!-- Backend -->
       <div class="flex flex-col gap-4 stagger-2" data-animate>
         <span class="text-sm font-medium text-text-primary">backend:</span>
-        <SkillBar name="node.js / express" percentage={92} />
-        <SkillBar name="postgresql / redis" percentage={85} />
-        <SkillBar name="rust / wasm" percentage={72} />
+        <SkillBar name="php" percentage={100} />
+        <SkillBar name="node.js" percentage={95} />
+        <SkillBar name="go" percentage={85} />
       </div>
       <!-- DevOps -->
       <div class="flex flex-col gap-4 stagger-3" data-animate>
         <span class="text-sm font-medium text-text-primary">devops:</span>
-        <SkillBar name="docker / k8s" percentage={80} />
-        <SkillBar name="aws / vercel" percentage={85} />
-        <SkillBar name="git / ci·cd" percentage={93} />
+        <SkillBar name="aws" percentage={100} />
+        <SkillBar name="docker" percentage={95} />
+        <SkillBar name="ci pipelines" percentage={100} />
       </div>
     </div>
   </section>
@@ -117,40 +118,27 @@ import ProjectCard from '../components/content/ProjectCard.astro';
         command="$ ls -la ~/projects"
         description="// selected works and open source contributions"
       />
-      <span class="text-xs text-text-muted">total: 6 projects</span>
+      <span class="text-xs text-text-muted">total: 2 projects</span>
     </div>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
       <div data-animate class="stagger-1">
         <ProjectCard
-          title="flux_engine"
-          description="// real-time data processing pipeline built with rust and webassembly for edge computing"
-          stars={2400}
-          link="#"
-          tags={['rust', 'wasm', 'edge']}
+          title="cashmunk"
+          description="// privacy-first envelope budgeting app for ios. your data stays on your device, pay once, own forever."
+          link="https://cashmunk.app/"
+          tags={['swift', 'ios', 'privacy']}
         >
           <div slot="image" class="h-full w-full bg-gradient-to-br from-green-primary/20 to-bg-surface"></div>
         </ProjectCard>
       </div>
       <div data-animate class="stagger-2">
         <ProjectCard
-          title="vex_cli"
-          description="// developer toolkit cli that scaffolds, lints, and deploys full-stack applications"
-          stars={5100}
-          link="#"
-          tags={['node', 'cli', 'oss']}
+          title="ddev-claude"
+          description="// ddev plugin for running claude code in sandboxed, firewalled containers"
+          link="https://github.com/FlorianRiquelme/ddev-claude"
+          tags={['ddev', 'docker', 'claude']}
         >
           <div slot="image" class="h-full w-full bg-gradient-to-br from-blue-info/20 to-bg-surface"></div>
-        </ProjectCard>
-      </div>
-      <div data-animate class="stagger-3">
-        <ProjectCard
-          title="signal_mesh"
-          description="// p2p encrypted messaging protocol with zero-knowledge proof authentication"
-          stars={4700}
-          link="#"
-          tags={['typescript', 'webrtc', 'crypto']}
-        >
-          <div slot="image" class="h-full w-full bg-gradient-to-br from-amber-warning/20 to-bg-surface"></div>
         </ProjectCard>
       </div>
     </div>
@@ -161,9 +149,9 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <!-- Contact Section -->
   <section id="contact" class="flex flex-col items-center gap-12 bg-bg-page px-16 py-20">
     <div class="flex flex-col items-center gap-2">
-      <h2 class="text-[28px] font-semibold text-green-primary">$ ping alex_dev</h2>
+      <h2 class="text-[28px] font-semibold text-green-primary">$ ping florian_dev</h2>
       <p class="text-[13px] text-text-tertiary text-center">
-        // open to collaboration, freelance, and full-time opportunities
+        // always open to interesting conversations and collaborations
       </p>
     </div>
 
@@ -172,11 +160,10 @@ import ProjectCard from '../components/content/ProjectCard.astro';
         <div id="contact-terminal">
           <p data-type="cmd" class="text-[13px] font-medium text-green-primary hidden">$ cat contact_info.json</p>
           <p data-type="out" class="text-[13px] text-text-muted whitespace-pre hidden">{"{"}</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "email":    "alex@rodriguez.dev",</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "github":   "github.com/alexrodriguez",</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "twitter":  "@alex_codes",</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "linkedin": "linkedin.com/in/alexrodriguez",</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "location": "san francisco, ca"</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "email":    "flo@friquelme.dev",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "github":   "github.com/FlorianRiquelme",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "linkedin": "linkedin.com/in/florian-riquelme",</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre hidden">  "location": "hamburg, germany"</p>
           <p data-type="out" class="text-[13px] text-text-muted whitespace-pre hidden">{"}"}</p>
           <div data-type="out" class="h-2 hidden"></div>
           <div id="contact-cursor" class="flex items-center hidden">
@@ -187,18 +174,16 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       </TerminalWindow>
     </div>
 
-    <ButtonPrimary label="send_message" icon="lucide:mail" href="mailto:alex@rodriguez.dev" />
+    <ButtonPrimary label="send_message" icon="lucide:mail" href="mailto:flo@friquelme.dev" />
   </section>
 
   <Divider />
 
   <!-- Footer -->
-  <Footer brandName="alex_dev" copyright="// designed & built by alex rodriguez © 2026">
+  <Footer brandName="florian_dev" copyright="// designed & built by florian riquelme © 2026">
     <Fragment slot="links">
-      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
-      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">twitter</a>
-      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
-      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">resume.pdf</a>
+      <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
+      <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
     </Fragment>
   </Footer>
 </Layout>
