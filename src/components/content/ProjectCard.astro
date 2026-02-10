@@ -18,9 +18,8 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
 ---
 
 <div class="flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
-  <!-- Image area -->
-  <div class="h-[180px] w-full overflow-hidden bg-bg-input">
-    {image ? (
+  {image && (
+    <div class="h-[180px] w-full overflow-hidden bg-bg-input">
       <Picture
         src={image}
         formats={['avif', 'webp']}
@@ -31,10 +30,8 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
         loading="lazy"
         decoding="async"
       />
-    ) : (
-      <div class="h-full w-full bg-bg-input" />
-    )}
-  </div>
+    </div>
+  )}
   <!-- Body -->
   <div class="flex flex-1 flex-col gap-3 p-5">
     <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>

@@ -24,9 +24,8 @@ const formattedDate = formatDate(pubDate);
   href={`/blog/${slug}`}
   class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
 >
-  <!-- Image -->
-  <div class="h-[200px] w-full overflow-hidden bg-bg-input">
-    {heroImage ? (
+  {heroImage && (
+    <div class="h-[200px] w-full overflow-hidden bg-bg-input">
       <Picture
         src={heroImage}
         formats={['avif', 'webp']}
@@ -37,10 +36,8 @@ const formattedDate = formatDate(pubDate);
         loading="lazy"
         decoding="async"
       />
-    ) : (
-      <div class="h-full w-full bg-bg-input" />
-    )}
-  </div>
+    </div>
+  )}
 
   <!-- Body -->
   <div class="flex flex-1 flex-col gap-3 p-5">

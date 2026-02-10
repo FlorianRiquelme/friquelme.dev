@@ -26,9 +26,8 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
   href={`/blog/${slug}`}
   class="group flex flex-col md:flex-row overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
 >
-  <!-- Image -->
-  <div class="h-[220px] md:h-auto md:w-[400px] shrink-0 overflow-hidden bg-bg-input">
-    {heroImage ? (
+  {heroImage && (
+    <div class="h-[220px] md:h-auto md:w-[400px] shrink-0 overflow-hidden bg-bg-input">
       <Picture
         src={heroImage}
         formats={['avif', 'webp']}
@@ -39,10 +38,8 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
         loading="eager"
         decoding="async"
       />
-    ) : (
-      <div class="h-full w-full bg-bg-input" />
-    )}
-  </div>
+    </div>
+  )}
 
   <!-- Body -->
   <div class="flex flex-1 flex-col justify-center gap-4 p-6 md:p-7">
