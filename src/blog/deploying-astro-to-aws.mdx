@@ -106,7 +106,7 @@ The `permissions.id-token: write` line is what enables **OpenID Connect** federa
 The trust relationship is locked down to:
 - This specific repository
 - The `production` GitHub environment only
-- Sessions expire after 1 hour
+- Sessions expire after 1 hour (the minimum AWS allows)
 
 This means even if someone forks the repo, they can't assume the deploy role.
 
