@@ -1,15 +1,19 @@
 ---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Tag from '../ui/Tag.astro';
 
 interface Props {
   title: string;
   description: string;
+  image: ImageMetadata;
+  imageAlt: string;
   stars?: number;
   link?: string;
   tags?: string[];
 }
 
-const { title, description, stars = 0, link = '#', tags = [] } = Astro.props;
+const { title, description, image, imageAlt, stars = 0, link = '#', tags = [] } = Astro.props;
 
 const formatStars = (n: number): string => {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
@@ -18,9 +22,18 @@ const formatStars = (n: number): string => {
 ---
 
 <div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
-  <!-- Image slot -->
-  <div class="h-[180px] w-full bg-bg-input">
-    <slot name="image" />
+  <!-- Image area -->
+  <div class="h-[180px] w-full overflow-hidden bg-bg-input">
+    <Picture
+      src={image}
+      formats={['avif', 'webp']}
+      widths={[400, 800]}
+      sizes="(max-width: 768px) 100vw, 50vw"
+      alt={imageAlt}
+      class="h-full w-full object-cover"
+      loading="lazy"
+      decoding="async"
+    />
   </div>
   <!-- Body -->
   <div class="flex flex-col gap-3 p-5">
