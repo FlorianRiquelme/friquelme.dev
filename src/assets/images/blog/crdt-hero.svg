@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" fill="none">
+  <rect width="800" height="360" fill="#171717"/>
+  <rect x="0.5" y="0.5" width="799" height="359" stroke="#1F1F1F"/>
+  <!-- Grid pattern -->
+  <g opacity="0.15">
+    <line x1="100" y1="0" x2="100" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="300" y1="0" x2="300" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="400" y1="0" x2="400" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="500" y1="0" x2="500" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="600" y1="0" x2="600" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="700" y1="0" x2="700" y2="360" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="0" y1="60" x2="800" y2="60" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="0" y1="120" x2="800" y2="120" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="0" y1="180" x2="800" y2="180" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="0" y1="240" x2="800" y2="240" stroke="#22C55E" stroke-width="0.5"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#22C55E" stroke-width="0.5"/>
+  </g>
+  <!-- Nodes -->
+  <circle cx="250" cy="140" r="24" stroke="#22C55E" stroke-width="2" fill="#22C55E" fill-opacity="0.1"/>
+  <circle cx="400" cy="100" r="24" stroke="#22C55E" stroke-width="2" fill="#22C55E" fill-opacity="0.1"/>
+  <circle cx="550" cy="140" r="24" stroke="#22C55E" stroke-width="2" fill="#22C55E" fill-opacity="0.1"/>
+  <circle cx="320" cy="250" r="24" stroke="#22C55E" stroke-width="2" fill="#22C55E" fill-opacity="0.1"/>
+  <circle cx="480" cy="250" r="24" stroke="#22C55E" stroke-width="2" fill="#22C55E" fill-opacity="0.1"/>
+  <!-- Connections -->
+  <line x1="274" y1="140" x2="376" y2="100" stroke="#22C55E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="424" y1="100" x2="526" y2="140" stroke="#22C55E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="250" y1="164" x2="320" y2="226" stroke="#22C55E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="550" y1="164" x2="480" y2="226" stroke="#22C55E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="344" y1="250" x2="456" y2="250" stroke="#22C55E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="400" y1="124" x2="400" y2="180" stroke="#22C55E" stroke-width="1.5" opacity="0.3" stroke-dasharray="4 4"/>
+  <!-- Label -->
+  <text x="400" y="330" text-anchor="middle" fill="#525252" font-family="monospace" font-size="12">crdt node graph // real-time sync</text>
+</svg>

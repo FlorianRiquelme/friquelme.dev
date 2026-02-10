@@ -1,0 +1,106 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// Nav
+import Logo from '../../components/nav/Logo.astro';
+import NavItem from '../../components/nav/NavItem.astro';
+import HeaderBar from '../../components/nav/HeaderBar.astro';
+import Footer from '../../components/nav/Footer.astro';
+
+// UI
+import StatusIndicator from '../../components/ui/StatusIndicator.astro';
+import Divider from '../../components/ui/Divider.astro';
+
+// Blog
+import ArticleHero from '../../components/blog/ArticleHero.astro';
+import TableOfContents from '../../components/blog/TableOfContents.astro';
+import AuthorCard from '../../components/blog/AuthorCard.astro';
+import RelatedPosts from '../../components/blog/RelatedPosts.astro';
+import PostNavigation from '../../components/blog/PostNavigation.astro';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog'))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prevPost: posts[i + 1] ? { id: posts[i + 1].id, title: posts[i + 1].data.title } : undefined,
+      nextPost: posts[i - 1] ? { id: posts[i - 1].id, title: posts[i - 1].data.title } : undefined,
+    },
+  }));
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+const allPosts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft && p.id !== post.id)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3)
+  .map((p) => ({
+    id: p.id,
+    title: p.data.title,
+    pubDate: p.data.pubDate,
+    tags: p.data.tags,
+  }));
+---
+
+<Layout title={`${post.data.title} — friquelme.dev`} description={post.data.description}>
+  <!-- Header -->
+  <HeaderBar>
+    <Logo name="friquelme.dev" slot="logo" />
+    <Fragment slot="nav">
+      <NavItem label="about" href="/#about" />
+      <NavItem label="projects" href="/#projects" />
+      <NavItem label="skills" href="/#skills" />
+      <NavItem label="contact" href="/#contact" />
+      <NavItem label="blog" href={`/blog/${post.id}`} active />
+    </Fragment>
+    <StatusIndicator text="building things" slot="status" />
+  </HeaderBar>
+
+  <!-- Article Hero -->
+  <ArticleHero
+    title={post.data.title}
+    pubDate={post.data.pubDate}
+    author={post.data.author}
+    tags={post.data.tags}
+    heroImage={post.data.heroImage}
+    heroImageAlt={post.data.heroImageAlt}
+    readingTime={remarkPluginFrontmatter.readingTime}
+  />
+
+  <Divider />
+
+  <!-- Article Body -->
+  <div class="flex flex-col items-center px-5 md:px-16 py-8 md:py-12">
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full max-w-[1148px]">
+      <!-- Main content -->
+      <article class="prose min-w-0 flex-1 max-w-[800px]">
+        <Content />
+        <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="flex flex-col gap-6 w-full lg:w-[300px] lg:shrink-0 lg:sticky lg:top-8 lg:self-start">
+        <TableOfContents headings={headings} />
+        <AuthorCard />
+        <RelatedPosts posts={allPosts} />
+      </aside>
+    </div>
+  </div>
+
+  <Divider />
+
+  <!-- Footer -->
+  <Footer brandName="friquelme.dev" copyright="// designed & built by florian riquelme © 2026">
+    <Fragment slot="links">
+      <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
+      <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
+    </Fragment>
+  </Footer>
+</Layout>

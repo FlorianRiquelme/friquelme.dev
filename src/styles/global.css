@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./prose.css";
 
 @theme {
   --color-amber-warning: #F59E0B;

@@ -1,0 +1,44 @@
+---
+import SurfaceCard from '../content/SurfaceCard.astro';
+
+interface Props {
+  name?: string;
+  role?: string;
+  bio?: string;
+  github?: string;
+  linkedin?: string;
+}
+
+const {
+  name = 'florian riquelme',
+  role = 'senior software engineer',
+  bio = 'product-focused engineer building web platforms. embraces ai-powered workflows to move fast without compromise.',
+  github = 'https://github.com/FlorianRiquelme',
+  linkedin = 'https://linkedin.com/in/florian-riquelme',
+} = Astro.props;
+
+const initials = name
+  .split(' ')
+  .map((n) => n[0])
+  .join('')
+  .toUpperCase();
+---
+
+<SurfaceCard title="// about the author">
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center size-10 rounded-full bg-green-primary/20 text-green-primary text-xs font-bold font-mono shrink-0">
+        {initials}
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-medium text-text-primary font-mono">{name}</span>
+        <span class="text-xs text-text-muted font-mono">{role}</span>
+      </div>
+    </div>
+    <p class="text-xs text-text-tertiary font-mono leading-[1.6]">{bio}</p>
+    <div class="flex items-center gap-4">
+      <a href={github} class="text-xs text-text-muted font-mono hover:text-text-secondary transition">github</a>
+      <a href={linkedin} class="text-xs text-text-muted font-mono hover:text-text-secondary transition">linkedin</a>
+    </div>
+  </div>
+</SurfaceCard>

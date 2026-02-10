@@ -3,9 +3,10 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = 'Portfolio' } = Astro.props;
+const { title = 'Portfolio', description } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,6 +23,7 @@ const { title = 'Portfolio' } = Astro.props;
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
     <title>{title}</title>
   </head>
   <body class="bg-bg-page text-text-primary font-mono antialiased">

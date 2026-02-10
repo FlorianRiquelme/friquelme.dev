@@ -1,0 +1,78 @@
+---
+import SurfaceCard from '../content/SurfaceCard.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const tocHeadings = headings.filter((h) => h.depth === 2);
+---
+
+{tocHeadings.length > 0 && (
+  <SurfaceCard title="// table of contents">
+    <nav>
+      <ul class="flex flex-col gap-2" id="toc-list">
+        {tocHeadings.map((heading, i) => (
+          <li>
+            <a
+              href={`#${heading.slug}`}
+              class:list={[
+                'block text-xs font-mono transition hover:text-green-primary',
+                'toc-link',
+                i === 0 ? 'text-green-primary' : 'text-text-tertiary',
+              ]}
+              data-heading={heading.slug}
+            >
+              <span class="toc-prefix">{i === 0 ? '> ' : '  '}</span>{heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </SurfaceCard>
+)}
+
+<script>
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link');
+  if (tocLinks.length > 0) {
+    const headingEls = Array.from(tocLinks).map((link) =>
+      document.getElementById(link.dataset.heading!)
+    ).filter(Boolean) as HTMLElement[];
+
+    function setActive(slug: string) {
+      tocLinks.forEach((link) => {
+        const prefix = link.querySelector('.toc-prefix');
+        if (link.dataset.heading === slug) {
+          link.classList.remove('text-text-tertiary');
+          link.classList.add('text-green-primary');
+          if (prefix) prefix.textContent = '> ';
+        } else {
+          link.classList.remove('text-green-primary');
+          link.classList.add('text-text-tertiary');
+          if (prefix) prefix.textContent = '  ';
+        }
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+    );
+
+    headingEls.forEach((el) => observer.observe(el));
+  }
+</script>

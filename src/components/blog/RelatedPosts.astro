@@ -1,0 +1,43 @@
+---
+import SurfaceCard from '../content/SurfaceCard.astro';
+
+interface RelatedPost {
+  id: string;
+  title: string;
+  pubDate: Date;
+  tags: string[];
+}
+
+interface Props {
+  posts: RelatedPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <SurfaceCard title="// related posts">
+    <div class="flex flex-col">
+      {posts.map((post, i) => (
+        <a
+          href={`/blog/${post.id}`}
+          class:list={[
+            'flex items-center justify-between gap-3 py-3 group transition',
+            i < posts.length - 1 && 'border-b border-border-primary',
+          ]}
+        >
+          <div class="flex flex-col gap-1 min-w-0">
+            <span class="text-xs text-text-primary font-mono group-hover:text-green-primary transition truncate">
+              {post.title}
+            </span>
+            <span class="text-xs text-text-tertiary font-mono">
+              {post.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {post.tags[0] && ` · ${post.tags[0]}`}
+            </span>
+          </div>
+          <span class="text-text-muted text-xs font-mono shrink-0 group-hover:text-green-primary transition">&rarr;</span>
+        </a>
+      ))}
+    </div>
+  </SurfaceCard>
+)}

@@ -1,0 +1,73 @@
+---
+import { Picture } from 'astro:assets';
+import Tag from '../ui/Tag.astro';
+
+interface Props {
+  title: string;
+  pubDate: Date;
+  author: string;
+  tags: string[];
+  heroImage?: ImageMetadata;
+  heroImageAlt?: string;
+  readingTime?: string;
+}
+
+const { title, pubDate, author, tags, heroImage, heroImageAlt = '', readingTime } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<section class="flex flex-col items-center px-5 md:px-16 pt-12 md:pt-[60px] pb-8 md:pb-12">
+  <div class="flex flex-col gap-6 w-full max-w-[800px]">
+    <!-- Back link -->
+    <a
+      href="/"
+      class="inline-flex items-center gap-2 text-xs text-text-muted font-mono hover:text-text-secondary transition w-fit"
+    >
+      <span class="text-green-primary">&lt;</span> cd ../blog
+    </a>
+
+    <!-- Title -->
+    <h1 class="text-2xl md:text-[32px] font-bold text-text-primary leading-[1.3]">
+      {title}
+    </h1>
+
+    <!-- Meta row -->
+    <div class="flex flex-wrap items-center gap-2 text-xs text-text-muted font-mono">
+      <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+      <span>|</span>
+      {readingTime && (
+        <>
+          <span>{readingTime}</span>
+          <span>|</span>
+        </>
+      )}
+      <span class="text-green-primary">{author}</span>
+    </div>
+
+    <!-- Tags -->
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <Tag label={tag} />
+        ))}
+      </div>
+    )}
+
+    <!-- Hero image -->
+    {heroImage && (
+      <div class="w-full max-w-[800px] mt-2">
+        <Picture
+          src={heroImage}
+          alt={heroImageAlt}
+          widths={[400, 800]}
+          class="w-full aspect-[20/9] object-cover rounded border border-border-primary"
+        />
+      </div>
+    )}
+  </div>
+</section>
