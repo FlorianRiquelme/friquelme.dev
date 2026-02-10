@@ -1,0 +1,300 @@
+---
+title: "deploying an astro site to aws — the full pipeline"
+description: "how this portfolio goes from git push to production — github actions, s3, cloudfront, oidc auth, and aws cdk. no stored credentials, no manual steps."
+pubDate: 2025-02-10
+author: "florian riquelme"
+heroImage: "../assets/images/blog/deploying-astro-aws-hero.svg"
+heroImageAlt: "Architecture diagram showing the deployment pipeline from GitHub to CloudFront"
+tags: ["aws", "astro", "devops", "github-actions"]
+---
+
+import Callout from '../components/blog/Callout.astro';
+
+## The Goal
+
+Every push to `main` should result in the site being live — no manual steps, no stored AWS credentials, and a cache strategy that keeps the site fast without serving stale content.
+
+This post walks through exactly how [friquelme.dev](https://friquelme.dev) is deployed: from the GitHub Actions workflow to the AWS infrastructure defined with CDK.
+
+## Architecture Overview
+
+The pipeline has four moving parts:
+
+1. **GitHub Actions** — builds the Astro site and syncs files to S3
+2. **OIDC federation** — short-lived AWS credentials with no stored secrets
+3. **S3** — private bucket serving as the origin for CloudFront
+4. **CloudFront** — CDN with HTTPS, HTTP/2+3, and security headers
+
+Everything is defined as code. The GitHub Actions workflow handles CI/CD, and AWS CDK manages the infrastructure.
+
+## The GitHub Actions Workflow
+
+The entire deployment lives in a single workflow file. Here's the full thing:
+
+```yaml
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run build
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Sync hashed assets with immutable cache headers
+      - name: Sync _astro/ assets
+        run: |
+          aws s3 sync dist/_astro/ s3://${{ secrets.S3_BUCKET_NAME }}/_astro/ \
+            --cache-control "public,max-age=31536000,immutable" \
+            --delete
+
+      # Sync root files with must-revalidate cache headers
+      - name: Sync root files
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --exclude "_astro/*" \
+            --cache-control "public,max-age=0,must-revalidate" \
+            --delete
+
+      # Invalidate only critical non-hashed paths
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/" "/index.html" "/favicon.ico" "/favicon.svg"
+```
+
+A few things worth noting.
+
+### OIDC Authentication
+
+The `permissions.id-token: write` line is what enables **OpenID Connect** federation. Instead of storing long-lived AWS access keys as GitHub secrets, the workflow exchanges a short-lived GitHub token for temporary AWS credentials via `aws-actions/configure-aws-credentials@v4`.
+
+The trust relationship is locked down to:
+- This specific repository
+- The `production` GitHub environment only
+- Sessions expire after 1 hour
+
+This means even if someone forks the repo, they can't assume the deploy role.
+
+### Two-Phase S3 Sync
+
+Astro generates hashed filenames for all processed assets (JS, CSS, images) under `_astro/`. These files are **content-addressable** — the filename changes when the content changes. This makes them safe to cache forever:
+
+```
+dist/_astro/Layout.DxF4k2.css
+dist/_astro/index.B7mK3p.js
+```
+
+The sync strategy exploits this:
+
+1. **`_astro/*`** → `max-age=31536000,immutable` — cached for 1 year, browsers never revalidate
+2. **Everything else** (HTML, favicons) → `max-age=0,must-revalidate` — always checks for fresh content
+
+This gives us the best of both worlds: instant loads for returning visitors on unchanged assets, and immediate updates for new content.
+
+### Selective CloudFront Invalidation
+
+Instead of invalidating `/*` (which costs money at scale and is slow), we only invalidate the paths that actually matter for freshness: the homepage and favicons. HTML pages already have `must-revalidate` cache headers, so CloudFront will check the origin on every request anyway.
+
+<Callout>
+**why not invalidate `/*`?** CloudFront charges $0.005 per path after the first 1,000 invalidations per month. For a static site with few critical paths, targeted invalidation is both faster and cheaper.
+</Callout>
+
+### Concurrency Control
+
+```yaml
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+```
+
+The `cancel-in-progress: false` setting is intentional. If two pushes happen in quick succession, we don't want the second deploy to cancel the first mid-sync — that could leave S3 in an inconsistent state. Instead, the second deploy queues and runs after the first completes.
+
+## AWS Infrastructure with CDK
+
+The infrastructure is defined in two CDK stacks. These are deployed manually (not through CI) since infrastructure changes are infrequent and warrant human review.
+
+### The Static Site Stack
+
+```typescript
+const DOMAIN_NAME = 'friquelme.dev';
+
+// S3 bucket — private, no public access
+this.bucket = new s3.Bucket(this, 'SiteBucket', {
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+});
+```
+
+The S3 bucket has **all public access blocked**. There's no bucket policy granting public read. Instead, CloudFront accesses S3 through **Origin Access Control (OAC)** — CloudFront's modern replacement for Origin Access Identity. This means the bucket contents are only accessible through the CDN, never directly.
+
+### CloudFront Configuration
+
+```typescript
+this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
+  defaultBehavior: {
+    origin: origins.S3BucketOrigin.withOriginAccessControl(this.bucket),
+    viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    responseHeadersPolicy,
+  },
+  domainNames: [DOMAIN_NAME, `www.${DOMAIN_NAME}`],
+  certificate,
+  defaultRootObject: 'index.html',
+  httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
+  priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
+});
+```
+
+Key decisions:
+
+- **HTTP/2 and HTTP/3** — HTTP/3 uses QUIC (UDP-based), which eliminates head-of-line blocking and reduces connection setup latency
+- **Price Class 100** — edge locations in North America and Europe only, keeps costs low for a personal site
+- **REDIRECT_TO_HTTPS** — all HTTP requests are upgraded, no mixed content possible
+
+### Security Headers
+
+Every response gets hardened headers injected at the CDN level:
+
+```typescript
+const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(
+  this, 'SecurityHeaders', {
+    securityHeadersBehavior: {
+      strictTransportSecurity: {
+        accessControlMaxAge: cdk.Duration.seconds(63072000), // 2 years
+        includeSubdomains: true,
+        preload: true,
+        override: true,
+      },
+      contentTypeOptions: { override: true },
+      frameOptions: {
+        frameOption: cloudfront.HeadersFrameOption.DENY,
+        override: true,
+      },
+      referrerPolicy: {
+        referrerPolicy:
+          cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+        override: true,
+      },
+    },
+  },
+);
+```
+
+This gives us:
+- **HSTS** with 2-year max-age, subdomains, and preload — the browser will never make an insecure connection
+- **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing attacks
+- **X-Frame-Options: DENY** — blocks clickjacking
+- **Referrer-Policy** — only sends origin on cross-origin requests
+
+### DNS and TLS
+
+```typescript
+const certificate = new acm.Certificate(this, 'SiteCertificate', {
+  domainName: DOMAIN_NAME,
+  subjectAlternativeNames: [`www.${DOMAIN_NAME}`],
+  validation: acm.CertificateValidation.fromDns(hostedZone),
+});
+
+new route53.ARecord(this, 'SiteAliasRecord', {
+  zone: hostedZone,
+  target: route53.RecordTarget.fromAlias(
+    new targets.CloudFrontTarget(this.distribution),
+  ),
+});
+```
+
+The ACM certificate covers both the apex domain and `www`. DNS validation via Route53 means certificate renewal is fully automatic — no manual intervention, no expiry surprises.
+
+### The OIDC Stack
+
+The second stack sets up the trust relationship between GitHub Actions and AWS:
+
+```typescript
+const oidcProvider = new iam.OpenIdConnectProvider(
+  this, 'GitHubOidcProvider', {
+    url: 'https://token.actions.githubusercontent.com',
+    clientIds: ['sts.amazonaws.com'],
+  },
+);
+
+const deployRole = new iam.Role(this, 'GitHubDeployRole', {
+  assumedBy: new iam.OpenIdConnectPrincipal(oidcProvider, {
+    StringEquals: {
+      'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+    },
+    StringLike: {
+      'token.actions.githubusercontent.com:sub':
+        `repo:${GITHUB_REPO}:environment:production`,
+    },
+  }),
+  maxSessionDuration: cdk.Duration.hours(1),
+});
+```
+
+The role's permissions follow **least privilege** — it can only:
+- Read, write, and delete objects in the site bucket
+- List the bucket contents
+- Create CloudFront invalidations
+
+Nothing else. No `s3:*`, no `cloudfront:*`. If the credentials were somehow compromised, the blast radius is limited to this specific bucket and distribution.
+
+## The Full Flow
+
+Putting it all together, a deploy looks like this:
+
+1. **`git push origin main`** — triggers the workflow
+2. **Build** — pnpm installs dependencies, Astro builds static files to `dist/`
+3. **OIDC exchange** — GitHub token → temporary AWS credentials (STS)
+4. **S3 sync phase 1** — hashed assets with immutable cache headers
+5. **S3 sync phase 2** — HTML and root files with must-revalidate headers
+6. **CloudFront invalidation** — clears cached versions of `/`, `/index.html`, favicons
+7. **Live** — the site is updated, typically under 2 minutes end-to-end
+
+The entire pipeline is reproducible, auditable, and runs without any stored secrets. The CDK stacks can be torn down and recreated at any time, and the GitHub Actions workflow is self-contained.
+
+## Cost
+
+For a personal portfolio with modest traffic, the monthly AWS bill is under **$1**:
+
+- **S3** — pennies for storage and requests
+- **CloudFront** — free tier covers 1TB/month of data transfer
+- **Route53** — $0.50/month for the hosted zone
+- **ACM** — free for public certificates
+
+The GitHub Actions minutes are free for public repos.
+
+---
+
+*If you're deploying a static site to AWS and want to avoid the common pitfalls — public S3 buckets, long-lived credentials, stale caches — this setup is a solid starting point. The full source code for both the site and infrastructure is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*
