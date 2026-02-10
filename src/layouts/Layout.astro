@@ -29,12 +29,16 @@ const { title = 'Portfolio' } = Astro.props;
     <script>
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+      function animateSkillBars(parent: HTMLElement) {
+        parent.querySelectorAll<HTMLElement>('[data-animate-skill]').forEach((el) => {
+          el.style.width = el.dataset.targetWidth + '%';
+        });
+      }
+
       if (reduced) {
         document.querySelectorAll<HTMLElement>('[data-animate]').forEach((el) => {
           el.classList.add('is-visible');
-        });
-        document.querySelectorAll<HTMLElement>('[data-animate-skill]').forEach((el) => {
-          el.style.width = el.dataset.targetWidth + '%';
+          animateSkillBars(el);
         });
       } else {
         const observer = new IntersectionObserver(
@@ -42,19 +46,15 @@ const { title = 'Portfolio' } = Astro.props;
             entries.forEach((entry) => {
               if (!entry.isIntersecting) return;
               const el = entry.target as HTMLElement;
-              if (el.hasAttribute('data-animate')) {
-                el.classList.add('is-visible');
-              }
-              if (el.hasAttribute('data-animate-skill')) {
-                el.style.width = el.dataset.targetWidth + '%';
-              }
+              el.classList.add('is-visible');
+              animateSkillBars(el);
               observer.unobserve(el);
             });
           },
           { threshold: 0.15, rootMargin: '-50px' }
         );
 
-        document.querySelectorAll('[data-animate], [data-animate-skill]').forEach((el) => {
+        document.querySelectorAll('[data-animate]').forEach((el) => {
           observer.observe(el);
         });
       }

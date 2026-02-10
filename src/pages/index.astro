@@ -34,7 +34,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   </HeaderBar>
 
   <!-- Hero Section -->
-  <section id="about" class="flex flex-col items-center gap-10 bg-bg-page px-16 pt-[120px] pb-[100px]">
+  <section id="about" class="flex flex-col items-center gap-8 bg-bg-page px-5 pt-20 pb-16 md:gap-10 md:px-16 md:pt-[120px] md:pb-[100px]">
     <div class="w-full max-w-[900px]">
       <TerminalWindow title="~/florian_dev — bash">
         <div id="hero-terminal">
@@ -63,13 +63,13 @@ import ProjectCard from '../components/content/ProjectCard.astro';
 
     <!-- Hero Bottom -->
     <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
-      <h1 class="text-4xl font-semibold text-text-primary text-center">
+      <h1 class="text-2xl font-semibold text-text-primary text-center md:text-4xl">
         building the future, one commit at a time.
       </h1>
       <p class="text-sm text-text-tertiary text-center">
         // senior software engineer · product-focused · ai-driven development
       </p>
-      <div class="flex items-center gap-4">
+      <div class="flex flex-col items-center gap-3 w-full sm:flex-row sm:gap-4 sm:w-auto">
         <ButtonPrimary label="view_projects" icon="lucide:terminal" href="#projects" />
         <ButtonSecondary label="github_profile" icon="lucide:github" href="https://github.com/FlorianRiquelme" />
       </div>
@@ -79,7 +79,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <Divider />
 
   <!-- Skills Section -->
-  <section id="skills" class="flex flex-col gap-12 bg-bg-page px-16 py-20">
+  <section id="skills" class="flex flex-col gap-8 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-20">
     <SectionHeader
       command="$ neofetch --skills"
       description="// system capabilities and proficiency levels"
@@ -88,8 +88,8 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       <!-- Frontend -->
       <div class="flex flex-col gap-4 stagger-1" data-animate>
         <span class="text-sm font-medium text-text-primary">frontend:</span>
-        <SkillBar name="react / next.js" percentage={95} />
         <SkillBar name="typescript" percentage={100} />
+        <SkillBar name="react / next.js" percentage={95} />
         <SkillBar name="tailwind css" percentage={90} />
       </div>
       <!-- Backend -->
@@ -103,8 +103,8 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       <div class="flex flex-col gap-4 stagger-3" data-animate>
         <span class="text-sm font-medium text-text-primary">devops:</span>
         <SkillBar name="aws" percentage={100} />
-        <SkillBar name="docker" percentage={95} />
         <SkillBar name="ci pipelines" percentage={100} />
+        <SkillBar name="docker" percentage={95} />
       </div>
     </div>
   </section>
@@ -112,8 +112,8 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <Divider />
 
   <!-- Projects Section -->
-  <section id="projects" class="flex flex-col gap-12 bg-bg-page px-16 py-20">
-    <div class="flex items-end justify-between">
+  <section id="projects" class="flex flex-col gap-8 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-20">
+    <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
       <SectionHeader
         command="$ ls -la ~/projects"
         description="// selected works and open source contributions"
@@ -147,9 +147,9 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <Divider />
 
   <!-- Contact Section -->
-  <section id="contact" class="flex flex-col items-center gap-12 bg-bg-page px-16 py-20">
+  <section id="contact" class="flex flex-col items-center gap-8 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-20">
     <div class="flex flex-col items-center gap-2">
-      <h2 class="text-[28px] font-semibold text-green-primary">$ ping florian_dev</h2>
+      <h2 class="text-xl font-semibold text-green-primary md:text-[28px]">$ ping florian_dev</h2>
       <p class="text-[13px] text-text-tertiary text-center">
         // always open to interesting conversations and collaborations
       </p>
