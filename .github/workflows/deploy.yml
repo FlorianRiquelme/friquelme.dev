@@ -1,0 +1,59 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run build
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Sync hashed assets with immutable cache headers
+      - name: Sync _astro/ assets
+        run: |
+          aws s3 sync dist/_astro/ s3://${{ secrets.S3_BUCKET_NAME }}/_astro/ \
+            --cache-control "public,max-age=31536000,immutable" \
+            --delete
+
+      # Sync root files with must-revalidate cache headers
+      - name: Sync root files
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --exclude "_astro/*" \
+            --cache-control "public,max-age=0,must-revalidate" \
+            --delete
+
+      # Invalidate only critical non-hashed paths
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/" "/index.html" "/favicon.ico" "/favicon.svg"
