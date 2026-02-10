@@ -1,0 +1,74 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Tag from '../ui/Tag.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  tags: string[];
+  heroImage?: ImageMetadata;
+  heroImageAlt?: string;
+  slug: string;
+  readingTime?: string;
+}
+
+const { title, description, pubDate, tags, heroImage, heroImageAlt = '', slug, readingTime } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<a
+  href={`/blog/${slug}`}
+  class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
+>
+  <!-- Image -->
+  <div class="h-[200px] w-full overflow-hidden bg-bg-input">
+    {heroImage ? (
+      <Picture
+        src={heroImage}
+        formats={['avif', 'webp']}
+        widths={[400, 800]}
+        sizes="(max-width: 768px) 100vw, 33vw"
+        alt={heroImageAlt}
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="h-full w-full bg-bg-input" />
+    )}
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 flex-col gap-3 p-5">
+    <!-- Meta -->
+    <div class="flex items-center gap-4">
+      <time datetime={pubDate.toISOString()} class="text-[11px] text-text-muted font-mono">{formattedDate}</time>
+      {readingTime && <span class="text-[11px] text-text-muted font-mono">{readingTime}</span>}
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-base font-semibold leading-[1.4] text-text-primary font-mono">{title}</h3>
+
+    <!-- Excerpt -->
+    <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+
+    <!-- Footer: tags + arrow -->
+    <div class="mt-auto flex items-center justify-between pt-1">
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {tags.slice(0, 2).map((tag) => (
+            <Tag label={tag} />
+          ))}
+        </div>
+      )}
+      <span class="text-[11px] font-medium text-green-primary font-mono">read →</span>
+    </div>
+  </div>
+</a>

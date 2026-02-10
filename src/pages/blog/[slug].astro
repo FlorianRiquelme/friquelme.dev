@@ -58,7 +58,7 @@ const allPosts = (await getCollection('blog'))
       <NavItem label="projects" href="/#projects" />
       <NavItem label="skills" href="/#skills" />
       <NavItem label="contact" href="/#contact" />
-      <NavItem label="blog" href={`/blog/${post.id}`} active />
+      <NavItem label="blog" href="/blog" active />
     </Fragment>
     <StatusIndicator text="building things" slot="status" />
   </HeaderBar>

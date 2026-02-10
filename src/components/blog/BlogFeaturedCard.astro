@@ -1,0 +1,66 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  heroImage?: ImageMetadata;
+  heroImageAlt?: string;
+  slug: string;
+  readingTime?: string;
+}
+
+const { title, description, pubDate, heroImage, heroImageAlt = '', slug, readingTime } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<a
+  href={`/blog/${slug}`}
+  class="group flex flex-col md:flex-row overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
+>
+  <!-- Image -->
+  <div class="h-[220px] md:h-auto md:w-[400px] shrink-0 overflow-hidden bg-bg-input">
+    {heroImage ? (
+      <Picture
+        src={heroImage}
+        formats={['avif', 'webp']}
+        widths={[400, 800]}
+        sizes="(max-width: 768px) 100vw, 400px"
+        alt={heroImageAlt}
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="eager"
+        decoding="async"
+      />
+    ) : (
+      <div class="h-full w-full bg-bg-input" />
+    )}
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 flex-col justify-center gap-4 p-6 md:p-7">
+    <Badge variant="info" label="latest" />
+
+    <h2 class="text-xl md:text-[22px] font-semibold leading-[1.4] text-text-primary font-mono">
+      {title}
+    </h2>
+
+    <p class="text-xs leading-relaxed text-text-tertiary font-mono">
+      {description}
+    </p>
+
+    <!-- Footer -->
+    <div class="flex items-center gap-4">
+      <time datetime={pubDate.toISOString()} class="text-[11px] text-text-muted font-mono">{formattedDate}</time>
+      {readingTime && <span class="text-[11px] text-text-muted font-mono">{readingTime}</span>}
+      <span class="text-[11px] font-medium text-green-primary font-mono">read_more →</span>
+    </div>
+  </div>
+</a>
