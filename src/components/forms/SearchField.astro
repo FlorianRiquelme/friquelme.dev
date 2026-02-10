@@ -1,0 +1,18 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  placeholder?: string;
+}
+
+const { placeholder = 'search' } = Astro.props;
+---
+
+<div class="inline-flex items-center gap-2 rounded bg-bg-input px-3 py-2">
+  <Icon name="lucide:search" class="size-3.5 text-text-muted" />
+  <input
+    type="text"
+    placeholder={placeholder}
+    class="w-full bg-transparent text-xs text-text-primary placeholder:text-text-muted font-mono outline-none"
+  />
+</div>

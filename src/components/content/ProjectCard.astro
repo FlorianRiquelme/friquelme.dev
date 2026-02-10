@@ -1,0 +1,38 @@
+---
+import Tag from '../ui/Tag.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  stars?: number;
+  link?: string;
+  tags?: string[];
+}
+
+const { title, description, stars = 0, link = '#', tags = [] } = Astro.props;
+---
+
+<div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary">
+  <!-- Image slot -->
+  <div class="h-[180px] w-full bg-bg-input">
+    <slot name="image" />
+  </div>
+  <!-- Body -->
+  <div class="flex flex-col gap-3 p-5">
+    <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
+    <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <Tag label={tag} />
+        ))}
+      </div>
+    )}
+    <div class="flex items-center justify-between">
+      <span class="text-[11px] text-green-primary font-mono">★ {stars}</span>
+      <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition">
+        view_repo →
+      </a>
+    </div>
+  </div>
+</div>

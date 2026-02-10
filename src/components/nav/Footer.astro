@@ -1,0 +1,25 @@
+---
+import Logo from './Logo.astro';
+import Divider from '../ui/Divider.astro';
+
+interface Props {
+  brandName?: string;
+  copyright?: string;
+}
+
+const { brandName = 'developer', copyright = `// built by ${brandName} © ${new Date().getFullYear()}` } = Astro.props;
+---
+
+<footer class="flex flex-col gap-8 px-8 py-10">
+  <div class="flex items-center justify-between">
+    <Logo name={brandName} />
+    <div class="flex items-center gap-6">
+      <slot name="links" />
+    </div>
+  </div>
+  <Divider />
+  <div class="flex items-center justify-between">
+    <span class="text-[11px] text-text-muted font-mono">{copyright}</span>
+    <span class="text-[11px] text-text-muted font-mono">exit 0</span>
+  </div>
+</footer>

@@ -1,0 +1,17 @@
+---
+interface Props {
+  title: string;
+  meta: string;
+  status?: string;
+}
+
+const { title, meta, status = 'active' } = Astro.props;
+---
+
+<div class="flex items-center justify-between border-b border-border-secondary px-0 py-3">
+  <div class="flex flex-col gap-1">
+    <span class="text-xs font-medium text-text-primary font-mono">{title}</span>
+    <span class="text-xs text-text-tertiary font-mono">{meta}</span>
+  </div>
+  <span class="text-xs font-medium text-green-primary font-mono">{status}</span>
+</div>

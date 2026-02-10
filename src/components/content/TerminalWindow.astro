@@ -1,0 +1,29 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = '~/directory — bash' } = Astro.props;
+---
+
+<div class="w-full overflow-hidden rounded bg-bg-surface border border-border-primary">
+  <!-- Title bar -->
+  <div class="flex items-center gap-2 border-b border-border-primary bg-bg-input px-4 py-3">
+    <span class="size-3 rounded-full bg-red-error"></span>
+    <span class="size-3 rounded-full bg-amber-warning"></span>
+    <span class="size-3 rounded-full bg-green-primary"></span>
+    <span class="ml-2 text-xs text-text-muted font-mono">{title}</span>
+  </div>
+  <!-- Content -->
+  <div class="flex flex-col gap-1.5 p-6">
+    <slot>
+      <p class="text-[13px] font-medium text-green-primary font-mono">$ echo 'hello world'</p>
+      <p class="text-[13px] text-text-primary font-mono">hello world</p>
+      <div class="h-2"></div>
+      <div class="flex items-center">
+        <span class="text-[13px] font-medium text-green-primary font-mono">$ </span>
+        <span class="h-4 w-[9px] bg-green-primary"></span>
+      </div>
+    </slot>
+  </div>
+</div>

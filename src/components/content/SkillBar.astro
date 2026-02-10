@@ -1,0 +1,21 @@
+---
+interface Props {
+  name: string;
+  percentage: number;
+}
+
+const { name, percentage } = Astro.props;
+---
+
+<div class="flex w-full flex-col gap-1.5">
+  <div class="flex w-full items-center justify-between">
+    <span class="text-xs text-text-secondary font-mono">{name}</span>
+    <span class="text-xs font-medium text-green-primary font-mono">{percentage}%</span>
+  </div>
+  <div class="h-1 w-full rounded-sm bg-border-primary">
+    <div
+      class="h-1 rounded-sm bg-green-primary"
+      style={`width: ${percentage}%`}
+    ></div>
+  </div>
+</div>

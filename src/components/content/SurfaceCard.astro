@@ -1,0 +1,16 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="flex flex-col gap-4 rounded bg-bg-surface border border-border-primary p-6">
+  <h3 class="text-sm font-medium text-text-primary font-mono">{title}</h3>
+  <div class="flex flex-col gap-3">
+    <slot>
+      <span class="text-xs text-text-tertiary font-mono">// content goes here</span>
+    </slot>
+  </div>
+</div>

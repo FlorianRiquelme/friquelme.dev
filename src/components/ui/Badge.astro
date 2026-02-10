@@ -1,0 +1,19 @@
+---
+interface Props {
+  variant: 'success' | 'warning' | 'error' | 'info';
+  label: string;
+}
+
+const { variant, label } = Astro.props;
+
+const variantStyles = {
+  success: 'text-green-primary bg-green-primary/[0.08]',
+  warning: 'text-amber-warning bg-amber-warning/[0.08]',
+  error: 'text-red-error bg-red-error/[0.08]',
+  info: 'text-blue-info bg-blue-info/[0.08]',
+} as const;
+---
+
+<span class:list={['inline-flex items-center rounded-sm px-2.5 py-1 text-[11px] font-medium font-mono', variantStyles[variant]]}>
+  {label}
+</span>

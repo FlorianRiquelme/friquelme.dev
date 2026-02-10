@@ -1,0 +1,185 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// UI
+import ButtonPrimary from '../components/ui/ButtonPrimary.astro';
+import ButtonSecondary from '../components/ui/ButtonSecondary.astro';
+import ButtonGhost from '../components/ui/ButtonGhost.astro';
+import ButtonSmall from '../components/ui/ButtonSmall.astro';
+import Tag from '../components/ui/Tag.astro';
+import Badge from '../components/ui/Badge.astro';
+import StatusIndicator from '../components/ui/StatusIndicator.astro';
+import Divider from '../components/ui/Divider.astro';
+
+// Nav
+import Logo from '../components/nav/Logo.astro';
+import NavItem from '../components/nav/NavItem.astro';
+import HeaderBar from '../components/nav/HeaderBar.astro';
+import Footer from '../components/nav/Footer.astro';
+
+// Content
+import SectionHeader from '../components/content/SectionHeader.astro';
+import TerminalWindow from '../components/content/TerminalWindow.astro';
+import SkillBar from '../components/content/SkillBar.astro';
+import MetricCard from '../components/content/MetricCard.astro';
+import SurfaceCard from '../components/content/SurfaceCard.astro';
+import ProjectCard from '../components/content/ProjectCard.astro';
+import ListItem from '../components/content/ListItem.astro';
+import TableRow from '../components/content/TableRow.astro';
+
+// Forms
+import InputGroup from '../components/forms/InputGroup.astro';
+import TextareaGroup from '../components/forms/TextareaGroup.astro';
+import SearchField from '../components/forms/SearchField.astro';
+---
+
+<Layout title="Component Showcase">
+  <!-- Header -->
+  <HeaderBar>
+    <Logo name="portfolio" slot="logo" />
+    <Fragment slot="nav">
+      <NavItem label="home" href="/" active />
+      <NavItem label="about" href="/about" />
+      <NavItem label="projects" href="/projects" />
+      <NavItem label="contact" href="/contact" />
+    </Fragment>
+    <StatusIndicator text="online" slot="status" />
+  </HeaderBar>
+
+  <main class="mx-auto max-w-5xl space-y-16 px-8 py-16">
+    <!-- Buttons -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --buttons" description="// interactive action elements" />
+      <div class="flex flex-wrap items-center gap-4">
+        <ButtonPrimary label="primary" />
+        <ButtonSecondary label="secondary" />
+        <ButtonGhost label="ghost" />
+        <ButtonSmall label="small" />
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- Badges & Tags -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --badges" description="// status labels and category tags" />
+      <div class="flex flex-wrap items-center gap-4">
+        <Badge variant="success" label="done" />
+        <Badge variant="warning" label="pending" />
+        <Badge variant="error" label="failed" />
+        <Badge variant="info" label="new" />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <Tag label="typescript" />
+        <Tag label="astro" />
+        <Tag label="tailwind" />
+        <Tag label="react" />
+        <Tag label="node.js" />
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- Navigation -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --navigation" description="// nav items, logo and status" />
+      <div class="flex items-center gap-4">
+        <Logo name="developer" />
+        <StatusIndicator text="available for hire" />
+      </div>
+      <div class="flex items-center gap-2">
+        <NavItem label="home" href="#" active />
+        <NavItem label="about" href="#" />
+        <NavItem label="projects" href="#" />
+        <NavItem label="contact" href="#" />
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- Terminal Window -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --terminal" description="// terminal emulator window" />
+      <TerminalWindow title="~/projects — bash" />
+    </section>
+
+    <Divider />
+
+    <!-- Content Cards -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --cards" description="// surface, metric and project cards" />
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <MetricCard label="commits" value="1,247" change="+12.5%" trend="up" />
+        <MetricCard label="projects" value="23" change="+3.2%" trend="up" />
+        <MetricCard label="open issues" value="5" change="-8.1%" trend="down" />
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <SurfaceCard title="recent_activity">
+          <ListItem title="feat: add dark mode" meta="2 hours ago" status="merged" />
+          <ListItem title="fix: resolve login bug" meta="5 hours ago" status="closed" />
+          <ListItem title="docs: update README" meta="1 day ago" status="open" />
+        </SurfaceCard>
+
+        <SurfaceCard title="tech_stack">
+          <SkillBar name="TypeScript" percentage={92} />
+          <SkillBar name="Rust" percentage={78} />
+          <SkillBar name="Go" percentage={65} />
+          <SkillBar name="Python" percentage={85} />
+        </SurfaceCard>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <ProjectCard
+          title="terminal-ui"
+          description="// a modern terminal emulator built with Rust and WebGPU for blazing fast rendering"
+          stars={342}
+          link="#"
+          tags={['rust', 'webgpu', 'terminal']}
+        />
+        <ProjectCard
+          title="dotfiles"
+          description="// personal dev environment config — neovim, tmux, zsh with custom theme"
+          stars={128}
+          link="#"
+          tags={['shell', 'neovim', 'config']}
+        />
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- Data Display -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --data" description="// tables and list items" />
+      <SurfaceCard title="deployment_log">
+        <TableRow cells={['v2.4.1', 'production', '2 min ago']} status="deployed" />
+        <TableRow cells={['v2.4.0', 'staging', '1 hour ago']} status="active" />
+        <TableRow cells={['v2.3.9', 'production', '3 days ago']} status="rolled back" />
+      </SurfaceCard>
+    </section>
+
+    <Divider />
+
+    <!-- Forms -->
+    <section class="space-y-6">
+      <SectionHeader command="$ ui --forms" description="// input fields and search" />
+      <div class="max-w-sm space-y-4">
+        <SearchField placeholder="search components..." />
+        <InputGroup label="username" placeholder="enter your handle" icon="lucide:user" />
+        <InputGroup label="email" placeholder="you@example.com" icon="lucide:mail" />
+        <TextareaGroup label="message" placeholder="// type your message here..." />
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <Footer brandName="developer">
+    <Fragment slot="links">
+      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">github</a>
+      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">twitter</a>
+      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">linkedin</a>
+    </Fragment>
+  </Footer>
+</Layout>

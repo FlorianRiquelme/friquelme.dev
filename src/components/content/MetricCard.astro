@@ -1,0 +1,21 @@
+---
+interface Props {
+  label: string;
+  value: string;
+  change: string;
+  trend?: 'up' | 'down';
+}
+
+const { label, value, change, trend = 'up' } = Astro.props;
+const arrow = trend === 'up' ? '↑' : '↓';
+const trendColor = trend === 'up' ? 'text-green-primary' : 'text-red-error';
+---
+
+<div class="flex flex-col gap-3 rounded bg-bg-surface border border-border-primary p-5">
+  <span class="text-xs text-text-tertiary font-mono">{label}</span>
+  <span class="text-[28px] font-semibold text-text-primary font-mono">{value}</span>
+  <div class="flex items-center gap-1.5">
+    <span class:list={['text-xs font-medium font-mono', trendColor]}>{arrow}</span>
+    <span class:list={['text-xs font-medium font-mono', trendColor]}>{change}</span>
+  </div>
+</div>
