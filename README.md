@@ -1,46 +1,56 @@
-# Astro Starter Kit: Basics
+# friquelme.dev
+
+Personal portfolio site for Florian Riquelme — senior software engineer based in Hamburg, Germany.
+
+**Live:** [friquelme.dev](https://friquelme.dev)
+
+## Tech Stack
+
+- **Framework:** [Astro 5](https://astro.build) (static output)
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com) via Vite plugin
+- **Icons:** [astro-icon](https://github.com/natemoo-re/astro-icon) with Lucide
+- **Font:** JetBrains Mono
+- **Infrastructure:** AWS CDK (S3 + CloudFront + Route53 + ACM)
+- **CI/CD:** GitHub Actions with OIDC authentication
+- **Package Manager:** pnpm
+
+## Development
 
 ```sh
-npm create astro@latest -- --template basics
+pnpm install
+pnpm dev          # http://localhost:4321
+pnpm build        # Static output to ./dist/
+pnpm preview      # Preview production build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Project Structure
 
-## 🚀 Project Structure
+```
+src/
+├── assets/images/       # Project card images
+├── components/
+│   ├── content/         # ProjectCard, SkillBar, TerminalWindow, etc.
+│   ├── forms/           # InputGroup, SearchField, TextareaGroup
+│   ├── nav/             # HeaderBar, Footer, Logo, NavItem
+│   └── ui/              # Badge, Button variants, Tag, Divider
+├── layouts/Layout.astro # Base HTML layout with meta, fonts, analytics
+├── pages/index.astro    # Single-page site (hero, skills, projects, contact)
+└── styles/global.css    # Tailwind theme, animations, base styles
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+infra/                   # AWS CDK stacks
+├── lib/
+│   ├── static-site-stack.ts   # S3 + CloudFront + DNS + TLS
+│   └── github-oidc-stack.ts   # GitHub Actions deploy role
+└── bin/infra.ts
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Deployment
 
-## 🧞 Commands
+Pushes to `main` trigger the GitHub Actions workflow which:
 
-All commands are run from the root of the project, from a terminal:
+1. Builds the static site with Astro
+2. Authenticates to AWS via OIDC (no stored credentials)
+3. Syncs to S3 with appropriate cache headers
+4. Invalidates CloudFront cache
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Infrastructure is managed separately via CDK in the `infra/` directory.
