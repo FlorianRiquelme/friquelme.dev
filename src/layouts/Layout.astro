@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import '@fontsource-variable/jetbrains-mono';
+import PostHog from '../components/posthog.astro';
 
 interface Props {
   title?: string;
@@ -42,6 +43,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="friquelme.dev blog" href="/rss.xml" />
+
+    <!-- Analytics -->
+    <PostHog />
   </head>
   <body class="bg-bg-page text-text-primary font-mono antialiased">
     <main>

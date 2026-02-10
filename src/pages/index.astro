@@ -18,7 +18,6 @@ import SectionHeader from '../components/content/SectionHeader.astro';
 import TerminalWindow from '../components/content/TerminalWindow.astro';
 import SkillBar from '../components/content/SkillBar.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
-
 ---
 
 <Layout title="Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS" description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS.">
@@ -188,96 +187,96 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       <a href="https://github.com/FlorianRiquelme/friquelme.dev" class="text-xs text-text-tertiary hover:text-green-primary transition">view source</a>
     </Fragment>
   </Footer>
-</Layout>
 
-<script>
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  <script>
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function sleep(ms: number) {
-    return new Promise((r) => setTimeout(r, ms));
-  }
-
-  async function typeText(el: HTMLElement) {
-    const text = el.textContent || '';
-    el.textContent = '';
-    el.classList.remove('hidden');
-    for (const char of text) {
-      el.textContent += char;
-      await sleep(40);
+    function sleep(ms: number) {
+      return new Promise((r) => setTimeout(r, ms));
     }
-  }
 
-  async function runTerminalSequence(containerId: string, cursorId: string) {
-    const lines = document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`);
-    const cursor = document.getElementById(cursorId);
-
-    for (const line of lines) {
-      if (line.dataset.type === 'cmd') {
-        await typeText(line);
-        await sleep(200);
-      } else {
-        line.classList.remove('hidden');
-        await sleep(50);
+    async function typeText(el: HTMLElement) {
+      const text = el.textContent || '';
+      el.textContent = '';
+      el.classList.remove('hidden');
+      for (const char of text) {
+        el.textContent += char;
+        await sleep(40);
       }
     }
-    cursor?.classList.remove('hidden');
-  }
 
-  function showTerminalAll(containerId: string, cursorId: string) {
-    document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`)
-      .forEach((el) => el.classList.remove('hidden'));
-    document.getElementById(cursorId)?.classList.remove('hidden');
-  }
+    async function runTerminalSequence(containerId: string, cursorId: string) {
+      const lines = document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`);
+      const cursor = document.getElementById(cursorId);
 
-  // Hero terminal — runs immediately on load
-  const heroBottom = document.getElementById('hero-bottom');
+      for (const line of lines) {
+        if (line.dataset.type === 'cmd') {
+          await typeText(line);
+          await sleep(200);
+        } else {
+          line.classList.remove('hidden');
+          await sleep(50);
+        }
+      }
+      cursor?.classList.remove('hidden');
+    }
 
-  if (reduced) {
-    showTerminalAll('hero-terminal', 'hero-cursor');
-    showTerminalAll('contact-terminal', 'contact-cursor');
-    if (heroBottom) heroBottom.style.opacity = '1';
-  } else {
-    runTerminalSequence('hero-terminal', 'hero-cursor').then(async () => {
-      await sleep(300);
+    function showTerminalAll(containerId: string, cursorId: string) {
+      document.querySelectorAll<HTMLElement>(`#${containerId} [data-type]`)
+        .forEach((el) => el.classList.remove('hidden'));
+      document.getElementById(cursorId)?.classList.remove('hidden');
+    }
+
+    // Hero terminal — runs immediately on load
+    const heroBottom = document.getElementById('hero-bottom');
+
+    if (reduced) {
+      showTerminalAll('hero-terminal', 'hero-cursor');
+      showTerminalAll('contact-terminal', 'contact-cursor');
       if (heroBottom) heroBottom.style.opacity = '1';
-    });
+    } else {
+      runTerminalSequence('hero-terminal', 'hero-cursor').then(async () => {
+        await sleep(300);
+        if (heroBottom) heroBottom.style.opacity = '1';
+      });
 
-    // Contact terminal — triggered on scroll
-    const contactWrapper = document.getElementById('contact-terminal-wrapper');
-    if (contactWrapper) {
-      const contactObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            contactObserver.unobserve(entry.target);
-            runTerminalSequence('contact-terminal', 'contact-cursor');
-          });
-        },
-        { threshold: 0.3 }
-      );
-      contactObserver.observe(contactWrapper);
+      // Contact terminal — triggered on scroll
+      const contactWrapper = document.getElementById('contact-terminal-wrapper');
+      if (contactWrapper) {
+        const contactObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              contactObserver.unobserve(entry.target);
+              runTerminalSequence('contact-terminal', 'contact-cursor');
+            });
+          },
+          { threshold: 0.3 }
+        );
+        contactObserver.observe(contactWrapper);
+      }
     }
-  }
-</script>
+  </script>
 
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "name": "friquelme.dev",
-      "url": "https://friquelme.dev"
-    },
-    {
-      "@type": "Person",
-      "name": "Florian Riquelme",
-      "url": "https://friquelme.dev",
-      "jobTitle": "Senior Software Engineer",
-      "sameAs": [
-        "https://github.com/FlorianRiquelme",
-        "https://linkedin.com/in/florian-riquelme"
-      ],
-      "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS"]
-    }
-  ]
-})} />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "friquelme.dev",
+        "url": "https://friquelme.dev"
+      },
+      {
+        "@type": "Person",
+        "name": "Florian Riquelme",
+        "url": "https://friquelme.dev",
+        "jobTitle": "Senior Software Engineer",
+        "sameAs": [
+          "https://github.com/FlorianRiquelme",
+          "https://linkedin.com/in/florian-riquelme"
+        ],
+        "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS"]
+      }
+    ]
+  })} />
+</Layout>

@@ -37,81 +37,81 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 ---
 
 <Layout title="Blog — Florian Riquelme | Code, Systems & DevOps" description="thoughts on code, systems, and building things that work">
-  <!-- Header -->
-  <HeaderBar>
-    <Logo name="friquelme.dev" slot="logo" />
-    <Fragment slot="nav">
-      <NavItem label="about" href="/#about" />
-      <NavItem label="projects" href="/#projects" />
-      <NavItem label="skills" href="/#skills" />
-      <NavItem label="blog" href="/blog" active />
-      <NavItem label="contact" href="/#contact" />
-    </Fragment>
-    <StatusIndicator text="building things" slot="status" />
-  </HeaderBar>
+    <!-- Header -->
+    <HeaderBar>
+      <Logo name="friquelme.dev" slot="logo" />
+      <Fragment slot="nav">
+        <NavItem label="about" href="/#about" />
+        <NavItem label="projects" href="/#projects" />
+        <NavItem label="skills" href="/#skills" />
+        <NavItem label="blog" href="/blog" active />
+        <NavItem label="contact" href="/#contact" />
+      </Fragment>
+      <StatusIndicator text="building things" slot="status" />
+    </HeaderBar>
 
-  <!-- Hero Section -->
-  <section class="flex flex-col gap-10 bg-bg-page px-5 pt-16 pb-12 md:gap-12 md:px-16 md:pt-20 md:pb-[60px]">
-    <SectionHeader
-      command="$ cat ~/blog"
-      description="// thoughts on code, systems, and building things that work"
-    />
-
-    {featuredPost && (
-      <BlogFeaturedCard
-        title={featuredPost.data.title}
-        description={featuredPost.data.description}
-        pubDate={featuredPost.data.pubDate}
-        heroImage={featuredPost.data.heroImage}
-        heroImageAlt={featuredPost.data.heroImageAlt}
-        slug={featuredPost.id}
-        readingTime={featuredPost.readingTime}
+    <!-- Hero Section -->
+    <section class="flex flex-col gap-10 bg-bg-page px-5 pt-16 pb-12 md:gap-12 md:px-16 md:pt-20 md:pb-[60px]">
+      <SectionHeader
+        command="$ cat ~/blog"
+        description="// thoughts on code, systems, and building things that work"
       />
-    )}
-  </section>
 
-  <Divider />
+      {featuredPost && (
+        <BlogFeaturedCard
+          title={featuredPost.data.title}
+          description={featuredPost.data.description}
+          pubDate={featuredPost.data.pubDate}
+          heroImage={featuredPost.data.heroImage}
+          heroImageAlt={featuredPost.data.heroImageAlt}
+          slug={featuredPost.id}
+          readingTime={featuredPost.readingTime}
+        />
+      )}
+    </section>
 
-  <!-- Posts Section -->
-  {remainingPosts.length > 0 && (
-    <section class="flex flex-col gap-10 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-[60px]">
-      <!-- Header row -->
-      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <h2 class="text-lg font-semibold text-green-primary font-mono md:text-xl">$ ls ./posts --recent</h2>
-        <div class="flex flex-wrap items-center gap-3">
-          {allTags.map((tag) => (
-            <Tag label={tag} />
+    <Divider />
+
+    <!-- Posts Section -->
+    {remainingPosts.length > 0 && (
+      <section class="flex flex-col gap-10 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-[60px]">
+        <!-- Header row -->
+        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <h2 class="text-lg font-semibold text-green-primary font-mono md:text-xl">$ ls ./posts --recent</h2>
+          <div class="flex flex-wrap items-center gap-3">
+            {allTags.map((tag) => (
+              <Tag label={tag} />
+            ))}
+          </div>
+        </div>
+
+        <!-- Posts grid -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {remainingPosts.map((post) => (
+            <div data-animate>
+              <BlogPostCard
+                title={post.data.title}
+                description={post.data.description}
+                pubDate={post.data.pubDate}
+                tags={post.data.tags}
+                heroImage={post.data.heroImage}
+                heroImageAlt={post.data.heroImageAlt}
+                slug={post.id}
+                readingTime={post.readingTime}
+              />
+            </div>
           ))}
         </div>
-      </div>
+      </section>
+    )}
 
-      <!-- Posts grid -->
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {remainingPosts.map((post) => (
-          <div data-animate>
-            <BlogPostCard
-              title={post.data.title}
-              description={post.data.description}
-              pubDate={post.data.pubDate}
-              tags={post.data.tags}
-              heroImage={post.data.heroImage}
-              heroImageAlt={post.data.heroImageAlt}
-              slug={post.id}
-              readingTime={post.readingTime}
-            />
-          </div>
-        ))}
-      </div>
-    </section>
-  )}
+    {remainingPosts.length > 0 && <Divider />}
 
-  {remainingPosts.length > 0 && <Divider />}
-
-  <!-- Footer -->
-  <Footer brandName="friquelme.dev" copyright="// designed & built by florian riquelme © 2026">
-    <Fragment slot="links">
-      <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
-      <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
-    </Fragment>
-  </Footer>
+    <!-- Footer -->
+    <Footer brandName="friquelme.dev" copyright="// designed & built by florian riquelme © 2026">
+      <Fragment slot="links">
+        <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
+        <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
+      </Fragment>
+    </Footer>
 </Layout>
