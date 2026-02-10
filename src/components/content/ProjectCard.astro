@@ -10,6 +10,11 @@ interface Props {
 }
 
 const { title, description, stars = 0, link = '#', tags = [] } = Astro.props;
+
+const formatStars = (n: number): string => {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+};
 ---
 
 <div class="flex flex-col overflow-hidden rounded bg-bg-surface border border-border-primary">
@@ -29,7 +34,7 @@ const { title, description, stars = 0, link = '#', tags = [] } = Astro.props;
       </div>
     )}
     <div class="flex items-center justify-between">
-      <span class="text-[11px] text-green-primary font-mono">★ {stars}</span>
+      <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>
       <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition">
         view_repo →
       </a>

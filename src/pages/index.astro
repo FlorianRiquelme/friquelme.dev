@@ -4,10 +4,6 @@ import Layout from '../layouts/Layout.astro';
 // UI
 import ButtonPrimary from '../components/ui/ButtonPrimary.astro';
 import ButtonSecondary from '../components/ui/ButtonSecondary.astro';
-import ButtonGhost from '../components/ui/ButtonGhost.astro';
-import ButtonSmall from '../components/ui/ButtonSmall.astro';
-import Tag from '../components/ui/Tag.astro';
-import Badge from '../components/ui/Badge.astro';
 import StatusIndicator from '../components/ui/StatusIndicator.astro';
 import Divider from '../components/ui/Divider.astro';
 
@@ -21,165 +17,178 @@ import Footer from '../components/nav/Footer.astro';
 import SectionHeader from '../components/content/SectionHeader.astro';
 import TerminalWindow from '../components/content/TerminalWindow.astro';
 import SkillBar from '../components/content/SkillBar.astro';
-import MetricCard from '../components/content/MetricCard.astro';
-import SurfaceCard from '../components/content/SurfaceCard.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
-import ListItem from '../components/content/ListItem.astro';
-import TableRow from '../components/content/TableRow.astro';
-
-// Forms
-import InputGroup from '../components/forms/InputGroup.astro';
-import TextareaGroup from '../components/forms/TextareaGroup.astro';
-import SearchField from '../components/forms/SearchField.astro';
 ---
 
-<Layout title="Component Showcase">
+<Layout title="alex_dev — portfolio">
   <!-- Header -->
   <HeaderBar>
-    <Logo name="portfolio" slot="logo" />
+    <Logo name="alex_dev" slot="logo" />
     <Fragment slot="nav">
-      <NavItem label="home" href="/" active />
-      <NavItem label="about" href="/about" />
-      <NavItem label="projects" href="/projects" />
-      <NavItem label="contact" href="/contact" />
+      <NavItem label="about" href="#about" active />
+      <NavItem label="projects" href="#projects" />
+      <NavItem label="skills" href="#skills" />
+      <NavItem label="contact" href="#contact" />
     </Fragment>
-    <StatusIndicator text="online" slot="status" />
+    <StatusIndicator text="available for hire" slot="status" />
   </HeaderBar>
 
-  <main class="mx-auto max-w-5xl space-y-16 px-8 py-16">
-    <!-- Buttons -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --buttons" description="// interactive action elements" />
-      <div class="flex flex-wrap items-center gap-4">
-        <ButtonPrimary label="primary" />
-        <ButtonSecondary label="secondary" />
-        <ButtonGhost label="ghost" />
-        <ButtonSmall label="small" />
-      </div>
-    </section>
+  <!-- Hero Section -->
+  <section id="about" class="flex flex-col items-center gap-10 bg-bg-page px-16 pt-[120px] pb-[100px]">
+    <div class="w-full max-w-[900px]">
+      <TerminalWindow title="~/alex_dev — bash">
+        <p class="text-sm font-medium text-green-primary">$ whoami</p>
+        <p class="text-sm text-text-primary">alex rodriguez — full-stack developer</p>
+        <div class="h-3"></div>
+        <p class="text-sm font-medium text-green-primary">$ cat intro.txt</p>
+        <p class="text-sm text-text-secondary">i build things for the web. passionate about clean code,</p>
+        <p class="text-sm text-text-secondary">open source, and developer experience. currently crafting</p>
+        <p class="text-sm text-text-secondary">performant interfaces at startup.io</p>
+        <div class="h-3"></div>
+        <p class="text-sm font-medium text-green-primary">$ echo $current_stack</p>
+        <p class="text-sm text-text-primary">typescript · react · node.js · postgresql · rust</p>
+        <div class="h-3"></div>
+        <p class="text-sm font-medium text-green-primary">$ echo $experience</p>
+        <p class="text-sm text-text-primary">5+ years · 40+ projects · 12k+ github stars</p>
+        <div class="h-4"></div>
+        <div class="flex items-center">
+          <span class="text-sm font-medium text-green-primary">$ </span>
+          <span class="h-[18px] w-[9px] bg-green-primary animate-blink"></span>
+        </div>
+      </TerminalWindow>
+    </div>
 
-    <Divider />
-
-    <!-- Badges & Tags -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --badges" description="// status labels and category tags" />
-      <div class="flex flex-wrap items-center gap-4">
-        <Badge variant="success" label="done" />
-        <Badge variant="warning" label="pending" />
-        <Badge variant="error" label="failed" />
-        <Badge variant="info" label="new" />
-      </div>
-      <div class="flex flex-wrap items-center gap-3">
-        <Tag label="typescript" />
-        <Tag label="astro" />
-        <Tag label="tailwind" />
-        <Tag label="react" />
-        <Tag label="node.js" />
-      </div>
-    </section>
-
-    <Divider />
-
-    <!-- Navigation -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --navigation" description="// nav items, logo and status" />
+    <!-- Hero Bottom -->
+    <div class="flex flex-col items-center gap-8 w-full max-w-[900px]">
+      <h1 class="text-4xl font-semibold text-text-primary text-center">
+        building the future, one commit at a time.
+      </h1>
+      <p class="text-sm text-text-tertiary text-center">
+        // full-stack developer specializing in scalable systems and beautiful interfaces
+      </p>
       <div class="flex items-center gap-4">
-        <Logo name="developer" />
-        <StatusIndicator text="available for hire" />
+        <ButtonPrimary label="view_projects" icon="lucide:terminal" href="#projects" />
+        <ButtonSecondary label="github_profile" icon="lucide:github" href="#" />
       </div>
-      <div class="flex items-center gap-2">
-        <NavItem label="home" href="#" active />
-        <NavItem label="about" href="#" />
-        <NavItem label="projects" href="#" />
-        <NavItem label="contact" href="#" />
+    </div>
+  </section>
+
+  <Divider />
+
+  <!-- Skills Section -->
+  <section id="skills" class="flex flex-col gap-12 bg-bg-page px-16 py-20">
+    <SectionHeader
+      command="$ neofetch --skills"
+      description="// system capabilities and proficiency levels"
+    />
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <!-- Frontend -->
+      <div class="flex flex-col gap-4">
+        <span class="text-sm font-medium text-text-primary">frontend:</span>
+        <SkillBar name="react / next.js" percentage={95} />
+        <SkillBar name="typescript" percentage={90} />
+        <SkillBar name="tailwind css" percentage={88} />
       </div>
-    </section>
-
-    <Divider />
-
-    <!-- Terminal Window -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --terminal" description="// terminal emulator window" />
-      <TerminalWindow title="~/projects — bash" />
-    </section>
-
-    <Divider />
-
-    <!-- Content Cards -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --cards" description="// surface, metric and project cards" />
-
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <MetricCard label="commits" value="1,247" change="+12.5%" trend="up" />
-        <MetricCard label="projects" value="23" change="+3.2%" trend="up" />
-        <MetricCard label="open issues" value="5" change="-8.1%" trend="down" />
+      <!-- Backend -->
+      <div class="flex flex-col gap-4">
+        <span class="text-sm font-medium text-text-primary">backend:</span>
+        <SkillBar name="node.js / express" percentage={92} />
+        <SkillBar name="postgresql / redis" percentage={85} />
+        <SkillBar name="rust / wasm" percentage={72} />
       </div>
-
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <SurfaceCard title="recent_activity">
-          <ListItem title="feat: add dark mode" meta="2 hours ago" status="merged" />
-          <ListItem title="fix: resolve login bug" meta="5 hours ago" status="closed" />
-          <ListItem title="docs: update README" meta="1 day ago" status="open" />
-        </SurfaceCard>
-
-        <SurfaceCard title="tech_stack">
-          <SkillBar name="TypeScript" percentage={92} />
-          <SkillBar name="Rust" percentage={78} />
-          <SkillBar name="Go" percentage={65} />
-          <SkillBar name="Python" percentage={85} />
-        </SurfaceCard>
+      <!-- DevOps -->
+      <div class="flex flex-col gap-4">
+        <span class="text-sm font-medium text-text-primary">devops:</span>
+        <SkillBar name="docker / k8s" percentage={80} />
+        <SkillBar name="aws / vercel" percentage={85} />
+        <SkillBar name="git / ci·cd" percentage={93} />
       </div>
+    </div>
+  </section>
 
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <ProjectCard
-          title="terminal-ui"
-          description="// a modern terminal emulator built with Rust and WebGPU for blazing fast rendering"
-          stars={342}
-          link="#"
-          tags={['rust', 'webgpu', 'terminal']}
-        />
-        <ProjectCard
-          title="dotfiles"
-          description="// personal dev environment config — neovim, tmux, zsh with custom theme"
-          stars={128}
-          link="#"
-          tags={['shell', 'neovim', 'config']}
-        />
-      </div>
-    </section>
+  <Divider />
 
-    <Divider />
+  <!-- Projects Section -->
+  <section id="projects" class="flex flex-col gap-12 bg-bg-page px-16 py-20">
+    <div class="flex items-end justify-between">
+      <SectionHeader
+        command="$ ls -la ~/projects"
+        description="// selected works and open source contributions"
+      />
+      <span class="text-xs text-text-muted">total: 6 projects</span>
+    </div>
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+      <ProjectCard
+        title="flux_engine"
+        description="// real-time data processing pipeline built with rust and webassembly for edge computing"
+        stars={2400}
+        link="#"
+        tags={['rust', 'wasm', 'edge']}
+      >
+        <div slot="image" class="h-full w-full bg-gradient-to-br from-green-primary/20 to-bg-surface"></div>
+      </ProjectCard>
+      <ProjectCard
+        title="vex_cli"
+        description="// developer toolkit cli that scaffolds, lints, and deploys full-stack applications"
+        stars={5100}
+        link="#"
+        tags={['node', 'cli', 'oss']}
+      >
+        <div slot="image" class="h-full w-full bg-gradient-to-br from-blue-info/20 to-bg-surface"></div>
+      </ProjectCard>
+      <ProjectCard
+        title="signal_mesh"
+        description="// p2p encrypted messaging protocol with zero-knowledge proof authentication"
+        stars={4700}
+        link="#"
+        tags={['typescript', 'webrtc', 'crypto']}
+      >
+        <div slot="image" class="h-full w-full bg-gradient-to-br from-amber-warning/20 to-bg-surface"></div>
+      </ProjectCard>
+    </div>
+  </section>
 
-    <!-- Data Display -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --data" description="// tables and list items" />
-      <SurfaceCard title="deployment_log">
-        <TableRow cells={['v2.4.1', 'production', '2 min ago']} status="deployed" />
-        <TableRow cells={['v2.4.0', 'staging', '1 hour ago']} status="active" />
-        <TableRow cells={['v2.3.9', 'production', '3 days ago']} status="rolled back" />
-      </SurfaceCard>
-    </section>
+  <Divider />
 
-    <Divider />
+  <!-- Contact Section -->
+  <section id="contact" class="flex flex-col items-center gap-12 bg-bg-page px-16 py-20">
+    <div class="flex flex-col items-center gap-2">
+      <h2 class="text-[28px] font-semibold text-green-primary">$ ping alex_dev</h2>
+      <p class="text-[13px] text-text-tertiary text-center">
+        // open to collaboration, freelance, and full-time opportunities
+      </p>
+    </div>
 
-    <!-- Forms -->
-    <section class="space-y-6">
-      <SectionHeader command="$ ui --forms" description="// input fields and search" />
-      <div class="max-w-sm space-y-4">
-        <SearchField placeholder="search components..." />
-        <InputGroup label="username" placeholder="enter your handle" icon="lucide:user" />
-        <InputGroup label="email" placeholder="you@example.com" icon="lucide:mail" />
-        <TextareaGroup label="message" placeholder="// type your message here..." />
-      </div>
-    </section>
-  </main>
+    <div class="w-full max-w-[700px]">
+      <TerminalWindow title="~/contact — bash">
+        <p class="text-[13px] font-medium text-green-primary">$ cat contact_info.json</p>
+        <p class="text-[13px] text-text-muted whitespace-pre">{"{"}</p>
+        <p class="text-[13px] text-text-secondary whitespace-pre">  "email":    "alex@rodriguez.dev",</p>
+        <p class="text-[13px] text-text-secondary whitespace-pre">  "github":   "github.com/alexrodriguez",</p>
+        <p class="text-[13px] text-text-secondary whitespace-pre">  "twitter":  "@alex_codes",</p>
+        <p class="text-[13px] text-text-secondary whitespace-pre">  "linkedin": "linkedin.com/in/alexrodriguez",</p>
+        <p class="text-[13px] text-text-secondary whitespace-pre">  "location": "san francisco, ca"</p>
+        <p class="text-[13px] text-text-muted whitespace-pre">{"}"}</p>
+        <div class="h-2"></div>
+        <div class="flex items-center">
+          <span class="text-[13px] font-medium text-green-primary">$ </span>
+          <span class="h-4 w-[9px] bg-green-primary animate-blink"></span>
+        </div>
+      </TerminalWindow>
+    </div>
+
+    <ButtonPrimary label="send_message" icon="lucide:mail" href="mailto:alex@rodriguez.dev" />
+  </section>
+
+  <Divider />
 
   <!-- Footer -->
-  <Footer brandName="developer">
+  <Footer brandName="alex_dev" copyright="// designed & built by alex rodriguez © 2026">
     <Fragment slot="links">
-      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">github</a>
-      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">twitter</a>
-      <a href="#" class="text-xs text-text-tertiary font-mono hover:text-text-secondary transition">linkedin</a>
+      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">github</a>
+      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">twitter</a>
+      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">linkedin</a>
+      <a href="#" class="text-xs text-text-tertiary hover:text-text-secondary transition">resume.pdf</a>
     </Fragment>
   </Footer>
 </Layout>
