@@ -22,7 +22,7 @@ The pipeline has four moving parts:
 
 1. **GitHub Actions** — builds the Astro site and syncs files to S3
 2. **OIDC federation** — short-lived AWS credentials with no stored secrets
-3. **S3** — private bucket serving as the origin for CloudFront
+3. **S3** — bucket with static website hosting, serving as the origin for CloudFront
 4. **CloudFront** — CDN with HTTPS, HTTP/2+3, and security headers
 
 Everything is defined as code. The GitHub Actions workflow handles CI/CD, and AWS CDK manages the infrastructure.
@@ -90,7 +90,7 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/" "/index.html" "/favicon.ico" "/favicon.svg"
+            --paths "/" "/index.html" "/favicon.ico" "/favicon.svg" "/blog/*"
 ```
 
 A few things worth noting.
@@ -124,7 +124,7 @@ This gives us the best of both worlds: instant loads for returning visitors on u
 
 ### Selective CloudFront Invalidation
 
-Instead of invalidating `/*` (which costs money at scale and is slow), we only invalidate the paths that actually matter for freshness: the homepage and favicons. HTML pages already have `must-revalidate` cache headers, so CloudFront will check the origin on every request anyway.
+Instead of invalidating `/*` (which costs money at scale and is slow), we only invalidate the paths that actually matter for freshness: the homepage, favicons, and blog content. HTML pages already have `must-revalidate` cache headers, so CloudFront will check the origin on every request anyway.
 
 <Callout>
 **why not invalidate `/*`?** CloudFront charges $0.005 per path after the first 1,000 invalidations per month. For a static site with few critical paths, targeted invalidation is both faster and cheaper.
@@ -149,29 +149,30 @@ The infrastructure is defined in two CDK stacks. These are deployed manually (no
 ```typescript
 const DOMAIN_NAME = 'friquelme.dev';
 
-// S3 bucket — private, no public access
+// S3 bucket — static website hosting for subdirectory index resolution
 this.bucket = new s3.Bucket(this, 'SiteBucket', {
-  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-  objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+  websiteIndexDocument: 'index.html',
+  publicReadAccess: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+  objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
   removalPolicy: cdk.RemovalPolicy.DESTROY,
   autoDeleteObjects: true,
 });
 ```
 
-The S3 bucket has **all public access blocked**. There's no bucket policy granting public read. Instead, CloudFront accesses S3 through **Origin Access Control (OAC)** — CloudFront's modern replacement for Origin Access Identity. This means the bucket contents are only accessible through the CDN, never directly.
+The S3 bucket uses **static website hosting** with `websiteIndexDocument` set. This is critical for multi-page static sites — more on why [below](#the-oac-trap-why-your-subpages-break).
 
 ### CloudFront Configuration
 
 ```typescript
 this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
   defaultBehavior: {
-    origin: origins.S3BucketOrigin.withOriginAccessControl(this.bucket),
+    origin: new origins.S3StaticWebsiteOrigin(this.bucket),
     viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     responseHeadersPolicy,
   },
   domainNames: [DOMAIN_NAME, `www.${DOMAIN_NAME}`],
   certificate,
-  defaultRootObject: 'index.html',
   httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
   priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
 });
@@ -179,9 +180,59 @@ this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
 
 Key decisions:
 
+- **`S3StaticWebsiteOrigin`** — connects CloudFront to S3's website hosting endpoint, which handles index document resolution natively
+- **No `defaultRootObject`** — S3 website hosting handles this; setting it on CloudFront would only apply to the root path anyway
 - **HTTP/2 and HTTP/3** — HTTP/3 uses QUIC (UDP-based), which eliminates head-of-line blocking and reduces connection setup latency
 - **Price Class 100** — edge locations in North America and Europe only, keeps costs low for a personal site
 - **REDIRECT_TO_HTTPS** — all HTTP requests are upgraded, no mixed content possible
+
+### The OAC Trap — Why Your Subpages Break
+
+This deserves its own section because it's a subtle issue that will bite anyone deploying a multi-page static site to S3 + CloudFront.
+
+The "modern" approach you'll find in most tutorials and AWS docs is to use **Origin Access Control (OAC)** — keep the S3 bucket private, and let CloudFront authenticate requests to it. This is what CDK's `S3BucketOrigin.withOriginAccessControl()` sets up. It sounds clean and secure.
+
+The problem: **OAC uses the S3 REST API, which does not resolve subdirectory index documents.**
+
+When a user visits `/blog`, Astro has generated `blog/index.html` in the bucket. With S3 static website hosting, the request resolves correctly: `/blog` → `blog/index.html`. But the S3 REST API (used by OAC) treats `/blog` as a key lookup — there's no object with that key, so S3 returns **403 Forbidden**.
+
+Here's where it gets worse. A common CDK pattern is to add custom error responses to "fix" SPAs:
+
+```typescript
+// DON'T do this for multi-page static sites
+errorResponses: [
+  {
+    httpStatus: 403,
+    responseHttpStatus: 200,
+    responsePagePath: '/index.html',
+  },
+  {
+    httpStatus: 404,
+    responseHttpStatus: 200,
+    responsePagePath: '/index.html',
+  },
+],
+```
+
+This catches the 403 and silently serves the homepage. For a single-page app with client-side routing, that's fine — the JS router picks up the URL and renders the right view. But for a **statically generated site** like Astro in static mode, there's no client-side router. The user sees the homepage, the URL says `/blog`, and nothing looks broken at first glance. It's a silent failure.
+
+<Callout>
+**the symptom:** navigating to any subpage (like `/blog`) shows the homepage instead of the actual page content. the url changes but the wrong page is served. no errors in the console, no 404 — just the wrong content.
+</Callout>
+
+The fix is to use **S3 static website hosting** as the origin instead of OAC:
+
+1. Enable `websiteIndexDocument` on the bucket
+2. Allow public read access (CloudFront still handles HTTPS and caching)
+3. Use `S3StaticWebsiteOrigin` instead of `S3BucketOrigin.withOriginAccessControl`
+4. Remove `defaultRootObject` from the distribution (S3 handles it)
+5. Remove `errorResponses` (no more masking real errors)
+
+Yes, the bucket is technically public. But the content is a static website — it's meant to be public. The security headers, HTTPS enforcement, and cache policies are all handled at the CloudFront layer regardless of origin type. If your content is meant to be served to the internet, the "private bucket + OAC" approach adds complexity without meaningful security benefit, and breaks multi-page routing in the process.
+
+<Callout>
+**alternatives if you really want a private bucket:** you can keep OAC and add a CloudFront Function to rewrite URIs (appending `/index.html` to directory paths). this works but adds another moving part. for most static sites, website hosting is simpler and more reliable.
+</Callout>
 
 ### Security Headers
 
@@ -297,4 +348,4 @@ The GitHub Actions minutes are free for public repos.
 
 ---
 
-*If you're deploying a static site to AWS and want to avoid the common pitfalls — public S3 buckets, long-lived credentials, stale caches — this setup is a solid starting point. The full source code for both the site and infrastructure is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*
+*If you're deploying a static site to AWS and want to avoid the common pitfalls — broken subpage routing with OAC, long-lived credentials, stale caches — this setup is a solid starting point. The full source code for both the site and infrastructure is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*
