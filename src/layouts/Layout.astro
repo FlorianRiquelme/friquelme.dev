@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '@fontsource-variable/jetbrains-mono';
 
 interface Props {
   title?: string;
@@ -15,19 +16,14 @@ const { title = 'Portfolio', description } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     <title>{title}</title>
   </head>
   <body class="bg-bg-page text-text-primary font-mono antialiased">
-    <slot />
+    <main>
+      <slot />
+    </main>
     <script>
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
