@@ -9,7 +9,7 @@ interface GitHubOidcStackProps extends cdk.StackProps {
   distribution: cloudfront.IDistribution;
 }
 
-const GITHUB_REPO = 'FlorianRiquelme/portfolio';
+const GITHUB_REPO = 'FlorianRiquelme/friquelme.dev';
 
 export class GitHubOidcStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: GitHubOidcStackProps) {
