@@ -67,6 +67,9 @@
 @layer base {
   html, body {
     min-height: 100%;
+  }
+
+  body {
     overflow-x: clip;
   }
 }
