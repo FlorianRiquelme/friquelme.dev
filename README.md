@@ -1,56 +1,29 @@
 # friquelme.dev
 
-Personal portfolio site for Florian Riquelme — senior software engineer based in Hamburg, Germany.
+Source code for [friquelme.dev](https://friquelme.dev) — my portfolio and technical blog.
 
-**Live:** [friquelme.dev](https://friquelme.dev)
+Built with [Astro](https://astro.build), styled with [Tailwind CSS](https://tailwindcss.com), deployed to AWS (S3 + CloudFront) via GitHub Actions. Terminal-inspired dark theme, monospace throughout.
 
-## Tech Stack
+## Blog
 
-- **Framework:** [Astro 5](https://astro.build) (static output)
-- **Styling:** [Tailwind CSS 4](https://tailwindcss.com) via Vite plugin
-- **Icons:** [astro-icon](https://github.com/natemoo-re/astro-icon) with Lucide
-- **Font:** JetBrains Mono
-- **Infrastructure:** AWS CDK (S3 + CloudFront + Route53 + ACM)
-- **CI/CD:** GitHub Actions with OIDC authentication
-- **Package Manager:** pnpm
+- [Deploying an Astro Site to AWS — The Full Pipeline](https://friquelme.dev/blog/deploying-astro-to-aws/) — GitHub Actions, S3, CloudFront, OIDC auth, and AWS CDK. No stored credentials, no manual steps.
+- [SEO for Astro Sites — What Actually Matters](https://friquelme.dev/blog/seo-for-astro-sites/) — Sitemap, Open Graph, JSON-LD, RSS, canonical URLs. No SEO plugins, just the fundamentals.
+
+## Stack
+
+- **Framework:** Astro 5 (static output)
+- **Styling:** Tailwind CSS 4
+- **Infrastructure:** AWS CDK (S3, CloudFront, Route 53, ACM)
+- **CI/CD:** GitHub Actions with OIDC federation (no stored AWS credentials)
 
 ## Development
 
-```sh
+```bash
 pnpm install
-pnpm dev          # http://localhost:4321
-pnpm build        # Static output to ./dist/
-pnpm preview      # Preview production build
+pnpm dev        # localhost:4321
+pnpm build      # production build to ./dist/
 ```
 
-## Project Structure
+## License
 
-```
-src/
-├── assets/images/       # Project card images
-├── components/
-│   ├── content/         # ProjectCard, SkillBar, TerminalWindow, etc.
-│   ├── forms/           # InputGroup, SearchField, TextareaGroup
-│   ├── nav/             # HeaderBar, Footer, Logo, NavItem
-│   └── ui/              # Badge, Button variants, Tag, Divider
-├── layouts/Layout.astro # Base HTML layout with meta, fonts, analytics
-├── pages/index.astro    # Single-page site (hero, skills, projects, contact)
-└── styles/global.css    # Tailwind theme, animations, base styles
-
-infra/                   # AWS CDK stacks
-├── lib/
-│   ├── static-site-stack.ts   # S3 + CloudFront + DNS + TLS
-│   └── github-oidc-stack.ts   # GitHub Actions deploy role
-└── bin/infra.ts
-```
-
-## Deployment
-
-Pushes to `main` trigger the GitHub Actions workflow which:
-
-1. Builds the static site with Astro
-2. Authenticates to AWS via OIDC (no stored credentials)
-3. Syncs to S3 with appropriate cache headers
-4. Invalidates CloudFront cache
-
-Infrastructure is managed separately via CDK in the `infra/` directory.
+MIT
