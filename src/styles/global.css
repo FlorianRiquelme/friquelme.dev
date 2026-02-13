@@ -65,11 +65,14 @@
 }
 
 @layer base {
-  html, body {
+  html {
     min-height: 100%;
+    scroll-padding-top: 80px;
+    scroll-behavior: smooth;
   }
 
   body {
+    min-height: 100%;
     overflow-x: clip;
   }
 }

@@ -21,8 +21,11 @@
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.1",
     "astro-icon": "^1.1.5",
+    "hastscript": "^9.0.1",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   },
