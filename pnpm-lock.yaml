@@ -27,8 +27,8 @@ importers:
         specifier: ^1.2.90
         version: 1.2.90
       '@posthog/wizard':
-        specifier: ^1.31.2
-        version: 1.31.2
+        specifier: ^1.32.1
+        version: 1.32.1
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@6.4.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
@@ -779,8 +779,8 @@ packages:
   '@oslojs/encoding@1.1.0':
     resolution: {integrity: sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==}
 
-  '@posthog/wizard@1.31.2':
-    resolution: {integrity: sha512-79LytLF7ei2dtdmeg6VRuMoxQEFP03W11rkOEOQdliyYp8TaMDee51EiLRlka+lrHQGiamdp7pOCqfBM/eFI0w==}
+  '@posthog/wizard@1.32.1':
+    resolution: {integrity: sha512-xSiQvStyzOlOJ4nEWzsEsLxvx/M+2qWWc12ESrY9bN9xHE/RrXOMW8Tjpaf+yqsYpn/Z90yMR5K1bTVtIoPcRw==}
     engines: {node: '>=18', npm: '>=3.10.7'}
     hasBin: true
 
@@ -2083,6 +2083,9 @@ packages:
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -3931,7 +3934,7 @@ snapshots:
 
   '@oslojs/encoding@1.1.0': {}
 
-  '@posthog/wizard@1.31.2':
+  '@posthog/wizard@1.32.1':
     dependencies:
       '@anthropic-ai/claude-agent-sdk': 0.1.77(zod@3.25.76)
       '@clack/core': 0.3.5
@@ -3943,7 +3946,7 @@ snapshots:
       glob: 9.3.5
       inquirer: 6.5.2
       jsonc-parser: 3.3.1
-      lodash: 4.17.21
+      lodash: 4.17.23
       magicast: 0.2.11
       opn: 5.5.0
       posthog-node: 4.18.0
@@ -5271,7 +5274,7 @@ snapshots:
       cli-width: 2.2.1
       external-editor: 3.1.0
       figures: 2.0.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.7
       run-async: 2.4.1
       rxjs: 6.6.7
@@ -5405,6 +5408,8 @@ snapshots:
       quansync: 0.2.11
 
   lodash@4.17.21: {}
+
+  lodash@4.17.23: {}
 
   longest-streak@3.1.0: {}
 

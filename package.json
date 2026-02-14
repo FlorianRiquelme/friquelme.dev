@@ -17,7 +17,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@iconify-json/lucide": "^1.2.90",
-    "@posthog/wizard": "^1.31.2",
+    "@posthog/wizard": "^1.32.1",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.2",
     "astro-icon": "^1.1.5",
