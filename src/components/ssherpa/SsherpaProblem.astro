@@ -1,0 +1,51 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<section class="border-b border-border-primary bg-bg-page px-5 py-12 md:px-16 md:py-20">
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Section Header -->
+    <div class="mb-12 flex flex-col items-center text-center" data-animate>
+      <p class="text-sm font-medium text-green-primary font-mono">$ ssherpa --why</p>
+      <h2 class="mt-4 text-3xl font-bold text-text-primary md:text-4xl">
+        SSH connections don't scale
+      </h2>
+    </div>
+
+    <!-- Pain Point Cards -->
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- Card 1 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-1">
+        <Icon name="lucide:brain" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Which server was it again?
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          You have 15 servers across 3 projects. Was it <code class="text-text-secondary">prod-api-1</code> or <code class="text-text-secondary">api-prod-1</code>? You check Slack, grep your history, or just guess. Every context switch costs you 2 minutes you'll never get back.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-2">
+        <Icon name="lucide:file-warning" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Your ~/.ssh/config is 500 lines
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          Adding a new server means editing a text file, copying the right template, hoping you didn't break the syntax. Sharing with your team? Copy-paste into Slack and pray they update theirs.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-3">
+        <Icon name="lucide:target" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          You always pick the wrong server
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          Yesterday you SSH'd into staging. Today you're in a different project and muscle memory sends you to staging again. Oops, you just restarted the wrong database.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

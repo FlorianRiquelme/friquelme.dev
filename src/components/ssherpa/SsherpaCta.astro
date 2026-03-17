@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components';
+import ButtonPrimary from '../ui/ButtonPrimary.astro';
+import ButtonSecondary from '../ui/ButtonSecondary.astro';
+---
+
+<section class="border-b border-border-primary bg-bg-page px-5 py-12 md:px-16 md:py-20">
+  <div class="mx-auto max-w-[1200px]">
+    <div class="flex flex-col items-center text-center" data-animate>
+      <!-- Install Command Block -->
+      <div class="mb-8 w-full max-w-[600px] rounded border border-border-primary bg-bg-surface p-6">
+        <div class="flex items-center justify-between">
+          <code class="text-base text-green-primary font-mono">brew install ssherpa</code>
+          <button
+            class="flex items-center gap-2 rounded bg-bg-input px-3 py-1.5 text-xs text-text-secondary font-mono hover:text-green-primary transition-colors"
+            onclick="navigator.clipboard.writeText('brew install ssherpa')"
+          >
+            <Icon name="lucide:copy" class="size-3.5" />
+            copy
+          </button>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <h2 class="max-w-[700px] text-3xl font-bold text-text-primary md:text-4xl">
+        Stop juggling servers. Start connecting instantly.
+      </h2>
+
+      <!-- Subheadline -->
+      <p class="mt-4 max-w-[600px] text-sm leading-relaxed text-text-secondary md:text-base">
+        Open source, cross-platform, and built for developers who SSH more than they'd like to admit.
+      </p>
+
+      <!-- CTAs -->
+      <div class="mt-8 flex flex-col items-center gap-4 sm:flex-row stagger-1" data-animate>
+        <ButtonPrimary label="Get Started" icon="lucide:download" href="#" />
+        <ButtonSecondary label="Read the Docs" icon="lucide:book-open" href="https://github.com/friquelme/ssherpa#readme" />
+      </div>
+
+      <!-- Trust Line -->
+      <p class="mt-8 text-xs text-text-muted font-mono">
+        Works on macOS, Linux, and Windows • Integrates with 1Password • No telemetry, no tracking
+      </p>
+    </div>
+  </div>
+</section>

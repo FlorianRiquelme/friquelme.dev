@@ -1,0 +1,62 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<section class="border-b border-border-primary bg-bg-page px-5 py-12 md:px-16 md:py-20">
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Section Header -->
+    <div class="mb-12 flex flex-col items-center text-center" data-animate>
+      <p class="text-sm font-medium text-green-primary font-mono">$ ssherpa --team</p>
+      <h2 class="mt-4 text-3xl font-bold text-text-primary md:text-4xl">
+        Credential sharing, solved
+      </h2>
+    </div>
+
+    <!-- Team Cards Grid -->
+    <div class="grid gap-6 md:grid-cols-2">
+      <!-- Card 1 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-1">
+        <Icon name="lucide:lock" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Centralized connection registry
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          Store server details in 1Password vaults or shared config repos. Everyone sees the same server list without manual distribution.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-2">
+        <Icon name="lucide:key" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Individual key provisioning
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          SSHerpa reads the connection list, but uses each developer's own SSH keys. No shared credentials, no security compromises.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-3">
+        <Icon name="lucide:git-branch" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Per-project defaults
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          New hire clones the repo, runs <code class="text-text-secondary">ssherpa</code>, and connects to staging. No onboarding docs explaining which server to use—it's already configured.
+        </p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-1">
+        <Icon name="lucide:refresh-cw" class="size-8 text-green-primary" />
+        <h3 class="text-lg font-semibold text-text-primary font-mono">
+          Always up to date
+        </h3>
+        <p class="text-sm leading-relaxed text-text-tertiary">
+          Add a new server to 1Password or your config backend. Everyone's SSHerpa picks it up automatically. No "did you update your ~/.ssh/config?" messages.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

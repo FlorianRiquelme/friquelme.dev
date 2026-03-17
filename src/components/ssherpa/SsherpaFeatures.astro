@@ -1,0 +1,103 @@
+---
+import { Icon } from 'astro-icon/components';
+import Badge from '../ui/Badge.astro';
+---
+
+<section id="features" class="scroll-mt-20 border-b border-border-primary bg-bg-page px-5 py-12 md:px-16 md:py-20">
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Section Header -->
+    <div class="mb-12 flex flex-col items-center text-center" data-animate>
+      <p class="text-sm font-medium text-green-primary font-mono">$ ssherpa --features</p>
+      <h2 class="mt-4 text-3xl font-bold text-text-primary md:text-4xl">
+        Built for how you actually work
+      </h2>
+    </div>
+
+    <!-- Feature Cards Grid -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Feature 1 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-1">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:brain" class="size-6 text-green-primary" />
+          <Badge variant="success" label="Smart Contexts" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          Remembers your last connection per project
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          SSHerpa knows which server you used last time you were in this Git repo. <code class="text-text-secondary">cd myproject && ssherpa</code> connects you to the right place, every time.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-2">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:shield-check" class="size-6 text-green-primary" />
+          <Badge variant="info" label="1Password Integration" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          Pull connection details from 1Password
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          Server configs stored as 1Password items sync automatically. Add a server once, access it everywhere. No secrets in config files, no manual syncing.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-3">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:zap" class="size-6 text-green-primary" />
+          <Badge variant="success" label="Instant Access" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          Three keystrokes to any server
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          Fuzzy search through all your connections. Type <code class="text-text-secondary">ssherpa</code>, hit Enter, type "prod", hit Enter again. You're in. Faster than remembering the full hostname.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-1">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:users" class="size-6 text-green-primary" />
+          <Badge variant="info" label="Team Sync" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          Share connection configs, not credentials
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          Your team gets the same server list without passing around SSH keys. Everyone provisions their own access, but nobody maintains duplicate config files.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-2">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:layers" class="size-6 text-green-primary" />
+          <Badge variant="success" label="Backend Agnostic" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          Works with your existing setup
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          Use 1Password, environment variables, or plain config files. SSHerpa adapts to your workflow instead of forcing you to change tools.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6" data-animate class="stagger-3">
+        <div class="flex items-start justify-between">
+          <Icon name="lucide:terminal" class="size-6 text-green-primary" />
+          <Badge variant="info" label="Just SSH" />
+        </div>
+        <h3 class="text-base font-semibold text-text-primary font-mono">
+          No magic, no proxies, no lock-in
+        </h3>
+        <p class="text-xs leading-relaxed text-text-tertiary">
+          SSHerpa hands off to standard SSH. Your keys, your config, your control. It's a connection manager, not a walled garden.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

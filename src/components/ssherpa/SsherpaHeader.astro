@@ -1,0 +1,29 @@
+---
+import { Icon } from 'astro-icon/components';
+import HeaderBar from '../nav/HeaderBar.astro';
+import ButtonSecondary from '../ui/ButtonSecondary.astro';
+import StatusIndicator from '../ui/StatusIndicator.astro';
+---
+
+<HeaderBar>
+  <div slot="logo" class="flex items-center gap-3">
+    <span class="text-lg font-medium text-green-primary font-mono">~ssherpa</span>
+  </div>
+
+  <div slot="nav" class="flex flex-col gap-4 md:flex-row md:gap-8">
+    <a href="#features" class="text-sm text-text-secondary font-mono hover:text-green-primary transition-colors">
+      features
+    </a>
+    <a href="#how-it-works" class="text-sm text-text-secondary font-mono hover:text-green-primary transition-colors">
+      how it works
+    </a>
+    <a href="https://github.com/friquelme/ssherpa" class="text-sm text-text-secondary font-mono hover:text-green-primary transition-colors md:hidden">
+      docs
+    </a>
+  </div>
+
+  <div slot="status" class="flex flex-col gap-4 md:flex-row md:items-center md:gap-4">
+    <StatusIndicator text="v0.9.0" />
+    <ButtonSecondary label="Star on GitHub" icon="lucide:github" href="https://github.com/friquelme/ssherpa" />
+  </div>
+</HeaderBar>

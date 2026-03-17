@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SsherpaHeader from '../components/ssherpa/SsherpaHeader.astro';
+import SsherpaHero from '../components/ssherpa/SsherpaHero.astro';
+import SsherpaProblem from '../components/ssherpa/SsherpaProblem.astro';
+import SsherpaFeatures from '../components/ssherpa/SsherpaFeatures.astro';
+import SsherpaHowItWorks from '../components/ssherpa/SsherpaHowItWorks.astro';
+import SsherpaTeam from '../components/ssherpa/SsherpaTeam.astro';
+import SsherpaCta from '../components/ssherpa/SsherpaCta.astro';
+import SsherpaFooter from '../components/ssherpa/SsherpaFooter.astro';
+
+const title = 'SSHerpa - SSH Connection Manager for Developers';
+const description = 'Open-source SSH connection manager that remembers your last server per project, syncs with 1Password, and eliminates config file hell. Install with one command.';
+---
+
+<Layout title={title} description={description}>
+  <SsherpaHeader />
+  <SsherpaHero />
+  <SsherpaProblem />
+  <SsherpaFeatures />
+  <SsherpaHowItWorks />
+  <SsherpaTeam />
+  <SsherpaCta />
+  <SsherpaFooter />
+</Layout>

@@ -1,0 +1,69 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<section id="how-it-works" class="scroll-mt-20 border-b border-border-primary bg-bg-page px-5 py-12 md:px-16 md:py-20">
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Section Header -->
+    <div class="mb-12 flex flex-col items-center text-center" data-animate>
+      <p class="text-sm font-medium text-green-primary font-mono">$ ssherpa --quickstart</p>
+      <h2 class="mt-4 text-3xl font-bold text-text-primary md:text-4xl">
+        Three commands to connected
+      </h2>
+    </div>
+
+    <!-- Step Cards -->
+    <div class="grid gap-8 md:grid-cols-3">
+      <!-- Step 1 -->
+      <div class="relative flex flex-col gap-4" data-animate class="stagger-1">
+        <div class="absolute -left-4 top-0 text-6xl font-bold text-text-muted opacity-30 font-mono">01</div>
+        <div class="relative z-10 flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6">
+          <Icon name="lucide:download" class="size-8 text-green-primary" />
+          <h3 class="text-lg font-semibold text-text-primary font-mono">
+            Install SSHerpa
+          </h3>
+          <p class="text-sm leading-relaxed text-text-tertiary">
+            One brew command (or download the binary for Linux/Windows). Works on macOS, Linux, and Windows. No dependencies, no setup wizards.
+          </p>
+          <div class="mt-2 rounded bg-bg-input p-3 border border-border-secondary">
+            <code class="text-xs text-green-primary font-mono">brew install ssherpa</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="relative flex flex-col gap-4" data-animate class="stagger-2">
+        <div class="absolute -left-4 top-0 text-6xl font-bold text-text-muted opacity-30 font-mono">02</div>
+        <div class="relative z-10 flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6">
+          <Icon name="lucide:database" class="size-8 text-green-primary" />
+          <h3 class="text-lg font-semibold text-text-primary font-mono">
+            Connect your backend
+          </h3>
+          <p class="text-sm leading-relaxed text-text-tertiary">
+            Point SSHerpa at 1Password, a config file, or environment variables. It reads your existing server list—no need to recreate what you already have.
+          </p>
+          <div class="mt-2 rounded bg-bg-input p-3 border border-border-secondary">
+            <code class="text-xs text-green-primary font-mono">ssherpa config backend 1password</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="relative flex flex-col gap-4" data-animate class="stagger-3">
+        <div class="absolute -left-4 top-0 text-6xl font-bold text-text-muted opacity-30 font-mono">03</div>
+        <div class="relative z-10 flex flex-col gap-4 rounded border border-border-primary bg-bg-surface p-6">
+          <Icon name="lucide:arrow-right-circle" class="size-8 text-green-primary" />
+          <h3 class="text-lg font-semibold text-text-primary font-mono">
+            SSH from anywhere
+          </h3>
+          <p class="text-sm leading-relaxed text-text-tertiary">
+            Run <code class="text-text-secondary">ssherpa</code> in any project directory. Fuzzy search your servers, or let it auto-connect to your last choice. That's it—you're connected.
+          </p>
+          <div class="mt-2 rounded bg-bg-input p-3 border border-border-secondary">
+            <code class="text-xs text-green-primary font-mono">ssherpa</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
