@@ -39,6 +39,36 @@ describe('buildCsp', () => {
     it('ends with upgrade-insecure-requests as the final directive', () => {
       expect(directives.at(-1)).toBe('upgrade-insecure-requests');
     });
+
+    it("default-src is exactly \"'self'\"", () => {
+      expect(directive('default-src')).toBe("default-src 'self'");
+    });
+
+    it("img-src allows data: and https: alongside 'self'", () => {
+      expect(directive('img-src')).toBe("img-src 'self' data: https:");
+    });
+
+    it("style-src allows 'unsafe-inline' for Astro scoped styles + Tailwind 4", () => {
+      expect(directive('style-src')).toBe(
+        "style-src 'self' 'unsafe-inline'",
+      );
+    });
+
+    it("font-src allows data: for inline base64 fonts", () => {
+      expect(directive('font-src')).toBe("font-src 'self' data:");
+    });
+
+    it("base-uri is locked to 'self' to prevent injected <base>", () => {
+      expect(directive('base-uri')).toBe("base-uri 'self'");
+    });
+
+    it("form-action is locked to 'self'", () => {
+      expect(directive('form-action')).toBe("form-action 'self'");
+    });
+
+    it("object-src is 'none' to block <object>/<embed>/<applet>", () => {
+      expect(directive('object-src')).toBe("object-src 'none'");
+    });
   });
 
   describe('without PostHog', () => {
