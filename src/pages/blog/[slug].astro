@@ -57,7 +57,7 @@ const allPosts = getPublishedPosts(await getCollection('blog'))
     description={post.data.description}
     type="article"
     publishedTime={post.data.pubDate.toISOString()}
-    image={post.data.heroImage ? new URL(post.data.heroImage.src, Astro.url.origin).href : undefined}
+    image={new URL(`/og/${post.id}.png`, Astro.site).href}
   >
     <!-- Header -->
     <HeaderBar>

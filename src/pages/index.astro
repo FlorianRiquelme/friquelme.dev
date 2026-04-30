@@ -20,7 +20,11 @@ import SkillBar from '../components/content/SkillBar.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
 ---
 
-<Layout title="Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS" description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS.">
+<Layout
+  title="Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS"
+  description="Florian Riquelme — senior software engineer. Product-focused, AI-driven development. PHP, React, TypeScript, Go, AWS."
+  image={new URL('/og/index.png', Astro.site).href}
+>
   <!-- Header -->
   <HeaderBar>
     <Logo name="friquelme.dev" slot="logo" />

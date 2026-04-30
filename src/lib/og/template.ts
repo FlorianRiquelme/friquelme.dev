@@ -29,12 +29,18 @@ function footerPath(input: OgImageInput): string {
   }
 }
 
-export function buildOgImageHtml(input: OgImageInput): string {
+export function buildOgImageHtml(
+  input: OgImageInput,
+  bgDataUri?: string,
+): string {
   const title = escapeHtml(input.title);
   const path = escapeHtml(footerPath(input));
+  const bgImage = bgDataUri
+    ? `background-image:url('${bgDataUri}');background-size:cover;`
+    : '';
 
   return `
-<div style="display:flex;flex-direction:column;width:1200px;height:630px;background:${COLORS.bg};color:${COLORS.text};font-family:JetBrains Mono;padding:64px;">
+<div style="display:flex;flex-direction:column;width:1200px;height:630px;background:${COLORS.bg};${bgImage}color:${COLORS.text};font-family:JetBrains Mono;padding:64px;">
   <div style="border-left:6px solid ${COLORS.accent};padding-left:24px;font-size:64px;line-height:1.15;">${title}</div>
   <div style="margin-top:auto;color:${COLORS.muted};font-size:24px;">${path}</div>
 </div>
