@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import '@fontsource-variable/jetbrains-mono';
 import PostHog from '../components/posthog.astro';
+import type { SeoOutput } from '../lib/seo';
 
 interface Props {
   title?: string;
@@ -9,10 +10,12 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   publishedTime?: string;
+  seo?: SeoOutput;
 }
 
-const { title = 'Portfolio', description, image, type = 'website', publishedTime } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const { title = 'Portfolio', description, image, type = 'website', publishedTime, seo } = Astro.props;
+const canonicalHref = seo?.canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const ogType = seo?.type ?? type;
 ---
 
 <!doctype html>
@@ -24,12 +27,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     <title>{title}</title>
-    <link rel="canonical" href={canonicalURL.href} />
+    <link rel="canonical" href={canonicalHref} />
     <meta name="author" content="Florian Riquelme" />
 
     <!-- Open Graph -->
-    <meta property="og:type" content={type} />
-    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalHref} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     {image && <meta property="og:image" content={image} />}
@@ -43,6 +46,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="friquelme.dev blog" href="/rss.xml" />
+
+    <!-- JSON-LD structured data -->
+    {seo?.articleJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(seo.articleJsonLd)} />
+    )}
 
     <!-- Analytics -->
     <PostHog />
