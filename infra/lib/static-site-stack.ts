@@ -6,6 +6,10 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
+import { buildCsp } from '../../src/lib/security/csp';
+
+const PERMISSIONS_POLICY =
+  'camera=(), microphone=(), geolocation=(), interest-cohort=()';
 
 const DOMAIN_NAME = 'friquelme.dev';
 
@@ -60,6 +64,19 @@ export class StaticSiteStack extends cdk.Stack {
               cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
             override: true,
           },
+          contentSecurityPolicy: {
+            contentSecurityPolicy: buildCsp({ posthog: 'eu' }),
+            override: true,
+          },
+        },
+        customHeadersBehavior: {
+          customHeaders: [
+            {
+              header: 'Permissions-Policy',
+              value: PERMISSIONS_POLICY,
+              override: true,
+            },
+          ],
         },
       },
     );
