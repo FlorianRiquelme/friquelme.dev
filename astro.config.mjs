@@ -12,6 +12,8 @@ import { h } from 'hastscript';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://friquelme.dev',
+  trailingSlash: 'always',
+  build: { format: 'directory' },
   compressHTML: true,
   prefetch: true,
   vite: {

@@ -9,6 +9,7 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:build": "vitest run --config vitest.build.config.ts",
     "test:mutation": "stryker run",
     "test:infra": "pnpm -C infra test"
   },
@@ -28,11 +29,14 @@
     "reading-time": "^1.5.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
+    "satori": "^0.26.0",
+    "satori-html": "^0.3.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "devDependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/vitest-runner": "^9.6.1",
     "happy-dom": "^20.6.1",
