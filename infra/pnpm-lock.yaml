@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       aws-cdk-lib:
-        specifier: ^2.251.0
+        specifier: ^2.180.0
         version: 2.251.0(constructs@10.4.5)
       constructs:
         specifier: ^10.4.2
@@ -19,8 +19,8 @@ importers:
         specifier: ^25.2.2
         version: 25.2.2
       aws-cdk:
-        specifier: ^2.180.0
-        version: 2.1105.0
+        specifier: ^2.1120.0
+        version: 2.1120.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -432,8 +432,8 @@ packages:
       - yaml
       - mime-types
 
-  aws-cdk@2.1105.0:
-    resolution: {integrity: sha512-1RY2UZJv31XYobEGFHQEb7c2HXNzDbHuHqdnfdYyygvZW4Nrm8MJCW42lqItQCn+wF52Ixc7r2VR5eR4YGtVhA==}
+  aws-cdk@2.1120.0:
+    resolution: {integrity: sha512-vDVa0IX0FhizARdY/GLSParFglKbdHCIhM8IDmynrAv9w8uLLljzWMeLUOhC1XpMErDZ/npYEihAOjfKxTaMIw==}
     engines: {node: '>= 18.0.0'}
     hasBin: true
 
@@ -1025,7 +1025,7 @@ snapshots:
       '@aws-cdk/cloud-assembly-schema': 53.19.0
       constructs: 10.4.5
 
-  aws-cdk@2.1105.0: {}
+  aws-cdk@2.1120.0: {}
 
   buffer-from@1.1.2: {}
 
