@@ -29,3 +29,7 @@ infra/cdk.out/
 
 # docs
 docs/
+
+# Stryker mutation testing
+reports/
+.stryker-tmp/

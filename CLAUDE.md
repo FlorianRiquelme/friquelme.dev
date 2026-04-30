@@ -9,6 +9,9 @@ Astro 5 static site with a portfolio homepage and a blog. Tailwind CSS 4, deploy
 - `pnpm dev` — local dev server at localhost:4321
 - `pnpm build` — build to `./dist/` (use this to verify changes compile)
 - `pnpm preview` — preview production build locally
+- `pnpm test` — run Vitest unit + Astro Container tests
+- `pnpm test:mutation` — Stryker mutation tests on `src/lib/seo.ts` + `src/lib/security/csp.ts`
+- `pnpm test:infra` — run CDK assertion tests in `infra/`
 
 ## Architecture
 
@@ -69,4 +72,4 @@ CDK changes are deployed manually, not through CI. Don't modify infra unless exp
 - Images go through Astro's `<Picture>` component for automatic optimization (AVIF/WebP)
 - Project images are SVGs in `src/assets/images/`
 - Blog posts are `.mdx` files in `src/blog/` with frontmatter (title, description, pubDate, author, heroImage, tags)
-- No testing framework — validate with `pnpm build`
+- Tests live in `tests/` (unit + Astro Container) and `infra/test/` (CDK assertions). Run `pnpm test` and `pnpm test:infra` before commits
