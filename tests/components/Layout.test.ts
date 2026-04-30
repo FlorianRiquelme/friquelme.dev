@@ -8,9 +8,25 @@ const articleSeo: SeoOutput = {
   type: 'article',
   articleJsonLd: {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: 'Test Post',
+    description: 'A test.',
     datePublished: '2026-01-15T00:00:00.000Z',
+    author: {
+      '@type': 'Person',
+      name: 'Florian Riquelme',
+      url: 'https://friquelme.dev',
+    },
+    publisher: {
+      '@type': 'Person',
+      name: 'Florian Riquelme',
+      url: 'https://friquelme.dev',
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': 'https://friquelme.dev/blog/test-post/',
+    },
+    keywords: 'test',
   },
 };
 
@@ -60,7 +76,7 @@ describe('Layout', () => {
     });
 
     expect(html).toContain('<script type="application/ld+json"');
-    expect(html).toContain('"@type":"Article"');
+    expect(html).toContain('"@type":"BlogPosting"');
     expect(html).toContain('"headline":"Test Post"');
     expect(html).toContain('"datePublished":"2026-01-15T00:00:00.000Z"');
   });

@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import { getSeoMeta } from '../../lib/seo';
 
 // Nav
 import Logo from '../../components/nav/Logo.astro';
@@ -50,12 +51,27 @@ const allPosts = getPublishedPosts(await getCollection('blog'))
     pubDate: p.data.pubDate,
     tags: p.data.tags,
   }));
+
+const seo = getSeoMeta(
+  {
+    kind: 'post',
+    title: post.data.title,
+    description: post.data.description,
+    slug: post.id,
+    datePublished: post.data.pubDate,
+    dateModified: post.data.updatedDate,
+    author: post.data.author,
+    tags: post.data.tags,
+    imageSrc: post.data.heroImage?.src,
+  },
+  { site: Astro.site!, pathname: Astro.url.pathname },
+);
 ---
 
 <Layout
     title={`${post.data.title} — friquelme.dev`}
     description={post.data.description}
-    type="article"
+    seo={seo}
     publishedTime={post.data.pubDate.toISOString()}
     image={new URL(`/og/${post.id}.png`, Astro.site).href}
   >
@@ -113,28 +129,4 @@ const allPosts = getPublishedPosts(await getCollection('blog'))
       </Fragment>
     </Footer>
 
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": post.data.title,
-      "description": post.data.description,
-      "datePublished": post.data.pubDate.toISOString(),
-      ...(post.data.updatedDate && { "dateModified": post.data.updatedDate.toISOString() }),
-      "author": {
-        "@type": "Person",
-        "name": post.data.author,
-        "url": "https://friquelme.dev"
-      },
-      "publisher": {
-        "@type": "Person",
-        "name": "Florian Riquelme",
-        "url": "https://friquelme.dev"
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": new URL(`/blog/${post.id}/`, "https://friquelme.dev").href
-      },
-      ...(post.data.heroImage && { "image": new URL(post.data.heroImage.src, "https://friquelme.dev").href }),
-      "keywords": post.data.tags.join(", ")
-    })} />
 </Layout>
