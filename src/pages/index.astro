@@ -126,7 +126,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
         command="$ ls -la ~/projects"
         description="// side projects & open source"
       />
-      <span class="text-xs text-text-muted">2 active</span>
+      <span class="text-xs text-text-muted">3 active</span>
     </div>
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
       <div data-animate class="stagger-1">
@@ -143,6 +143,14 @@ import ProjectCard from '../components/content/ProjectCard.astro';
           description="// ddev plugin for running claude code in sandboxed, firewalled containers"
           link="https://github.com/FlorianRiquelme/ddev-claude"
           tags={['ddev', 'docker', 'claude']}
+        />
+      </div>
+      <div data-animate class="stagger-3">
+        <ProjectCard
+          title="nachtschicht"
+          description="// autonomous task queue for claude code with a trust protocol. queue work, sleep, read the morning brief."
+          link="https://github.com/FlorianRiquelme/nachtschicht"
+          tags={['claude code', 'autonomy', 'trust protocol']}
         />
       </div>
     </div>
