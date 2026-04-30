@@ -28,26 +28,35 @@ describe('astro build output', () => {
       expect(offenders).toEqual([]);
     });
 
-    it('internal <a href> links in the rendered home page end with a trailing slash', () => {
-      const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
-      const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+    it.each([
+      ['index.html', '/'],
+      ['blog/index.html', '/blog/'],
+      ['blog/seo-for-astro-sites/index.html', '/blog/<slug>/'],
+    ])(
+      'every internal <a href> in dist/%s ends with a trailing slash',
+      (file) => {
+        const html = readFileSync(resolve(DIST, file), 'utf-8');
+        const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map(
+          (m) => m[1],
+        );
 
-      const internalPageLinks = hrefs.filter((href) => {
-        if (!href.startsWith('/')) return false;
-        if (href.startsWith('//')) return false;
-        if (href.startsWith('/#')) return false;
-        if (href.includes('#')) return false;
-        if (href.includes('?')) return false;
-        const last = href.split('/').at(-1) ?? '';
-        if (last.includes('.')) return false;
-        return true;
-      });
+        const internalPageLinks = hrefs.filter((href) => {
+          if (!href.startsWith('/')) return false;
+          if (href.startsWith('//')) return false;
+          if (href.startsWith('/#')) return false;
+          if (href.includes('#')) return false;
+          if (href.includes('?')) return false;
+          const last = href.split('/').at(-1) ?? '';
+          if (last.includes('.')) return false;
+          return true;
+        });
 
-      const offenders = internalPageLinks.filter(
-        (href) => !href.endsWith('/'),
-      );
-      expect(offenders).toEqual([]);
-    });
+        const offenders = internalPageLinks.filter(
+          (href) => !href.endsWith('/'),
+        );
+        expect(offenders).toEqual([]);
+      },
+    );
   });
 
   describe('og images', () => {
