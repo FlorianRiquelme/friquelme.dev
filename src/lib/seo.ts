@@ -36,6 +36,15 @@ type Person = {
   url: string;
 };
 
+type ImageObject = {
+  '@type': 'ImageObject';
+  url: string;
+};
+
+type Publisher = Person & {
+  logo: ImageObject;
+};
+
 type WebPageRef = {
   '@type': 'WebPage';
   '@id': string;
@@ -49,9 +58,9 @@ export type ArticleJsonLd = {
   datePublished: string;
   dateModified?: string;
   author: Person;
-  publisher: Person;
+  publisher: Publisher;
   mainEntityOfPage: WebPageRef;
-  image?: string;
+  image: string;
   keywords: string;
 };
 
@@ -68,6 +77,10 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
 
   if (input.kind === 'post') {
     const siteOrigin = ctx.site.origin;
+    const image = input.imageSrc
+      ? new URL(input.imageSrc, ctx.site).href
+      : new URL(`/og/${input.slug}.png`, ctx.site).href;
+    const publisherLogo = new URL('/og/index.png', ctx.site).href;
     return {
       canonical,
       type: 'article',
@@ -89,14 +102,16 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
           '@type': 'Person',
           name: PUBLISHER_NAME,
           url: siteOrigin,
+          logo: {
+            '@type': 'ImageObject',
+            url: publisherLogo,
+          },
         },
         mainEntityOfPage: {
           '@type': 'WebPage',
           '@id': canonical,
         },
-        ...(input.imageSrc && {
-          image: new URL(input.imageSrc, ctx.site).href,
-        }),
+        image,
         keywords: input.tags.join(', '),
       },
     };

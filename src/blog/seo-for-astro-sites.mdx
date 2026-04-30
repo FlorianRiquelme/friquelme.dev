@@ -1,6 +1,6 @@
 ---
 title: "seo for astro sites — what actually matters"
-description: "a practical walkthrough of the seo setup behind this site — sitemap, og meta, json-ld, rss, canonical urls. no seo plugins, no guesswork, just the fundamentals that move the needle."
+description: "a practical walkthrough of the seo setup behind this site — sitemap, og meta, json-ld, rss, canonical urls. no plugins, just the fundamentals."
 pubDate: 2025-02-17
 author: "florian riquelme"
 tags: ["astro", "seo", "web"]
@@ -142,7 +142,7 @@ This means every post gets unique, accurate meta tags without any manual work. T
 
 ```yaml
 ---
-title: "deploying an astro site to aws — the full pipeline"
+title: "deploying astro to aws — the full pipeline"
 description: "how this portfolio goes from git push to production..."
 pubDate: 2025-02-10
 heroImage: "../assets/images/blog/deploying-astro-aws-hero.svg"
@@ -270,10 +270,10 @@ There's one more technique worth mentioning. The homepage has a `sr-only` block 
 
 ```html
 <div class="sr-only">
-  <p>Florian Riquelme — Senior Software Engineer. Product-focused
-  engineer with 9+ years of building web platforms. Current stack:
-  PHP, React, TypeScript, Go. Embraces AI-powered workflows.
-  Currently at digital-masters in Hamburg, Germany.</p>
+  <p>Florian Riquelme — Senior Software Engineer. 9+ years
+  shipping SaaS platforms, e-commerce, and web apps. Full-stack:
+  PHP, React, TypeScript, Go, AWS. Currently at digital-masters
+  in Hamburg, Germany.</p>
 </div>
 ```
 
@@ -288,9 +288,9 @@ The terminal animation on the homepage types out content character by character 
 Page titles are the single most impactful on-page SEO factor. The titles on this site are structured to include relevant keywords naturally:
 
 ```
-Homepage: "Florian Riquelme — Senior Software Engineer | PHP, React, TypeScript, AWS"
+Homepage: "Florian Riquelme — Senior Engineer · AI Integration"
 Blog:     "Blog — Florian Riquelme | Code, Systems & DevOps"
-Post:     "deploying an astro site to aws — the full pipeline — friquelme.dev"
+Post:     "deploying astro to aws — the full pipeline — friquelme.dev"
 ```
 
 The pattern is: **primary keyword — secondary context | supporting keywords**. The homepage title includes the job title and key technologies. Blog post titles use the post's own title followed by the site name for brand consistency.

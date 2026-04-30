@@ -106,7 +106,7 @@ describe('getSeoMeta', () => {
       });
     });
 
-    it('emits Person publisher with site origin URL', () => {
+    it('emits Person publisher with site origin URL and logo', () => {
       const result = getSeoMeta(postInput, {
         site,
         pathname: '/blog/hello-world/',
@@ -116,6 +116,10 @@ describe('getSeoMeta', () => {
         '@type': 'Person',
         name: 'Florian Riquelme',
         url: 'https://friquelme.dev',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://friquelme.dev/og/index.png',
+        },
       });
     });
 
@@ -151,13 +155,15 @@ describe('getSeoMeta', () => {
       );
     });
 
-    it('omits image when imageSrc not provided', () => {
+    it('defaults image to /og/<slug>.png when imageSrc not provided', () => {
       const result = getSeoMeta(postInput, {
         site,
         pathname: '/blog/hello-world/',
       });
 
-      expect(result.articleJsonLd?.image).toBeUndefined();
+      expect(result.articleJsonLd?.image).toBe(
+        'https://friquelme.dev/og/hello-world.png',
+      );
     });
   });
 

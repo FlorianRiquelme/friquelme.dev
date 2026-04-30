@@ -38,7 +38,7 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
 <Layout
   title="Blog — Florian Riquelme | Code, Systems & DevOps"
-  description="thoughts on code, systems, and building things that work"
+  description="thoughts on shipping AI into production codebases — aws, devops, evals, and the boring infrastructure that lets non-technical teams trust LLMs."
   image={new URL('/og/index.png', Astro.site).href}
 >
     <!-- Header -->
@@ -56,10 +56,15 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
     <!-- Hero Section -->
     <section class="flex flex-col gap-10 bg-bg-page px-5 pt-16 pb-12 md:gap-12 md:px-16 md:pt-20 md:pb-[60px]">
-      <SectionHeader
-        command="$ cat ~/blog"
-        description="// thoughts on code, systems, and building things that work"
-      />
+      <div class="flex flex-col gap-6">
+        <h1 class="text-2xl font-semibold text-text-primary md:text-4xl">
+          shipping AI into real codebases.
+        </h1>
+        <SectionHeader
+          command="$ cat ~/blog"
+          description="// thoughts on code, systems, and building things that work"
+        />
+      </div>
 
       {featuredPost && (
         <BlogFeaturedCard
