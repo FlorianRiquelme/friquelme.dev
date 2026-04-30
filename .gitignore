@@ -33,3 +33,12 @@ docs/
 # Stryker mutation testing
 reports/
 .stryker-tmp/
+
+# Planning / research scratch (kept local)
+.research/
+.planning/
+.claude/HANDOFF.md
+EXECUTION_PLAN.md
+MANIFESTO_OUTLINE.md
+PORTFOLIO_REFRESH.md
+squirrel.toml
