@@ -30,7 +30,12 @@ const postsWithReadingTime = await Promise.all(
   })
 );
 
-const [featuredPost, ...remainingPosts] = postsWithReadingTime;
+const PINNED_SLUG = 'brownfield-ai';
+const pinned = postsWithReadingTime.find((p) => p.id === PINNED_SLUG);
+const featuredPost = pinned ?? postsWithReadingTime[0];
+const remainingPosts = pinned
+  ? postsWithReadingTime.filter((p) => p.id !== PINNED_SLUG)
+  : postsWithReadingTime.slice(1);
 
 // Collect unique tags from all posts
 const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
