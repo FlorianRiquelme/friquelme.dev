@@ -19,7 +19,7 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
 
 <a
   href={link}
-  class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
+  class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
 >
   {image && (
     <div class="h-[180px] w-full overflow-hidden bg-bg-input">
@@ -48,7 +48,7 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
     )}
     <div class="mt-auto flex items-center justify-between">
       {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
-      <span class="text-[11px] font-medium text-text-tertiary font-mono group-hover:text-text-secondary transition">
+      <span class="text-[11px] font-medium text-text-tertiary font-mono group-hover:text-text-secondary transition-colors">
         view_repo →
       </span>
     </div>

@@ -21,7 +21,7 @@ const { prevPost, nextPost } = Astro.props;
       {prevPost ? (
         <a href={`/blog/${prevPost.id}/`} class="flex flex-col gap-1 group">
           <span class="text-xs text-text-muted font-mono">&lt; previous post</span>
-          <span class="text-sm text-text-primary font-mono group-hover:text-green-primary transition">
+          <span class="text-sm text-text-primary font-mono group-hover:text-green-primary transition-colors">
             {prevPost.title}
           </span>
         </a>
@@ -31,7 +31,7 @@ const { prevPost, nextPost } = Astro.props;
       {nextPost ? (
         <a href={`/blog/${nextPost.id}/`} class="flex flex-col gap-1 items-end text-right group">
           <span class="text-xs text-text-muted font-mono">next post &gt;</span>
-          <span class="text-sm text-text-primary font-mono group-hover:text-green-primary transition">
+          <span class="text-sm text-text-primary font-mono group-hover:text-green-primary transition-colors">
             {nextPost.title}
           </span>
         </a>

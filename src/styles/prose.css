@@ -83,9 +83,9 @@
 }
 
 .prose blockquote {
-  background: color-mix(in oklab, var(--color-green-primary) 3%, transparent);
-  border-left: 3px solid var(--color-green-primary);
-  border-radius: 0 6px 6px 0;
+  background: color-mix(in oklab, var(--color-green-primary) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-green-primary) 20%, transparent);
+  border-radius: 6px;
   padding: 12px 16px;
   margin-bottom: 20px;
 }

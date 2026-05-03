@@ -24,7 +24,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2);
             <a
               href={`#${heading.slug}`}
               class:list={[
-                'block text-xs font-mono transition hover:text-green-primary',
+                'block text-xs font-mono transition-colors hover:text-green-primary',
                 'toc-link',
                 i === 0 ? 'text-green-primary' : 'text-text-tertiary',
               ]}

@@ -9,9 +9,9 @@ const { title = '~/directory — bash' } = Astro.props;
 <div class="w-full overflow-hidden rounded bg-bg-surface border border-border-primary">
   <!-- Title bar -->
   <div class="flex items-center gap-2 border-b border-border-primary bg-bg-input px-4 py-3">
-    <span class="size-3 rounded-full bg-red-error"></span>
-    <span class="size-3 rounded-full bg-amber-warning"></span>
-    <span class="size-3 rounded-full bg-green-primary"></span>
+    <span aria-hidden="true" class="size-3 rounded-full bg-red-error"></span>
+    <span aria-hidden="true" class="size-3 rounded-full bg-amber-warning"></span>
+    <span aria-hidden="true" class="size-3 rounded-full bg-green-primary"></span>
     <span class="ml-2 text-xs text-text-muted font-mono">{title}</span>
   </div>
   <!-- Content -->
