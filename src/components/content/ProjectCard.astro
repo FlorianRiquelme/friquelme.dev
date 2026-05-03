@@ -17,7 +17,10 @@ interface Props {
 const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = [] } = Astro.props;
 ---
 
-<div class="flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5">
+<a
+  href={link}
+  class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-all duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
+>
   {image && (
     <div class="h-[180px] w-full overflow-hidden bg-bg-input">
       <Picture
@@ -26,7 +29,7 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
         widths={[400, 800]}
         sizes="(max-width: 768px) 100vw, 50vw"
         alt={imageAlt}
-        class="h-full w-full object-cover"
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
         decoding="async"
       />
@@ -45,9 +48,9 @@ const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = 
     )}
     <div class="mt-auto flex items-center justify-between">
       {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
-      <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition">
+      <span class="text-[11px] font-medium text-text-tertiary font-mono group-hover:text-text-secondary transition">
         view_repo →
-      </a>
+      </span>
     </div>
   </div>
-</div>
+</a>
