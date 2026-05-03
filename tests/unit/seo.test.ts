@@ -84,13 +84,15 @@ describe('getSeoMeta', () => {
       );
     });
 
-    it('omits dateModified when not provided', () => {
+    it('falls back dateModified to datePublished when not provided', () => {
       const result = getSeoMeta(postInput, {
         site,
         pathname: '/blog/hello-world/',
       });
 
-      expect(result.articleJsonLd?.dateModified).toBeUndefined();
+      expect(result.articleJsonLd?.dateModified).toBe(
+        '2026-01-15T00:00:00.000Z',
+      );
     });
 
     it('emits Person author with site origin URL', () => {

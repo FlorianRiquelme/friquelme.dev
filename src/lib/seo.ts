@@ -56,7 +56,7 @@ export type ArticleJsonLd = {
   headline: string;
   description: string;
   datePublished: string;
-  dateModified?: string;
+  dateModified: string;
   author: Person;
   publisher: Publisher;
   mainEntityOfPage: WebPageRef;
@@ -90,9 +90,7 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
         headline: input.title,
         description: input.description,
         datePublished: input.datePublished.toISOString(),
-        ...(input.dateModified && {
-          dateModified: input.dateModified.toISOString(),
-        }),
+        dateModified: (input.dateModified ?? input.datePublished).toISOString(),
         author: {
           '@type': 'Person',
           name: input.author,

@@ -69,7 +69,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     <!-- Hero Bottom -->
     <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
       <div class="sr-only">
-        <p>Florian Riquelme — Senior Software Engineer. 9+ years shipping SaaS platforms, e-commerce, and web apps. Full-stack: PHP, React, TypeScript, Go, AWS. Currently at digital-masters in Hamburg, Germany.</p>
+        <p>Florian Riquelme is a senior software engineer at digital-masters in Hamburg, Germany, specializing in brownfield AI — integrating LLMs into existing production codebases without breaking trust. He has 9+ years shipping SaaS platforms, e-commerce, and web applications, and works full-stack across PHP, React, TypeScript, Go, and AWS. He maintains open-source tooling for autonomous AI workflows, including nachtschicht and ddev-claude, and writes about eval-gated rollouts, reversibility, and the operational discipline of running AI inside real codebases on real teams.</p>
       </div>
       <h1 class="text-2xl font-semibold text-text-primary text-center md:text-4xl">
         shipping products, not just writing code.
@@ -277,18 +277,31 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       {
         "@type": "WebSite",
         "name": "friquelme.dev",
-        "url": "https://friquelme.dev"
+        "url": "https://friquelme.dev",
+        "inLanguage": "en"
       },
       {
         "@type": "Person",
         "name": "Florian Riquelme",
         "url": "https://friquelme.dev",
         "jobTitle": "Senior Software Engineer",
+        "description": "Senior software engineer specializing in brownfield AI — integrating LLMs into existing production codebases without breaking trust. 9+ years across SaaS, e-commerce, and web platforms.",
+        "image": "https://friquelme.dev/og/index.png",
+        "email": "mailto:flo@friquelme.dev",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "digital-masters"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Hamburg",
+          "addressCountry": "DE"
+        },
         "sameAs": [
           "https://github.com/FlorianRiquelme",
           "https://linkedin.com/in/florian-riquelme"
         ],
-        "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS"]
+        "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS", "Brownfield AI", "LLM Integration"]
       }
     ]
   })} />
