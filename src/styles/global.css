@@ -52,6 +52,21 @@
 .stagger-2 { animation-delay: 0.15s; }
 .stagger-3 { animation-delay: 0.3s; }
 
+/* Layout-preserving hide for terminal lines: occupies final space from t=0 so
+   the surrounding container paints at its final size at FCP and content below
+   doesn't shift as lines reveal sequentially. */
+.terminal-hidden { visibility: hidden; }
+
+.terminal-reveal {
+  visibility: visible;
+  animation: terminal-line-reveal 280ms steps(24, end) forwards;
+}
+
+@keyframes terminal-line-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-animate] {
     opacity: 1;
@@ -62,6 +77,8 @@
   [data-animate-skill] {
     transition: none !important;
   }
+
+  .terminal-reveal { animation: none; }
 }
 
 @layer base {
