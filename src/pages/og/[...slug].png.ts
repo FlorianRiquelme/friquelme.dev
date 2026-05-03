@@ -7,7 +7,6 @@ import { html } from 'satori-html';
 import sharp from 'sharp';
 import { buildOgImageHtml, type OgImageInput } from '../../lib/og/template';
 import { getPublishedPosts } from '../../utils/blog';
-// @ts-expect-error — Vite ?inline returns a base64 data URI string
 import bgDataUri from '../../assets/og/bg.png?inline';
 
 const FONT_URL = new URL(
@@ -62,7 +61,7 @@ export const GET: APIRoute = async ({ props }) => {
     ],
   });
   const png = await sharp(Buffer.from(svg)).png().toBuffer();
-  return new Response(png, {
+  return new Response(new Uint8Array(png), {
     headers: { 'Content-Type': 'image/png' },
   });
 };

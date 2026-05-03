@@ -12,6 +12,7 @@ const articleSeo: SeoOutput = {
     headline: 'Test Post',
     description: 'A test.',
     datePublished: '2026-01-15T00:00:00.000Z',
+    dateModified: '2026-01-15T00:00:00.000Z',
     author: {
       '@type': 'Person',
       name: 'Florian Riquelme',
@@ -21,11 +22,16 @@ const articleSeo: SeoOutput = {
       '@type': 'Person',
       name: 'Florian Riquelme',
       url: 'https://friquelme.dev',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://friquelme.dev/og/index.png',
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': 'https://friquelme.dev/blog/test-post/',
     },
+    image: 'https://friquelme.dev/og/test-post.png',
     keywords: 'test',
   },
 };
