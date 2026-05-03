@@ -4,6 +4,23 @@
 
 Astro 5 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
 
+## Design Context
+
+Strategic and visual context lives in two files at the project root. **Read these before any design work.**
+
+- `PRODUCT.md` — register, users, product purpose, brand personality, anti-references, design principles, accessibility bar. The strategic source of truth.
+- `DESIGN.md` — Stitch-format visual system: tokens (colors, typography, rounded, spacing), six-section spec, named rules. The visual source of truth.
+- `DESIGN.json` — machine-readable sidecar with tonal ramps, motion tokens, and self-contained component snippets. Used by the impeccable live panel; do not hand-edit.
+
+Quick anchors for agents:
+- **Register:** `brand` (personal portfolio + manifesto blog; design IS the product).
+- **Position:** brownfield AI engineer for AI-enabled (not AI-native) companies.
+- **North Star:** "The Operator's Console" — terminal-native, restraint as authority.
+- **Eight named rules** govern the spec (One Voice, Tonal Ladder, Twin-Gray, Lowercase Default, Comment-as-Caption, Prompt-as-Heading, Flat-by-Default, Glow-Means-Interactive). See DESIGN.md.
+- **Hard bans:** side-stripe borders >1px, gradient text, glassmorphism, hero-metric templates, em dashes in shipped copy, `#000` / `#fff`.
+
+Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIGN.md + DESIGN.json) when the system shifts. Never edit DESIGN.json by hand.
+
 ## Commands
 
 - `pnpm dev` — local dev server at localhost:4321
@@ -32,21 +49,7 @@ All components are `.astro` files (no client-side framework). Client-side JS is 
 
 ## Styling
 
-Tailwind CSS 4 with a custom dark theme defined in `src/styles/global.css`. Key tokens:
-
-| Token | Value | Usage |
-|---|---|---|
-| `bg-page` | #0C0C0C | Page background |
-| `bg-surface` | #171717 | Cards, sections |
-| `green-primary` | #22C55E | Accent, CTAs, links |
-| `text-primary` | #E5E5E5 | Headings, body |
-| `text-secondary` | #A3A3A3 | Descriptions |
-| `text-tertiary` | #737373 | Subtle labels |
-| `text-muted` | #525252 | Decorative text |
-| `border-primary` | #1F1F1F | Card borders |
-| `font-mono` | JetBrains Mono | Everything — monospace throughout |
-
-The design is terminal-inspired. Keep this aesthetic consistent: monospace font, dark background, green accents, understated UI.
+Tailwind CSS 4 with a custom dark theme. Tokens are declared in `@theme` blocks inside `src/styles/global.css` (utilities like `bg-bg-page`, `text-text-primary`, `text-green-primary`, `border-border-primary`, `font-mono`). For the canonical token list, naming, role assignments, and named rules, see `DESIGN.md` — do not duplicate values here.
 
 ### Animations
 

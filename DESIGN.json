@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-03T11:47:38Z",
+  "title": "Design System: friquelme.dev",
+  "extensions": {
+    "colorMeta": {
+      "console-black": {
+        "role": "neutral",
+        "displayName": "Console Black",
+        "canonical": "oklch(13% 0 0)",
+        "tonalRamp": [
+          "oklch(8% 0 0)",
+          "oklch(13% 0 0)",
+          "oklch(20% 0 0)",
+          "oklch(30% 0 0)",
+          "oklch(45% 0 0)",
+          "oklch(60% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "tier-one-surface": {
+        "role": "neutral",
+        "displayName": "Tier-One Surface",
+        "canonical": "oklch(18% 0 0)",
+        "tonalRamp": [
+          "oklch(13% 0 0)",
+          "oklch(18% 0 0)",
+          "oklch(25% 0 0)",
+          "oklch(35% 0 0)",
+          "oklch(50% 0 0)",
+          "oklch(65% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "tier-two-inset": {
+        "role": "neutral",
+        "displayName": "Tier-Two Inset",
+        "canonical": "oklch(20% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(20% 0 0)",
+          "oklch(28% 0 0)",
+          "oklch(38% 0 0)",
+          "oklch(50% 0 0)",
+          "oklch(65% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "subtle-rule": {
+        "role": "neutral",
+        "displayName": "Subtle Rule",
+        "canonical": "oklch(22% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(22% 0 0)",
+          "oklch(30% 0 0)",
+          "oklch(40% 0 0)",
+          "oklch(52% 0 0)",
+          "oklch(66% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "active-rule": {
+        "role": "neutral",
+        "displayName": "Active Rule",
+        "canonical": "oklch(25% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(25% 0 0)",
+          "oklch(32% 0 0)",
+          "oklch(42% 0 0)",
+          "oklch(55% 0 0)",
+          "oklch(68% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "stdout-white": {
+        "role": "neutral",
+        "displayName": "Stdout White",
+        "canonical": "oklch(91% 0 0)",
+        "tonalRamp": [
+          "oklch(20% 0 0)",
+          "oklch(35% 0 0)",
+          "oklch(50% 0 0)",
+          "oklch(65% 0 0)",
+          "oklch(78% 0 0)",
+          "oklch(86% 0 0)",
+          "oklch(91% 0 0)",
+          "oklch(96% 0 0)"
+        ]
+      },
+      "body-gray": {
+        "role": "neutral",
+        "displayName": "Body Gray",
+        "canonical": "oklch(70% 0 0)",
+        "tonalRamp": [
+          "oklch(20% 0 0)",
+          "oklch(32% 0 0)",
+          "oklch(45% 0 0)",
+          "oklch(58% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(88% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "comment-gray": {
+        "role": "neutral",
+        "displayName": "Comment Gray",
+        "canonical": "oklch(58% 0 0)",
+        "tonalRamp": [
+          "oklch(18% 0 0)",
+          "oklch(28% 0 0)",
+          "oklch(38% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(58% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "decoration-gray": {
+        "role": "neutral",
+        "displayName": "Decoration Gray",
+        "canonical": "oklch(60% 0 0)",
+        "tonalRamp": [
+          "oklch(20% 0 0)",
+          "oklch(30% 0 0)",
+          "oklch(40% 0 0)",
+          "oklch(50% 0 0)",
+          "oklch(60% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(83% 0 0)",
+          "oklch(94% 0 0)"
+        ]
+      },
+      "kernel-green": {
+        "role": "primary",
+        "displayName": "Kernel Green",
+        "canonical": "oklch(73% 0.21 142)",
+        "tonalRamp": [
+          "oklch(20% 0.06 142)",
+          "oklch(32% 0.10 142)",
+          "oklch(45% 0.15 142)",
+          "oklch(57% 0.19 142)",
+          "oklch(65% 0.21 142)",
+          "oklch(73% 0.21 142)",
+          "oklch(85% 0.16 142)",
+          "oklch(94% 0.07 142)"
+        ]
+      },
+      "caution-amber": {
+        "role": "tertiary",
+        "displayName": "Caution Amber",
+        "canonical": "oklch(76% 0.17 70)",
+        "tonalRamp": [
+          "oklch(25% 0.06 70)",
+          "oklch(38% 0.10 70)",
+          "oklch(50% 0.14 70)",
+          "oklch(62% 0.16 70)",
+          "oklch(70% 0.17 70)",
+          "oklch(76% 0.17 70)",
+          "oklch(86% 0.13 70)",
+          "oklch(94% 0.06 70)"
+        ]
+      },
+      "halt-red": {
+        "role": "tertiary",
+        "displayName": "Halt Red",
+        "canonical": "oklch(67% 0.22 25)",
+        "tonalRamp": [
+          "oklch(22% 0.07 25)",
+          "oklch(34% 0.12 25)",
+          "oklch(46% 0.17 25)",
+          "oklch(58% 0.20 25)",
+          "oklch(67% 0.22 25)",
+          "oklch(77% 0.18 25)",
+          "oklch(86% 0.12 25)",
+          "oklch(94% 0.05 25)"
+        ]
+      },
+      "info-blue": {
+        "role": "tertiary",
+        "displayName": "Info Blue",
+        "canonical": "oklch(64% 0.19 256)",
+        "tonalRamp": [
+          "oklch(22% 0.07 256)",
+          "oklch(34% 0.11 256)",
+          "oklch(46% 0.15 256)",
+          "oklch(56% 0.18 256)",
+          "oklch(64% 0.19 256)",
+          "oklch(75% 0.16 256)",
+          "oklch(86% 0.10 256)",
+          "oklch(94% 0.04 256)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero h1 and article h1 only. Holds the page promise."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section header commands ($ ls -la, $ neofetch). Set in Kernel Green so they read as terminal commands, not prose."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, sub-section h2, featured-card h2."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraph copy in long-form posts and descriptive UI text. Long-form line height lifts to 1.8."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, nav, tags, badges, footer copyright. The most-used scale on the site."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hover-glow",
+        "value": "0 10px 15px -3px rgba(34,197,94,0.05), 0 4px 6px -4px rgba(34,197,94,0.05)",
+        "purpose": "Green-tinted ambient halo on interactive cards (project card, blog post card) under :hover. Paired with translateY(-4px) and a green-tinted border. The only shadow in the system; reserved for state, never structure."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-quick",
+        "value": "200ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default duration/ease for button hover, link colour shifts, simple state transitions."
+      },
+      {
+        "name": "ease-card",
+        "value": "300ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Card hover lift, image scale, border tint. Slower than ease-quick to read as a deliberate response."
+      },
+      {
+        "name": "ease-skill",
+        "value": "1000ms cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Skill bar width fill on first scroll-into-view. Heavy ease-out so the bar lands rather than coasts."
+      },
+      {
+        "name": "fade-in-up",
+        "value": "600ms cubic-bezier(0, 0, 0.2, 1) forwards",
+        "purpose": "Sectional reveal as elements scroll into view. Translate from +20px Y to 0 with opacity fade. Stagger via 0/0.15s/0.3s delays. Bypassed entirely under prefers-reduced-motion."
+      },
+      {
+        "name": "blink",
+        "value": "1s steps(1) infinite",
+        "purpose": "Terminal cursor block. Step-end timing keeps the blink crisp, never smooth."
+      },
+      {
+        "name": "ping",
+        "value": "1s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "purpose": "Status indicator halo. The site's only ambient motion at rest. Renders as an expanding green ring at 75% opacity fading to 0."
+      },
+      {
+        "name": "type-reveal",
+        "value": "280ms steps(24, end) forwards",
+        "purpose": "Terminal line reveal. Steps the clip-path from inset(0 100% 0 0) to inset(0) so characters appear one at a time, like a real shell."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action. Kernel Green surface, Console Black text, leading terminal icon. Coverage budget: at most one per visible viewport.",
+      "html": "<button class=\"ds-btn-primary\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"4 17 10 11 4 5\"/><line x1=\"12\" x2=\"20\" y1=\"19\" y2=\"19\"/></svg><span>read_blog</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: #22C55E; color: #0C0C0C; border: none; border-radius: 4px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; font-weight: 500; cursor: pointer; transition: filter 200ms cubic-bezier(0.4,0,0.2,1), transform 200ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary svg { width: 16px; height: 16px; } .ds-btn-primary:hover { filter: brightness(1.1); } .ds-btn-primary:active { transform: scale(0.95); } .ds-btn-primary:focus-visible { outline: 2px solid rgba(34,197,94,0.6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quieter companion to Primary. Tier-One Surface with a 1px Subtle Rule border; border darkens slightly on hover.",
+      "html": "<button class=\"ds-btn-secondary\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4\"/><path d=\"M9 18c-4.51 2-5-2-7-2\"/></svg><span>github_profile</span></button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: #171717; color: #858585; border: 1px solid #1F1F1F; border-radius: 4px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; font-weight: 400; cursor: pointer; transition: border-color 200ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-secondary svg { width: 16px; height: 16px; } .ds-btn-secondary:hover { border-color: #252525; } .ds-btn-secondary:focus-visible { outline: 2px solid rgba(34,197,94,0.6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "No-chrome variant. Used for tertiary actions where Secondary would be too loud.",
+      "html": "<button class=\"ds-btn-ghost\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg><span>view_more</span></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: transparent; color: #898989; border: none; border-radius: 4px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; cursor: pointer; transition: color 200ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-ghost svg { width: 16px; height: 16px; } .ds-btn-ghost:hover { color: #858585; } .ds-btn-ghost:focus-visible { outline: 2px solid rgba(34,197,94,0.6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Read-only metadata pill. Used for project tech tags and post topics. No interaction.",
+      "html": "<span class=\"ds-tag\">typescript</span>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; padding: 4px 10px; background: #1A1A1A; color: #A3A3A3; border-radius: 2px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 11px; line-height: 1.4; }"
+    },
+    {
+      "name": "Status Indicator",
+      "kind": "custom",
+      "refersTo": "nav-item-active",
+      "description": "Pulsing green dot with label. Sits in the header, signalling presence. The site's only ambient motion at rest.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-status-dot\"><span class=\"ds-status-pulse\"></span><span class=\"ds-status-core\"></span></span><span class=\"ds-status-label\">building things</span></div>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 11px; color: #22C55E; } .ds-status-dot { position: relative; display: inline-flex; width: 8px; height: 8px; } .ds-status-pulse { position: absolute; inset: 0; background: #22C55E; border-radius: 9999px; opacity: 0.75; animation: ds-status-ping 1s cubic-bezier(0,0,0.2,1) infinite; } .ds-status-core { position: relative; width: 8px; height: 8px; background: #22C55E; border-radius: 9999px; } @keyframes ds-status-ping { 75%, 100% { transform: scale(2); opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-status-pulse { animation: none; } }"
+    },
+    {
+      "name": "Nav Item (Active)",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Header navigation entry. Active state shows a leading green > prompt and a Tier-Two Inset background pill. Inactive entries hold a non-breaking space in place of the prompt to preserve alignment.",
+      "html": "<a href=\"#about\" class=\"ds-nav-item ds-nav-item-active\"><span class=\"ds-nav-prompt\">&gt;</span><span>about</span></a>",
+      "css": ".ds-nav-item { display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 4px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; text-decoration: none; transition: color 200ms cubic-bezier(0.4,0,0.2,1); color: #858585; } .ds-nav-item:hover { color: #A3A3A3; } .ds-nav-item-active { background: #1A1A1A; color: #22C55E; font-weight: 500; } .ds-nav-prompt { color: #22C55E; } .ds-nav-item:not(.ds-nav-item-active) .ds-nav-prompt { color: #898989; }"
+    },
+    {
+      "name": "Card Surface",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Default content card. Tier-One Surface with a 1px Subtle Rule border. Interactive variants (project, blog post) lift on hover with a green-tinted glow; the unstyled default holds still.",
+      "html": "<a href=\"#\" class=\"ds-card-interactive\"><div class=\"ds-card-body\"><h3 class=\"ds-card-title\">cashmunk</h3><p class=\"ds-card-desc\">// privacy-first envelope budgeting app for ios. your data stays on your device, pay once, own forever.</p><div class=\"ds-card-tags\"><span class=\"ds-tag\">swift</span><span class=\"ds-tag\">ios</span><span class=\"ds-tag\">privacy</span></div><div class=\"ds-card-foot\"><span class=\"ds-card-link\">view_repo &rarr;</span></div></div></a>",
+      "css": ".ds-card-interactive { display: flex; flex-direction: column; gap: 12px; background: #171717; border: 1px solid #1F1F1F; border-radius: 4px; padding: 20px; text-decoration: none; transition: transform 300ms cubic-bezier(0.4,0,0.2,1), border-color 300ms cubic-bezier(0.4,0,0.2,1), box-shadow 300ms cubic-bezier(0.4,0,0.2,1); } .ds-card-interactive:hover { transform: translateY(-4px); border-color: rgba(34,197,94,0.2); box-shadow: 0 10px 15px -3px rgba(34,197,94,0.05), 0 4px 6px -4px rgba(34,197,94,0.05); } .ds-card-title { color: #E5E5E5; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 16px; font-weight: 600; margin: 0; } .ds-card-desc { color: #858585; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 12px; line-height: 1.6; margin: 0; } .ds-card-tags { display: flex; flex-wrap: wrap; gap: 8px; } .ds-card-foot { margin-top: auto; display: flex; justify-content: flex-end; padding-top: 4px; } .ds-card-link { color: #858585; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 11px; font-weight: 500; transition: color 200ms cubic-bezier(0.4,0,0.2,1); } .ds-card-interactive:hover .ds-card-link { color: #A3A3A3; } .ds-tag { display: inline-flex; align-items: center; padding: 4px 10px; background: #1A1A1A; color: #A3A3A3; border-radius: 2px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 11px; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Labelled text field with a leading terminal icon. Tier-Two Inset surface, Subtle Rule border. Focus shows a 2px Kernel Green inset ring at 40% alpha; the input keeps outline-none so the visible state lives on the bordered shell.",
+      "html": "<label class=\"ds-input-group\"><span class=\"ds-input-label\">email</span><span class=\"ds-input-shell\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"4 17 10 11 4 5\"/><line x1=\"12\" x2=\"20\" y1=\"19\" y2=\"19\"/></svg><input type=\"email\" placeholder=\"flo@friquelme.dev\" class=\"ds-input\"/></span></label>",
+      "css": ".ds-input-group { display: flex; flex-direction: column; gap: 8px; } .ds-input-label { color: #A3A3A3; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 12px; font-weight: 500; } .ds-input-shell { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #1A1A1A; border: 1px solid #1F1F1F; border-radius: 4px; transition: border-color 200ms cubic-bezier(0.4,0,0.2,1); } .ds-input-shell:focus-within { border-color: rgba(34,197,94,0.5); box-shadow: 0 0 0 2px rgba(34,197,94,0.2) inset; } .ds-input-shell svg { width: 14px; height: 14px; color: #898989; flex-shrink: 0; } .ds-input { flex: 1; background: transparent; border: none; outline: none; color: #E5E5E5; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; } .ds-input::placeholder { color: #898989; }"
+    },
+    {
+      "name": "Section Header",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Top-of-section heading written as a terminal command. The h2 is set in Kernel Green; the description below leads with // as a code comment. Treated as the canonical way to open every landing-page section.",
+      "html": "<div class=\"ds-section-header\"><h2 class=\"ds-section-cmd\">$ ls -la ~/projects</h2><p class=\"ds-section-desc\">// side projects &amp; open source</p></div>",
+      "css": ".ds-section-header { display: flex; flex-direction: column; gap: 8px; } .ds-section-cmd { margin: 0; color: #22C55E; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 28px; font-weight: 600; line-height: 1.3; } .ds-section-desc { margin: 0; color: #858585; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; } @media (max-width: 767px) { .ds-section-cmd { font-size: 18px; } }"
+    },
+    {
+      "name": "Terminal Window",
+      "kind": "custom",
+      "refersTo": "card-surface",
+      "description": "Signature component. Faux-macOS terminal frame holding hero copy, contact details, or any narrative content the site wants to anchor in CLI grammar. Use sparingly — its weight depends on rarity.",
+      "html": "<div class=\"ds-terminal\"><div class=\"ds-terminal-bar\"><span class=\"ds-terminal-dot\" style=\"background:#EF4444\"></span><span class=\"ds-terminal-dot\" style=\"background:#F59E0B\"></span><span class=\"ds-terminal-dot\" style=\"background:#22C55E\"></span><span class=\"ds-terminal-title\">~/friquelme.dev — bash</span></div><div class=\"ds-terminal-body\"><p class=\"ds-terminal-cmd\">$ whoami</p><p class=\"ds-terminal-out\">florian riquelme — senior software engineer</p><div style=\"height:12px\"></div><p class=\"ds-terminal-cmd\">$ cat intro.txt</p><p class=\"ds-terminal-out-soft\">9+ years shipping saas platforms, e-commerce, and web apps.</p><div class=\"ds-terminal-cursor-row\"><span class=\"ds-terminal-cmd\">$ </span><span class=\"ds-terminal-cursor\"></span></div></div></div>",
+      "css": ".ds-terminal { width: 100%; overflow: hidden; background: #171717; border: 1px solid #1F1F1F; border-radius: 4px; } .ds-terminal-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #1A1A1A; border-bottom: 1px solid #1F1F1F; } .ds-terminal-dot { width: 12px; height: 12px; border-radius: 9999px; } .ds-terminal-title { margin-left: 8px; color: #898989; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 12px; } .ds-terminal-body { display: flex; flex-direction: column; gap: 6px; padding: 16px; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 13px; } @media (min-width: 768px) { .ds-terminal-body { padding: 24px; } } .ds-terminal-cmd { margin: 0; color: #22C55E; font-weight: 500; } .ds-terminal-out { margin: 0; color: #E5E5E5; } .ds-terminal-out-soft { margin: 0; color: #A3A3A3; } .ds-terminal-cursor-row { display: flex; align-items: center; } .ds-terminal-cursor { width: 9px; height: 18px; background: #22C55E; animation: ds-blink 1s steps(1) infinite; } @keyframes ds-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-terminal-cursor { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Operator's Console",
+    "overview": "A console for the people who already live in a console. The visual language is the practitioner's workspace, not a depiction of one. Every element ought to feel as if it were rendered by ls, cat, or ps — typeface, prompts, status pulses, comment slashes — and not as nostalgic costume but as the reader's actual habitat. The audience (hiring engineers and EMs at AI-enabled companies) recognises the form on sight; that recognition is the filter, and the filter is the point.\n\nThe philosophy is restraint as authority. Where the category shouts (gradients, neon, particle backgrounds, hero-metric templates), this site says less. One accent, one font family, three depth tiers. The site itself is the proof of craft for the brownfield AI thesis: if the portfolio cannot ship with the same discipline that's claimed about production AI, the position collapses. Every visual choice serves the position or gets cut.\n\nAnti-references, carried over from PRODUCT.md and enforced visually here: gradient-heavy SaaS landing pages, neon-on-black 'AI engineer' portfolios, glassmorphism, hero-metric templates, identical card grids, and bootcamp-grad portfolios with decorative SVG illustrations and pastel palettes.",
+    "keyCharacteristics": [
+      "Mono-forward typography (JetBrains Mono, all roles)",
+      "Three-tier tonal depth on a near-black canvas, no shadows at rest",
+      "Single saturated accent (Kernel Green) used sparingly for signal, never decoration",
+      "Terminal grammar treated as first-class typography: $ prompts, // comments, ~ paths",
+      "Lowercase by default in copy and UI; uppercase reserved for nothing",
+      "Tight component shapes (4px corners, full borders, no side stripes)"
+    ],
+    "rules": [
+      {
+        "name": "The One Voice Rule",
+        "body": "Kernel Green is the only saturated colour on most screens. If the screen has more than one saturated colour, one of them is wrong. The amber/red/blue semantic trio exists for state, not for decoration; they appear as 8% backgrounds with full-strength text, never as primary surface treatments.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tonal Ladder Rule",
+        "body": "Depth is tonal, never shadowed. The three steps are Console Black → Tier-One Surface → Tier-Two Inset. A new component must pick one step, not invent a fourth.",
+        "section": "colors"
+      },
+      {
+        "name": "The Twin-Gray Rule",
+        "body": "Comment Gray (#858585) and Decoration Gray (#898989) are intentionally near-identical. Pick by role, not by appearance: Comment Gray for inline content (descriptions, captions, table cells), Decoration Gray for chrome (timestamps, footers, label tier). Never introduce a third gray in this band.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lowercase Default Rule",
+        "body": "UI copy and headings default to lowercase. The terminal hates Shift. Capitalisation, when it appears, is in long-form blog body text only — and even there, sentence case dominates.",
+        "section": "typography"
+      },
+      {
+        "name": "The Comment-as-Caption Rule",
+        "body": "Descriptive text under a heading or beside a section is framed with leading // . Section descriptions, project blurbs, and footer copyright all follow this. It treats helper text as code commentary, not marketing copy.",
+        "section": "typography"
+      },
+      {
+        "name": "The Prompt-as-Heading Rule",
+        "body": "Top-level section headers on landing pages are written as terminal commands prefixed with $ and coloured Kernel Green. They are headings, not decoration; screen readers receive them as h2 elements.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "No component has a resting shadow. If a designer reaches for box-shadow on a default state, the answer is to step the surface up the tonal ladder instead.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glow-Means-Interactive Rule",
+        "body": "The green-tinted hover halo is reserved for elements that change route on click. Static cards (skill bars, status indicators, dividers) do not get the treatment. Hover effects are a state contract, not decoration.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep Kernel Green coverage at or below 10% of any given screen. Its rarity is the meaning.",
+      "Do use the three-tier tonal ladder (Console Black → Tier-One Surface → Tier-Two Inset) as the only depth grammar. New components pick a step, not a shadow.",
+      "Do treat $ prefixes, // comments, and ~ paths as first-class typography. They are headings and captions, not decoration.",
+      "Do write UI copy in lowercase by default. Sentence case appears only in long-form blog body.",
+      "Do pair the Kernel Green accent with a non-colour cue (text, icon, prompt prefix) so state never depends on hue alone.",
+      "Do hold body text contrast ≥ 4.5:1 and large text / UI components ≥ 3:1 against the dark surfaces. Stdout White on Console Black clears this comfortably; Comment Gray and Decoration Gray sit at the edge — verify before promoting either to body copy.",
+      "Do respect prefers-reduced-motion. Reduced-motion users get the same content, just without movement.",
+      "Do ship hover/focus/active states on every interactive element. A static default-only component reads as dead."
+    ],
+    "donts": [
+      "Don't use border-left or border-right greater than 1px as a coloured accent stripe on cards, list items, callouts, or alerts. The Callout and prose blockquote use full-perimeter 1px green/20 borders with a 6% green background tint and a leading > glyph — copy that pattern for any new emphasised block.",
+      "Don't write gradient text. No background-clip: text with a gradient. Single solid colour, emphasis via weight or size.",
+      "Don't use glassmorphism. No backdrop blurs as decoration. The dark surfaces don't need fog.",
+      "Don't introduce a hero-metric template (big number, small label, supporting stats, gradient accent). The MetricCard primitive exists for genuine data display, not for SaaS-cliché identity.",
+      "Don't ship identical card grids. The homepage already varies card sizes (project grid 2-up, blog grid 3-up, featured card full-width). Maintain that variation; do not collapse to a single card system.",
+      "Don't reach for a modal as the first thought. Inline disclosure, progressive enhancement, or a separate route almost always beats a modal on this site.",
+      "Don't introduce a third gray near #858585 / #898989. The pair already covers tertiary and chrome roles. New muted needs pick one; they don't add a third.",
+      "Don't add a second display font, body font, or sans companion. JetBrains Mono carries every role.",
+      "Don't wrap copy in a max-w-prose container reflexively. Most landing-page sections want their own measure.",
+      "Don't write em dashes in copy. Use commas, colons, semicolons, periods, or parentheses. This rule applies in .astro and .mdx files alike.",
+      "Don't use #000 or #fff anywhere. Console Black (#0C0C0C) and Stdout White (#E5E5E5) are the only legal extremes.",
+      "Don't describe yourself with adjectives the audience can't verify ('AI-driven', 'scalable', 'robust'). Show, don't tell.",
+      "Don't ship a marketing aesthetic. Neon, particles, animated gradients, 'Trusted by' logo bars, and gradient-heavy CTA bands are the anti-position. If the screen could appear unchanged on a generic AI-product landing page, redo it."
+    ]
+  }
+}
