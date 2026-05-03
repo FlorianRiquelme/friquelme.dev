@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import '@fontsource-variable/jetbrains-mono';
+import jetbrainsMonoLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import PostHog from '../components/posthog.astro';
 import type { SeoOutput } from '../lib/seo';
 
@@ -26,6 +27,7 @@ const ogType = seo?.type ?? type;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://eu.i.posthog.com" crossorigin />
     <link rel="preconnect" href="https://eu-assets.i.posthog.com" crossorigin />
+    <link rel="preload" href={jetbrainsMonoLatin} as="font" type="font/woff2" crossorigin />
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     <title>{title}</title>
