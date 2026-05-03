@@ -10,19 +10,16 @@ import Footer from '../../components/nav/Footer.astro';
 
 // UI
 import StatusIndicator from '../../components/ui/StatusIndicator.astro';
-import Divider from '../../components/ui/Divider.astro';
 import Tag from '../../components/ui/Tag.astro';
 
-// Blog
+// Content
 import SectionHeader from '../../components/content/SectionHeader.astro';
-import BlogFeaturedCard from '../../components/blog/BlogFeaturedCard.astro';
-import BlogPostCard from '../../components/blog/BlogPostCard.astro';
+import TerminalWindow from '../../components/content/TerminalWindow.astro';
 
-import { getPublishedPosts } from '../../utils/blog';
+import { getPublishedPosts, formatDate } from '../../utils/blog';
 
 const posts = getPublishedPosts(await getCollection('blog'));
 
-// Get reading times for all posts
 const postsWithReadingTime = await Promise.all(
   posts.map(async (post) => {
     const { remarkPluginFrontmatter } = await render(post);
@@ -31,14 +28,8 @@ const postsWithReadingTime = await Promise.all(
 );
 
 const PINNED_SLUG = 'brownfield-ai';
-const pinned = postsWithReadingTime.find((p) => p.id === PINNED_SLUG);
-const featuredPost = pinned ?? postsWithReadingTime[0];
-const remainingPosts = pinned
-  ? postsWithReadingTime.filter((p) => p.id !== PINNED_SLUG)
-  : postsWithReadingTime.slice(1);
-
-// Collect unique tags from all posts
-const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const pinned = postsWithReadingTime.find((p) => p.id === PINNED_SLUG) ?? postsWithReadingTime[0];
+const rest = postsWithReadingTime.filter((p) => p.id !== pinned.id);
 ---
 
 <Layout
@@ -46,86 +37,134 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   description="thoughts on shipping AI into production codebases: aws, devops, evals, and the boring infrastructure that lets non-technical teams trust LLMs."
   image={new URL('/og/index.png', Astro.site).href}
 >
-    <!-- Header -->
-    <HeaderBar>
-      <Logo name="friquelme.dev" slot="logo" />
-      <Fragment slot="nav">
-        <NavItem label="about" href="/#about" />
-        <NavItem label="projects" href="/#projects" />
-        <NavItem label="skills" href="/#skills" />
-        <NavItem label="blog" href="/blog/" active />
-        <NavItem label="contact" href="/#contact" />
-      </Fragment>
-      <StatusIndicator text="building things" slot="status" />
-    </HeaderBar>
+  <HeaderBar>
+    <Logo name="friquelme.dev" slot="logo" />
+    <Fragment slot="nav">
+      <NavItem label="about" href="/#about" />
+      <NavItem label="projects" href="/#projects" />
+      <NavItem label="skills" href="/#skills" />
+      <NavItem label="blog" href="/blog/" active />
+      <NavItem label="contact" href="/#contact" />
+    </Fragment>
+    <StatusIndicator text="building things" slot="status" />
+  </HeaderBar>
 
-    <!-- Hero Section -->
-    <section class="flex flex-col gap-10 bg-bg-page px-5 pt-16 pb-12 md:gap-12 md:px-16 md:pt-20 md:pb-[60px]">
-      <div class="flex flex-col gap-6">
-        <h1 class="text-2xl font-semibold text-text-primary md:text-4xl">
-          shipping AI into real codebases.
-        </h1>
-        <SectionHeader
-          command="$ cat ~/blog"
-          description="// thoughts on code, systems, and building things that work"
-        />
+  <!-- Hero -->
+  <section class="mx-auto flex w-full max-w-[920px] flex-col gap-10 px-5 pt-16 pb-12 md:gap-12 md:px-8 md:pt-20 md:pb-[60px]">
+    <div class="flex flex-col gap-6">
+      <h1 class="text-2xl font-semibold text-text-primary md:text-4xl">
+        shipping AI into real codebases.
+      </h1>
+      <SectionHeader
+        command="$ cat ~/blog"
+        description="// thoughts on code, systems, and building things that work"
+      />
+    </div>
+
+    <!-- Pinned essay -->
+    <a
+      href={`/blog/${pinned.id}/`}
+      class="group block transition-transform duration-300 hover:-translate-y-0.5"
+      aria-label={`open pinned essay: ${pinned.data.title}`}
+    >
+      <TerminalWindow title={`~/posts/${pinned.id}.md — bash`}>
+        <p class="font-mono text-[13px] font-semibold leading-[1.4] text-green-primary">
+          $ cat {pinned.id}.md
+        </p>
+        <p class="font-mono text-[12px] text-text-muted">{'// pinned'}</p>
+        <div class="h-2"></div>
+        <h2 class="font-mono text-xl font-semibold leading-[1.3] text-text-primary md:text-2xl">
+          {pinned.data.title}
+        </h2>
+        <div class="h-1"></div>
+        <p class="max-w-[62ch] font-mono text-[13px] leading-[1.7] text-text-secondary">
+          {pinned.data.description}
+        </p>
+        <div class="h-3"></div>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[11px] text-text-muted">
+          <time datetime={pinned.data.pubDate.toISOString()}>{formatDate(pinned.data.pubDate)}</time>
+          <span aria-hidden="true">·</span>
+          {pinned.readingTime && <span>{pinned.readingTime}</span>}
+        </div>
+        <div class="mt-2 flex flex-wrap gap-2">
+          {pinned.data.tags.map((tag) => <Tag label={tag} />)}
+        </div>
+        <div class="h-3"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-[13px] font-semibold text-green-primary">$ open</span>
+          <span class="font-mono text-[13px] text-text-primary transition-colors group-hover:text-green-primary">
+            ~/posts/{pinned.id}.md
+          </span>
+          <span class="font-mono text-[13px] text-green-primary opacity-70 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100" aria-hidden="true">
+            →
+          </span>
+        </div>
+        <div class="h-2"></div>
+        <p class="font-mono text-[11px] text-text-muted">{'// EOF'}</p>
+      </TerminalWindow>
+    </a>
+  </section>
+
+  <!-- Recent posts -->
+  {rest.length > 0 && (
+    <section class="mx-auto flex w-full max-w-[920px] flex-col gap-6 px-5 pb-16 md:px-8 md:pb-[80px]">
+      <div class="flex flex-col gap-1.5">
+        <h2 class="font-mono text-lg font-semibold text-green-primary md:text-xl">
+          $ ls ./posts --recent
+        </h2>
+        <p class="font-mono text-[12px] text-text-tertiary">
+          // {rest.length} {rest.length === 1 ? 'file' : 'files'}
+        </p>
       </div>
 
-      {featuredPost && (
-        <BlogFeaturedCard
-          title={featuredPost.data.title}
-          description={featuredPost.data.description}
-          pubDate={featuredPost.data.pubDate}
-          heroImage={featuredPost.data.heroImage}
-          heroImageAlt={featuredPost.data.heroImageAlt}
-          slug={featuredPost.id}
-          readingTime={featuredPost.readingTime}
-        />
-      )}
+      <ol class="flex flex-col" role="list">
+        {rest.map((post, i) => {
+          const idx = String(i + 1).padStart(3, '0');
+          return (
+            <li class="border-t border-border-primary last:border-b" data-animate>
+              <a
+                href={`/blog/${post.id}/`}
+                class="group grid grid-cols-[auto_1fr_auto] items-start gap-x-4 gap-y-1 px-3 py-5 transition-colors duration-200 hover:bg-bg-surface md:px-4"
+              >
+                <span class="font-mono text-[13px] leading-[1.4] text-text-muted">{idx}/</span>
+
+                <div class="flex min-w-0 flex-col gap-1.5">
+                  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span class="font-mono text-[11px] uppercase tracking-wide text-text-muted">
+                      {formatDate(post.data.pubDate).toLowerCase()}
+                    </span>
+                    {post.readingTime && (
+                      <span class="font-mono text-[11px] text-text-muted">· {post.readingTime}</span>
+                    )}
+                  </div>
+                  <h3 class="font-mono text-[15px] font-semibold leading-[1.4] text-text-primary transition-colors group-hover:text-green-primary md:text-base">
+                    {post.data.title}
+                  </h3>
+                  <p class="font-mono text-[13px] leading-[1.6] text-text-secondary">
+                    {post.data.description}
+                  </p>
+                  <div class="mt-1 flex flex-wrap gap-2">
+                    {post.data.tags.slice(0, 3).map((tag) => (
+                      <Tag label={tag} />
+                    ))}
+                  </div>
+                </div>
+
+                <span class="self-center font-mono text-base text-green-primary opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
     </section>
+  )}
 
-    <Divider />
-
-    <!-- Posts Section -->
-    {remainingPosts.length > 0 && (
-      <section class="flex flex-col gap-10 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-[60px]">
-        <!-- Header row -->
-        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <h2 class="text-lg font-semibold text-green-primary font-mono md:text-xl">$ ls ./posts --recent</h2>
-          <div class="flex flex-wrap items-center gap-3">
-            {allTags.map((tag) => (
-              <Tag label={tag} />
-            ))}
-          </div>
-        </div>
-
-        <!-- Posts grid -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {remainingPosts.map((post) => (
-            <div data-animate>
-              <BlogPostCard
-                title={post.data.title}
-                description={post.data.description}
-                pubDate={post.data.pubDate}
-                tags={post.data.tags}
-                heroImage={post.data.heroImage}
-                heroImageAlt={post.data.heroImageAlt}
-                slug={post.id}
-                readingTime={post.readingTime}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-    )}
-
-    {remainingPosts.length > 0 && <Divider />}
-
-    <!-- Footer -->
-    <Footer brandName="friquelme.dev" copyright="// designed & built by florian riquelme © 2026">
-      <Fragment slot="links">
-        <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition-colors">github</a>
-        <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition-colors">linkedin</a>
-      </Fragment>
-    </Footer>
+  <Footer brandName="friquelme.dev" copyright="// designed & built by florian riquelme © 2026">
+    <Fragment slot="links">
+      <a href="https://github.com/FlorianRiquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition-colors">github</a>
+      <a href="https://linkedin.com/in/florian-riquelme" class="text-xs text-text-tertiary hover:text-text-secondary transition-colors">linkedin</a>
+    </Fragment>
+  </Footer>
 </Layout>
