@@ -12,10 +12,10 @@ const { name, percentage } = Astro.props;
     <span class="text-xs text-text-secondary font-mono">{name}</span>
     <span class="text-xs font-medium text-green-primary font-mono">{percentage}%</span>
   </div>
-  <div class="h-1 w-full rounded-sm bg-border-primary">
+  <div class="h-1 w-full overflow-hidden rounded-sm bg-border-primary">
     <div
-      class="h-1 rounded-sm bg-green-primary transition-all duration-1000 ease-out"
-      style="width: 0%"
+      class="h-1 w-full origin-left rounded-sm bg-green-primary transition-transform duration-1000 ease-out"
+      style="transform: scaleX(0)"
       data-animate-skill
       data-target-width={percentage}
     ></div>

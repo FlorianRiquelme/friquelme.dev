@@ -68,7 +68,8 @@ const ogType = seo?.type ?? type;
 
       function animateSkillBars(parent: HTMLElement) {
         parent.querySelectorAll<HTMLElement>('[data-animate-skill]').forEach((el) => {
-          el.style.width = el.dataset.targetWidth + '%';
+          const target = Number(el.dataset.targetWidth ?? 0);
+          el.style.transform = `scaleX(${Math.max(0, Math.min(100, target)) / 100})`;
         });
       }
 
