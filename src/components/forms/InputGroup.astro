@@ -12,7 +12,7 @@ const { label, placeholder = '', icon = 'lucide:terminal' } = Astro.props;
 
 <div class="flex flex-col gap-2">
   <label class="text-xs font-medium text-text-secondary font-mono">{label}</label>
-  <div class="flex items-center gap-2 rounded bg-bg-input border border-border-primary px-3.5 py-2.5">
+  <div class="flex items-center gap-2 rounded bg-bg-input border border-border-primary px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-primary/40">
     <Icon name={icon} class="size-3.5 text-text-muted" />
     <input
       type="text"

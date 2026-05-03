@@ -79,6 +79,11 @@
   }
 
   .terminal-reveal { animation: none; }
+
+  .animate-blink,
+  .animate-ping {
+    animation: none !important;
+  }
 }
 
 @layer base {
