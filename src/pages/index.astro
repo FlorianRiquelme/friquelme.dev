@@ -242,15 +242,16 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     // Hero terminal — runs immediately on load
     const heroBottom = document.getElementById('hero-bottom');
 
+    // Reveal hero-bottom immediately so the H1 (LCP element) doesn't wait
+    // for the terminal typing sequence. The 700ms CSS transition still gives
+    // a soft fade-in.
+    if (heroBottom) heroBottom.style.opacity = '1';
+
     if (reduced) {
       showTerminalAll('hero-terminal', 'hero-cursor');
       showTerminalAll('contact-terminal', 'contact-cursor');
-      if (heroBottom) heroBottom.style.opacity = '1';
     } else {
-      runTerminalSequence('hero-terminal', 'hero-cursor').then(async () => {
-        await sleep(300);
-        if (heroBottom) heroBottom.style.opacity = '1';
-      });
+      runTerminalSequence('hero-terminal', 'hero-cursor');
 
       // Contact terminal — triggered on scroll
       const contactWrapper = document.getElementById('contact-terminal-wrapper');

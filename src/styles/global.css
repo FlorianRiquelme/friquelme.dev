@@ -11,10 +11,10 @@
   --color-border-secondary: #252525;
   --color-green-primary: #22C55E;
   --color-red-error: #EF4444;
-  --color-text-muted: #525252;
+  --color-text-muted: #898989;
   --color-text-primary: #E5E5E5;
   --color-text-secondary: #A3A3A3;
-  --color-text-tertiary: #737373;
+  --color-text-tertiary: #858585;
 
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
