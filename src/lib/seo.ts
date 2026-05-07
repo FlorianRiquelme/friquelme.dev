@@ -30,8 +30,11 @@ export type SeoContext = {
   pathname: string;
 };
 
+export const PERSON_ID = 'https://friquelme.dev/#person';
+
 type Person = {
   '@type': 'Person';
+  '@id'?: string;
   name: string;
   url: string;
 };
@@ -50,6 +53,24 @@ type WebPageRef = {
   '@id': string;
 };
 
+type SpeakableSpecification = {
+  '@type': 'SpeakableSpecification';
+  cssSelector: string[];
+};
+
+type BreadcrumbItem = {
+  '@type': 'ListItem';
+  position: number;
+  name: string;
+  item: string;
+};
+
+export type BreadcrumbListJsonLd = {
+  '@context': 'https://schema.org';
+  '@type': 'BreadcrumbList';
+  itemListElement: BreadcrumbItem[];
+};
+
 export type ArticleJsonLd = {
   '@context': 'https://schema.org';
   '@type': 'BlogPosting';
@@ -62,12 +83,14 @@ export type ArticleJsonLd = {
   mainEntityOfPage: WebPageRef;
   image: string;
   keywords: string;
+  speakable: SpeakableSpecification;
 };
 
 export type SeoOutput = {
   canonical: string;
   type: 'website' | 'article';
   articleJsonLd?: ArticleJsonLd;
+  breadcrumbsJsonLd?: BreadcrumbListJsonLd;
 };
 
 const PUBLISHER_NAME = 'Florian Riquelme';
@@ -93,11 +116,13 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
         dateModified: (input.dateModified ?? input.datePublished).toISOString(),
         author: {
           '@type': 'Person',
+          '@id': PERSON_ID,
           name: input.author,
           url: siteOrigin,
         },
         publisher: {
           '@type': 'Person',
+          '@id': PERSON_ID,
           name: PUBLISHER_NAME,
           url: siteOrigin,
           logo: {
@@ -111,6 +136,34 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
         },
         image,
         keywords: input.tags.join(', '),
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['.article-title', '.article-summary'],
+        },
+      },
+      breadcrumbsJsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: new URL('/', ctx.site).href,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: new URL('/blog/', ctx.site).href,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: input.title,
+            item: canonical,
+          },
+        ],
       },
     };
   }
