@@ -32,6 +32,15 @@ describe('getSeoMeta', () => {
 
       expect(result.articleJsonLd).toBeUndefined();
     });
+
+    it('omits breadcrumbsJsonLd', () => {
+      const result = getSeoMeta(
+        { kind: 'home', title: 't', description: 'd' },
+        { site, pathname: '/' },
+      );
+
+      expect(result.breadcrumbsJsonLd).toBeUndefined();
+    });
   });
 
   describe('post variant', () => {
@@ -95,7 +104,7 @@ describe('getSeoMeta', () => {
       );
     });
 
-    it('emits Person author with site origin URL', () => {
+    it('emits Person author with shared @id and site origin URL', () => {
       const result = getSeoMeta(postInput, {
         site,
         pathname: '/blog/hello-world/',
@@ -103,12 +112,13 @@ describe('getSeoMeta', () => {
 
       expect(result.articleJsonLd?.author).toEqual({
         '@type': 'Person',
+        '@id': 'https://friquelme.dev/#person',
         name: 'Florian Riquelme',
         url: 'https://friquelme.dev',
       });
     });
 
-    it('emits Person publisher with site origin URL and logo', () => {
+    it('emits Person publisher with shared @id, site origin URL and logo', () => {
       const result = getSeoMeta(postInput, {
         site,
         pathname: '/blog/hello-world/',
@@ -116,12 +126,57 @@ describe('getSeoMeta', () => {
 
       expect(result.articleJsonLd?.publisher).toEqual({
         '@type': 'Person',
+        '@id': 'https://friquelme.dev/#person',
         name: 'Florian Riquelme',
         url: 'https://friquelme.dev',
         logo: {
           '@type': 'ImageObject',
           url: 'https://friquelme.dev/og/index.png',
         },
+      });
+    });
+
+    it('emits speakable with .article-title and .article-summary selectors', () => {
+      const result = getSeoMeta(postInput, {
+        site,
+        pathname: '/blog/hello-world/',
+      });
+
+      expect(result.articleJsonLd?.speakable).toEqual({
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['.article-title', '.article-summary'],
+      });
+    });
+
+    it('emits BreadcrumbList Home → Blog → post', () => {
+      const result = getSeoMeta(postInput, {
+        site,
+        pathname: '/blog/hello-world/',
+      });
+
+      expect(result.breadcrumbsJsonLd).toEqual({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://friquelme.dev/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: 'https://friquelme.dev/blog/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: 'Hello world',
+            item: 'https://friquelme.dev/blog/hello-world/',
+          },
+        ],
       });
     });
 

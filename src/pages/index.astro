@@ -69,7 +69,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     <!-- Hero Bottom -->
     <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
       <div class="sr-only">
-        <p>Florian Riquelme is a senior software engineer at digital-masters in Hamburg, Germany, specializing in brownfield AI — integrating LLMs into existing production codebases without breaking trust. He has 9+ years shipping SaaS platforms, e-commerce, and web applications, and works full-stack across PHP, React, TypeScript, Go, and AWS. He maintains open-source tooling for autonomous AI workflows, including nachtschicht and ddev-claude, and writes about eval-gated rollouts, reversibility, and the operational discipline of running AI inside real codebases on real teams.</p>
+        <p id="profile-summary">Florian Riquelme is a senior software engineer at digital-masters in Hamburg, Germany, specializing in brownfield AI — integrating LLMs into existing production codebases without breaking trust. He has 9+ years shipping SaaS platforms, e-commerce, and web applications, and works full-stack across PHP, React, TypeScript, Go, and AWS. He maintains open-source tooling for autonomous AI workflows, including nachtschicht and ddev-claude, and writes about eval-gated rollouts, reversibility, and the operational discipline of running AI inside real codebases on real teams.</p>
       </div>
       <h1 class="text-2xl font-semibold text-text-primary text-center md:text-4xl">
         shipping products, not just writing code.
@@ -282,6 +282,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
       },
       {
         "@type": "Person",
+        "@id": "https://friquelme.dev/#person",
         "name": "Florian Riquelme",
         "url": "https://friquelme.dev",
         "jobTitle": "Senior Software Engineer",
@@ -302,6 +303,43 @@ import ProjectCard from '../components/content/ProjectCard.astro';
           "https://www.linkedin.com/in/florian-riquelme-b97756143"
         ],
         "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS", "Brownfield AI", "LLM Integration"]
+      },
+      {
+        "@type": "ProfilePage",
+        "@id": "https://friquelme.dev/#profile",
+        "url": "https://friquelme.dev",
+        "mainEntity": { "@id": "https://friquelme.dev/#person" },
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": ["#profile-summary"]
+        }
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "cashmunk",
+        "description": "privacy-first envelope budgeting app for ios. data stays on device, pay once, own forever.",
+        "url": "https://cashmunk.app/",
+        "programmingLanguage": "Swift",
+        "author": { "@id": "https://friquelme.dev/#person" },
+        "keywords": "swift, ios, privacy"
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "ddev-claude",
+        "description": "ddev plugin for running claude code in sandboxed, firewalled containers.",
+        "codeRepository": "https://github.com/FlorianRiquelme/ddev-claude",
+        "programmingLanguage": "Shell",
+        "author": { "@id": "https://friquelme.dev/#person" },
+        "keywords": "ddev, docker, claude"
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "nachtschicht",
+        "description": "autonomous task queue for claude code with a trust protocol.",
+        "codeRepository": "https://github.com/FlorianRiquelme/nachtschicht",
+        "programmingLanguage": "TypeScript",
+        "author": { "@id": "https://friquelme.dev/#person" },
+        "keywords": "claude code, autonomy, trust protocol"
       }
     ]
   })} />

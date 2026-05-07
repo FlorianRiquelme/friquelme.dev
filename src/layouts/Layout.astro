@@ -55,6 +55,9 @@ const ogType = seo?.type ?? type;
     {seo?.articleJsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(seo.articleJsonLd)} />
     )}
+    {seo?.breadcrumbsJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(seo.breadcrumbsJsonLd)} />
+    )}
 
     <!-- Analytics -->
     <PostHog />

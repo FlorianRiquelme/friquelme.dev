@@ -15,11 +15,13 @@ const articleSeo: SeoOutput = {
     dateModified: '2026-01-15T00:00:00.000Z',
     author: {
       '@type': 'Person',
+      '@id': 'https://friquelme.dev/#person',
       name: 'Florian Riquelme',
       url: 'https://friquelme.dev',
     },
     publisher: {
       '@type': 'Person',
+      '@id': 'https://friquelme.dev/#person',
       name: 'Florian Riquelme',
       url: 'https://friquelme.dev',
       logo: {
@@ -33,6 +35,19 @@ const articleSeo: SeoOutput = {
     },
     image: 'https://friquelme.dev/og/test-post.png',
     keywords: 'test',
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['.article-title', '.article-summary'],
+    },
+  },
+  breadcrumbsJsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://friquelme.dev/' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://friquelme.dev/blog/' },
+      { '@type': 'ListItem', position: 3, name: 'Test Post', item: 'https://friquelme.dev/blog/test-post/' },
+    ],
   },
 };
 
@@ -94,5 +109,18 @@ describe('Layout', () => {
     });
 
     expect(html).not.toContain('application/ld+json');
+  });
+
+  it('renders sibling BreadcrumbList JSON-LD when seo.breadcrumbsJsonLd is set', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Layout, {
+      props: { ...baseProps, seo: articleSeo },
+    });
+
+    const scriptCount = (html.match(/application\/ld\+json/g) ?? []).length;
+    expect(scriptCount).toBe(2);
+    expect(html).toContain('"@type":"BreadcrumbList"');
+    expect(html).toContain('"name":"Home"');
+    expect(html).toContain('"name":"Blog"');
   });
 });
