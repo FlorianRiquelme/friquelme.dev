@@ -27,7 +27,7 @@ const postsWithReadingTime = await Promise.all(
   })
 );
 
-const PINNED_SLUG = 'brownfield-ai';
+const PINNED_SLUG = 'designing-for-the-operator';
 const pinned = postsWithReadingTime.find((p) => p.id === PINNED_SLUG) ?? postsWithReadingTime[0];
 const rest = postsWithReadingTime.filter((p) => p.id !== pinned.id);
 ---
