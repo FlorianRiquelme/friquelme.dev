@@ -5,9 +5,12 @@ import icon from 'astro-icon';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.mjs';
+import { loadPostsFromDir, serializeSitemapEntry } from './src/plugins/sitemap-serialize.mjs';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { h } from 'hastscript';
+
+const postsBySlug = loadPostsFromDir(new URL('./src/blog/', import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
@@ -38,7 +41,11 @@ export default defineConfig({
         ],
       ],
     }),
-    sitemap()
+    sitemap({
+      serialize(item) {
+        return serializeSitemapEntry(item, postsBySlug);
+      },
+    })
   ],
   markdown: {
     shikiConfig: {

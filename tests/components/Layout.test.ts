@@ -111,6 +111,17 @@ describe('Layout', () => {
     expect(html).not.toContain('application/ld+json');
   });
 
+  it('renders viewport meta with initial-scale=1 for correct mobile rendering', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Layout, {
+      props: { ...baseProps, seo: websiteSeo },
+    });
+
+    expect(html).toContain(
+      '<meta name="viewport" content="width=device-width, initial-scale=1"',
+    );
+  });
+
   it('renders sibling BreadcrumbList JSON-LD when seo.breadcrumbsJsonLd is set', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Layout, {

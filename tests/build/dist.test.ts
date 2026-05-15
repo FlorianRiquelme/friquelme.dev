@@ -28,6 +28,16 @@ describe('astro build output', () => {
       expect(offenders).toEqual([]);
     });
 
+    it('sitemap entries for blog posts include <lastmod>', () => {
+      const xml = readFileSync(resolve(DIST, 'sitemap-0.xml'), 'utf-8');
+      const blogEntries = [...xml.matchAll(/<url>[\s\S]*?<\/url>/g)]
+        .map((m) => m[0])
+        .filter((entry) => /<loc>https:\/\/[^<]+\/blog\/[a-z0-9-]+\/<\/loc>/.test(entry));
+      expect(blogEntries.length).toBeGreaterThan(0);
+      const missingLastmod = blogEntries.filter((e) => !e.includes('<lastmod>'));
+      expect(missingLastmod).toEqual([]);
+    });
+
     it.each([
       ['index.html', '/'],
       ['blog/index.html', '/blog/'],
@@ -57,6 +67,13 @@ describe('astro build output', () => {
         expect(offenders).toEqual([]);
       },
     );
+  });
+
+  describe('homepage internal links', () => {
+    it('links to /blog/designing-for-the-operator/ from the homepage', () => {
+      const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+      expect(html).toContain('href="/blog/designing-for-the-operator/"');
+    });
   });
 
   describe('og images', () => {

@@ -11,46 +11,83 @@ interface Props {
   imageAlt?: string;
   stars?: number;
   link?: string;
+  postLink?: string;
   tags?: string[];
 }
 
-const { title, description, image, imageAlt = '', stars = 0, link = '#', tags = [] } = Astro.props;
+const { title, description, image, imageAlt = '', stars = 0, link = '#', postLink, tags = [] } = Astro.props;
+
+const wrapperClass = 'group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5';
 ---
 
-<a
-  href={link}
-  class="group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5"
->
-  {image && (
-    <div class="h-[180px] w-full overflow-hidden bg-bg-input">
-      <Picture
-        src={image}
-        formats={['avif', 'webp']}
-        widths={[400, 800]}
-        sizes="(max-width: 768px) 100vw, 50vw"
-        alt={imageAlt}
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-        decoding="async"
-      />
-    </div>
-  )}
-  <!-- Body -->
-  <div class="flex flex-1 flex-col gap-3 p-5">
-    <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
-    <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
-    {tags.length > 0 && (
-      <div class="flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <Tag label={tag} />
-        ))}
+{postLink ? (
+  <div class={wrapperClass}>
+    {image && (
+      <div class="h-[180px] w-full overflow-hidden bg-bg-input">
+        <Picture
+          src={image}
+          formats={['avif', 'webp']}
+          widths={[400, 800]}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          alt={imageAlt}
+          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     )}
-    <div class="mt-auto flex items-center justify-between">
-      {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
-      <span class="text-[11px] font-medium text-text-tertiary font-mono group-hover:text-text-secondary transition-colors">
-        view_repo →
-      </span>
+    <div class="flex flex-1 flex-col gap-3 p-5">
+      <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
+      <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <Tag label={tag} />
+          ))}
+        </div>
+      )}
+      <div class="mt-auto flex items-center justify-between">
+        <a href={postLink} class="text-[11px] font-medium text-green-primary font-mono hover:text-green-bright transition-colors">
+          read_post →
+        </a>
+        <a href={link} class="text-[11px] font-medium text-text-tertiary font-mono hover:text-text-secondary transition-colors">
+          view_repo →
+        </a>
+      </div>
     </div>
   </div>
-</a>
+) : (
+  <a href={link} class={wrapperClass}>
+    {image && (
+      <div class="h-[180px] w-full overflow-hidden bg-bg-input">
+        <Picture
+          src={image}
+          formats={['avif', 'webp']}
+          widths={[400, 800]}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          alt={imageAlt}
+          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )}
+    <div class="flex flex-1 flex-col gap-3 p-5">
+      <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
+      <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <Tag label={tag} />
+          ))}
+        </div>
+      )}
+      <div class="mt-auto flex items-center justify-between">
+        {stars > 0 && <span class="text-[11px] text-green-primary font-mono">★ {formatStars(stars)}</span>}
+        <span class="text-[11px] font-medium text-text-tertiary font-mono group-hover:text-text-secondary transition-colors">
+          view_repo →
+        </span>
+      </div>
+    </div>
+  </a>
+)}
