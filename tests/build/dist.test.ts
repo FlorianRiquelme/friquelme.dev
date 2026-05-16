@@ -76,6 +76,15 @@ describe('astro build output', () => {
     });
   });
 
+  describe('homepage H1 brand voice', () => {
+    it('keeps the brand-voice H1 (SEO carried by title tag + Person schema, not the H1)', () => {
+      const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+      const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
+      expect(h1Match).not.toBeNull();
+      expect(h1Match![1]).toContain('shipping products');
+    });
+  });
+
   describe('og images', () => {
     it('emits dist/og/index.png for the homepage', () => {
       expect(existsSync(resolve(DIST, 'og/index.png'))).toBe(true);
