@@ -67,7 +67,7 @@ const rest = postsWithReadingTime.filter((p) => p.id !== pinned.id);
       class="group block transition-transform duration-300 hover:-translate-y-0.5"
       aria-label={`open pinned essay: ${pinned.data.title}`}
     >
-      <TerminalWindow title={`~/posts/${pinned.id}.md — bash`}>
+      <TerminalWindow title={`~/posts/${pinned.id}.md`}>
         <p class="font-mono text-[13px] font-semibold leading-[1.4] text-green-primary">
           $ cat {pinned.id}.md
         </p>

@@ -9,43 +9,43 @@ tags: ["ai", "brownfield", "autonomy", "trust"]
 import Callout from '../components/blog/Callout.astro';
 
 <Callout>
-**tldr:** greenfield ai gets the magazine covers. brownfield ai ships the products. six principles i work by — drawn from [nachtschicht](https://github.com/FlorianRiquelme/nachtschicht) and [ddev-claude](https://github.com/FlorianRiquelme/ddev-claude), the tools i actually use every day.
+**tldr:** greenfield ai gets the magazine covers. brownfield ai ships the products. six principles i work by, drawn from [nachtschicht](https://github.com/FlorianRiquelme/nachtschicht) and [ddev-claude](https://github.com/FlorianRiquelme/ddev-claude), the tools i actually use every day.
 </Callout>
 
-## The 2 AM Question
+## the 2 am question
 
 It's 2 AM. An autonomous agent has been working on a refactor in your codebase for three hours. You're asleep. In the morning, you'll read a summary and decide whether to merge.
 
-What does the system have to *do* — and *not do* — to make that sentence one you'd accept?
+What does the system have to *do*, and *not do*, to make that sentence one you'd accept?
 
 This is the brownfield ai question. Not "can the model write code?" (it can). Not "can it run tests?" (it can). The question is: *can it work safely inside a real codebase, with real users, without me losing trust?*
 
 Most ai-engineer content is about greenfield: clean slates, fresh repos, demo problems. Most actual ai engineering happens in brownfield: 10-year-old codebases, non-technical teams, real P&L. These aren't the same job. This post is six principles I work by, drawn from the tools I've built and use every day.
 
-## The Tools Behind the Principles
+## the tools behind the principles
 
 Two open-source artifacts feed this post:
 
-- **[nachtschicht](https://github.com/FlorianRiquelme/nachtschicht)** — autonomous task queue for Claude Code with a trust protocol. The principles are codified in its [`CLAUDE.md`](https://github.com/FlorianRiquelme/nachtschicht/blob/main/CLAUDE.md).
-- **[ddev-claude](https://github.com/FlorianRiquelme/ddev-claude)** — sandboxed dev environments for ai coding assistants.
+- **[nachtschicht](https://github.com/FlorianRiquelme/nachtschicht)**: autonomous task queue for Claude Code with a trust protocol. The principles are codified in its [`CLAUDE.md`](https://github.com/FlorianRiquelme/nachtschicht/blob/main/CLAUDE.md).
+- **[ddev-claude](https://github.com/FlorianRiquelme/ddev-claude)**: sandboxed dev environments for ai coding assistants.
 
 Different surfaces, same six principles. Here they are.
 
-## Principle 1 — The Morning Brief Is the Product
+## principle 1: the morning brief is the product
 
 **Failure mode it prevents.** AI silently does work and you don't know what changed.
 
-NachtSchicht's morning brief is structured: what changed, what was verified, what failed, what was rolled back, what needs human judgment. *Ambiguity gets its own section, never silence.* Compare to: "agent ran successfully ✓" — which tells you nothing.
+NachtSchicht's morning brief is structured: what changed, what was verified, what failed, what was rolled back, what needs human judgment. *Ambiguity gets its own section, never silence.* Compare to: "agent ran successfully ✓", which tells you nothing.
 
-The artifact your team reads — the brief, the report, the alert — is what you actually shipped. Not the automation. Not the model call. The legible, trustworthy *output that humans use*.
+The artifact your team reads, the brief, the report, the alert, is what you actually shipped. Not the automation. Not the model call. The legible, trustworthy *output that humans use*.
 
 Every ai feature has a "brief." For an alert classifier it's the Slack message. For a RAG system it's the cited answer. Make the brief the product, not the byproduct.
 
 > *If the brief isn't the contract, you don't have a system. You have a vibe.*
 
-## Principle 2 — Rigor Scales with Blast Radius
+## principle 2: rigor scales with blast radius
 
-**Failure mode it prevents.** Uniform strictness — either too slow on small things, or too reckless on big things.
+**Failure mode it prevents.** Uniform strictness, either too slow on small things, or too reckless on big things.
 
 NachtSchicht classifies every task by blast radius before execution. A typo fix and a schema migration do not deserve the same proof burden. Verification intensity scales with reversibility: small change, light gate; big change, heavy gate, and the user gets asked.
 
@@ -55,7 +55,7 @@ Match verification intensity to the scope of impact. Classify automatically; don
 
 > *Uniform strictness is wrong in both directions.*
 
-## Principle 3 — Ambiguity Halts, It Does Not Improvise
+## principle 3: ambiguity halts, it does not improvise
 
 **Failure mode it prevents.** Scope drift. The agent guesses, gets it wrong, and you discover at 9 AM.
 
@@ -67,11 +67,11 @@ This is the hardest principle to internalize because LLMs are *built* to fill ga
 
 > *A thousand correct decisions build trust slowly. One wrong improvisation destroys it fast.*
 
-## Principle 4 — Reversibility Is Architecture, Not a Feature
+## principle 4: reversibility is architecture, not a feature
 
 **Failure mode it prevents.** "I'll add safety later." (You won't.)
 
-ddev-claude exists because running Claude Code against a real codebase without a sandbox is a bad idea — not because the model is malicious, but because *you can't undo a `rm -rf` from a plausible-sounding tool call*. Sandboxing isn't a safety feature; it's the structural foundation that makes the rest of the work psychologically viable.
+ddev-claude exists because running Claude Code against a real codebase without a sandbox is a bad idea, not because the model is malicious, but because *you can't undo a `rm -rf` from a plausible-sounding tool call*. Sandboxing isn't a safety feature; it's the structural foundation that makes the rest of the work psychologically viable.
 
 Every action the system takes must be reversible by default. Irreversible operations require explicit human pre-authorization.
 
@@ -79,11 +79,11 @@ Brownfield ai lives or dies on this. The reason senior engineers can use ai codi
 
 > *Can the developer undo this with one command? If not, it needs pre-authorization or a different approach.*
 
-## Principle 5 — Evidence Compounds into Trust
+## principle 5: evidence compounds into trust
 
 **Failure mode it prevents.** "Trust me, the ai handled it."
 
-Every NachtSchicht run leaves an immutable trail: what was tried, what was checked, what failed, what was retried, the final state. Over time the trail becomes the system's reputation — tasks completed, merge rate, halt rate, intervention frequency. The system *earns* autonomy empirically. It isn't granted upfront.
+Every NachtSchicht run leaves an immutable trail: what was tried, what was checked, what failed, what was retried, the final state. Over time the trail becomes the system's reputation: tasks completed, merge rate, halt rate, intervention frequency. The system *earns* autonomy empirically. It isn't granted upfront.
 
 Every run produces an immutable evidence trail. Over time, trust accrues. Without the trail, every run starts from zero.
 
@@ -91,19 +91,19 @@ The first six months of any production ai system are about trust acquisition, no
 
 > *No trail, no trust. No trust, no autonomy.*
 
-## Principle 6 — One-Word UX
+## principle 6: one-word ux
 
 **Failure mode it prevents.** Every ai feature requires a manual.
 
-NachtSchicht's interface is `nacht`. One command. Not because only one command exists — but because bare `nacht` always *tells you what to do next* by detecting the current state and surfacing the 1–3 relevant actions. Subcommands exist; the router *surfaces* them, doesn't *replace* them.
+NachtSchicht's interface is `nacht`. One command. Not because only one command exists, but because bare `nacht` always *tells you what to do next* by detecting the current state and surfacing the 1–3 relevant actions. Subcommands exist; the router *surfaces* them, doesn't *replace* them.
 
 Simplicity comes from never needing to choose, not from having fewer choices. The interface should guide, not gate.
 
-AI features are notorious for surfacing too much capability. The right move is contextual disclosure — show the right action for the current state, hide the rest. Same principle as good CLI design, just with state inference doing the routing.
+AI features are notorious for surfacing too much capability. The right move is contextual disclosure: show the right action for the current state, hide the rest. Same principle as good CLI design, just with state inference doing the routing.
 
 > *The user should always know what to do next without reading the docs.*
 
-## Naming the Discipline
+## naming the discipline
 
 These six principles aren't unique to me. Anyone shipping ai in production codebases hits them eventually. What's missing is the *name*.
 
@@ -111,7 +111,7 @@ Greenfield ai gets the magazine covers; brownfield ai ships the products. The di
 
 Brownfield ai is the work of taking an existing codebase, an existing team, and an existing P&L, and threading LLMs through them without breaking trust. It's mostly *not* ai work. It's eval design, change management, sandbox engineering, evidence trails, and the boring scaffolding that lets non-technical teams trust probabilistic systems.
 
-If you're hiring for that — that's the work I want to do.
+If you're hiring for that, that's the work I want to do.
 
 ---
 

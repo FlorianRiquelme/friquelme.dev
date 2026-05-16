@@ -9,27 +9,27 @@ tags: ["aws", "astro", "devops", "github-actions"]
 import Callout from '../components/blog/Callout.astro';
 
 <Callout>
-**tldr:** this entire site — astro frontend, aws cdk infrastructure, github actions pipeline — is open source. grab the code at [github.com/FlorianRiquelme/friquelme.dev](https://github.com/FlorianRiquelme/friquelme.dev) and use it as a starting point for your own setup.
+**tldr:** this entire site, astro frontend, aws cdk infrastructure, github actions pipeline, is open source. grab the code at [github.com/FlorianRiquelme/friquelme.dev](https://github.com/FlorianRiquelme/friquelme.dev) and use it as a starting point for your own setup.
 </Callout>
 
-## The Goal
+## the goal
 
-Every push to `main` should result in the site being live — no manual steps, no stored AWS credentials, and a cache strategy that keeps the site fast without serving stale content.
+Every push to `main` should result in the site being live, no manual steps, no stored AWS credentials, and a cache strategy that keeps the site fast without serving stale content.
 
 This post walks through exactly how [friquelme.dev](https://friquelme.dev) is deployed: from the GitHub Actions workflow to the AWS infrastructure defined with CDK.
 
-## Architecture Overview
+## architecture overview
 
 The pipeline has four moving parts:
 
-1. **GitHub Actions** — builds the Astro site and syncs files to S3
-2. **OIDC federation** — short-lived AWS credentials with no stored secrets
-3. **S3** — bucket with static website hosting, serving as the origin for CloudFront
-4. **CloudFront** — CDN with HTTPS, HTTP/2+3, and security headers
+1. **GitHub Actions**: builds the Astro site and syncs files to S3
+2. **OIDC federation**: short-lived AWS credentials with no stored secrets
+3. **S3**: bucket with static website hosting, serving as the origin for CloudFront
+4. **CloudFront**: CDN with HTTPS, HTTP/2+3, and security headers
 
 Everything is defined as code. The GitHub Actions workflow handles CI/CD, and AWS CDK manages the infrastructure.
 
-## The GitHub Actions Workflow
+## the github actions workflow
 
 The entire deployment lives in a single workflow file. Here's the full thing:
 
@@ -97,7 +97,7 @@ jobs:
 
 A few things worth noting.
 
-### OIDC Authentication
+### oidc authentication
 
 The `permissions.id-token: write` line is what enables **OpenID Connect** federation. Instead of storing long-lived AWS access keys as GitHub secrets, the workflow exchanges a short-lived GitHub token for temporary AWS credentials via `aws-actions/configure-aws-credentials@v4`.
 
@@ -108,9 +108,9 @@ The trust relationship is locked down to:
 
 This means even if someone forks the repo, they can't assume the deploy role.
 
-### Two-Phase S3 Sync
+### two-phase s3 sync
 
-Astro generates hashed filenames for all processed assets (JS, CSS, images) under `_astro/`. These files are **content-addressable** — the filename changes when the content changes. This makes them safe to cache forever:
+Astro generates hashed filenames for all processed assets (JS, CSS, images) under `_astro/`. These files are **content-addressable**: the filename changes when the content changes. This makes them safe to cache forever:
 
 ```
 dist/_astro/Layout.DxF4k2.css
@@ -119,12 +119,12 @@ dist/_astro/index.B7mK3p.js
 
 The sync strategy exploits this:
 
-1. **`_astro/*`** → `max-age=31536000,immutable` — cached for 1 year, browsers never revalidate
-2. **Everything else** (HTML, favicons) → `max-age=0,must-revalidate` — always checks for fresh content
+1. **`_astro/*`** → `max-age=31536000,immutable`. Cached for 1 year, browsers never revalidate.
+2. **Everything else** (HTML, favicons) → `max-age=0,must-revalidate`. Always checks for fresh content.
 
 This gives us the best of both worlds: instant loads for returning visitors on unchanged assets, and immediate updates for new content.
 
-### Selective CloudFront Invalidation
+### selective cloudfront invalidation
 
 Instead of invalidating `/*` (which costs money at scale and is slow), we only invalidate the paths that actually matter for freshness: the homepage, favicons, and blog content. HTML pages already have `must-revalidate` cache headers, so CloudFront will check the origin on every request anyway.
 
@@ -132,7 +132,7 @@ Instead of invalidating `/*` (which costs money at scale and is slow), we only i
 **why not invalidate `/*`?** CloudFront charges $0.005 per path after the first 1,000 invalidations per month. For a static site with few critical paths, targeted invalidation is both faster and cheaper.
 </Callout>
 
-### Concurrency Control
+### concurrency control
 
 ```yaml
 concurrency:
@@ -140,18 +140,18 @@ concurrency:
   cancel-in-progress: false
 ```
 
-The `cancel-in-progress: false` setting is intentional. If two pushes happen in quick succession, we don't want the second deploy to cancel the first mid-sync — that could leave S3 in an inconsistent state. Instead, the second deploy queues and runs after the first completes.
+The `cancel-in-progress: false` setting is intentional. If two pushes happen in quick succession, we don't want the second deploy to cancel the first mid-sync. That could leave S3 in an inconsistent state. Instead, the second deploy queues and runs after the first completes.
 
-## AWS Infrastructure with CDK
+## aws infrastructure with cdk
 
 The infrastructure is defined in two CDK stacks. These are deployed manually (not through CI) since infrastructure changes are infrequent and warrant human review.
 
-### The Static Site Stack
+### the static site stack
 
 ```typescript
 const DOMAIN_NAME = 'friquelme.dev';
 
-// S3 bucket — static website hosting for subdirectory index resolution
+// S3 bucket: static website hosting for subdirectory index resolution
 this.bucket = new s3.Bucket(this, 'SiteBucket', {
   websiteIndexDocument: 'index.html',
   publicReadAccess: true,
@@ -162,9 +162,9 @@ this.bucket = new s3.Bucket(this, 'SiteBucket', {
 });
 ```
 
-The S3 bucket uses **static website hosting** with `websiteIndexDocument` set. This is critical for multi-page static sites — more on why [below](#the-oac-trap-why-your-subpages-break).
+The S3 bucket uses **static website hosting** with `websiteIndexDocument` set. This is critical for multi-page static sites; more on why [below](#the-oac-trap-why-your-subpages-break).
 
-### CloudFront Configuration
+### cloudfront configuration
 
 ```typescript
 this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
@@ -182,21 +182,21 @@ this.distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
 
 Key decisions:
 
-- **`S3StaticWebsiteOrigin`** — connects CloudFront to S3's website hosting endpoint, which handles index document resolution natively
-- **No `defaultRootObject`** — S3 website hosting handles this; setting it on CloudFront would only apply to the root path anyway
-- **HTTP/2 and HTTP/3** — HTTP/3 uses QUIC (UDP-based), which eliminates head-of-line blocking and reduces connection setup latency
-- **Price Class All** — uses all CloudFront edge locations globally for the lowest latency everywhere, since the free tier covers most personal site traffic anyway
-- **REDIRECT_TO_HTTPS** — all HTTP requests are upgraded, no mixed content possible
+- **`S3StaticWebsiteOrigin`**: connects CloudFront to S3's website hosting endpoint, which handles index document resolution natively
+- **No `defaultRootObject`**: S3 website hosting handles this; setting it on CloudFront would only apply to the root path anyway
+- **HTTP/2 and HTTP/3**: HTTP/3 uses QUIC (UDP-based), which eliminates head-of-line blocking and reduces connection setup latency
+- **Price Class All**: uses all CloudFront edge locations globally for the lowest latency everywhere, since the free tier covers most personal site traffic anyway
+- **REDIRECT_TO_HTTPS**: all HTTP requests are upgraded, no mixed content possible
 
-### The OAC Trap — Why Your Subpages Break
+### the oac trap: why your subpages break
 
 This deserves its own section because it's a subtle issue that will bite anyone deploying a multi-page static site to S3 + CloudFront.
 
-The "modern" approach you'll find in most tutorials and AWS docs is to use **Origin Access Control (OAC)** — keep the S3 bucket private, and let CloudFront authenticate requests to it. This is what CDK's `S3BucketOrigin.withOriginAccessControl()` sets up. It sounds clean and secure.
+The "modern" approach you'll find in most tutorials and AWS docs is to use **Origin Access Control (OAC)**: keep the S3 bucket private, and let CloudFront authenticate requests to it. This is what CDK's `S3BucketOrigin.withOriginAccessControl()` sets up. It sounds clean and secure.
 
 The problem: **OAC uses the S3 REST API, which does not resolve subdirectory index documents.**
 
-When a user visits `/blog`, Astro has generated `blog/index.html` in the bucket. With S3 static website hosting, the request resolves correctly: `/blog` → `blog/index.html`. But the S3 REST API (used by OAC) treats `/blog` as a key lookup — there's no object with that key, so S3 returns **403 Forbidden**.
+When a user visits `/blog`, Astro has generated `blog/index.html` in the bucket. With S3 static website hosting, the request resolves correctly: `/blog` → `blog/index.html`. But the S3 REST API (used by OAC) treats `/blog` as a key lookup. There's no object with that key, so S3 returns **403 Forbidden**.
 
 Here's where it gets worse. A common CDK pattern is to add custom error responses to "fix" SPAs:
 
@@ -216,10 +216,10 @@ errorResponses: [
 ],
 ```
 
-This catches the 403 and silently serves the homepage. For a single-page app with client-side routing, that's fine — the JS router picks up the URL and renders the right view. But for a **statically generated site** like Astro in static mode, there's no client-side router. The user sees the homepage, the URL says `/blog`, and nothing looks broken at first glance. It's a silent failure.
+This catches the 403 and silently serves the homepage. For a single-page app with client-side routing, that's fine. The JS router picks up the URL and renders the right view. But for a **statically generated site** like Astro in static mode, there's no client-side router. The user sees the homepage, the URL says `/blog`, and nothing looks broken at first glance. It's a silent failure.
 
 <Callout>
-**the symptom:** navigating to any subpage (like `/blog`) shows the homepage instead of the actual page content. the url changes but the wrong page is served. no errors in the console, no 404 — just the wrong content.
+**the symptom:** navigating to any subpage (like `/blog`) shows the homepage instead of the actual page content. the url changes but the wrong page is served. no errors in the console, no 404, just the wrong content.
 </Callout>
 
 The fix is to use **S3 static website hosting** as the origin instead of OAC:
@@ -230,13 +230,13 @@ The fix is to use **S3 static website hosting** as the origin instead of OAC:
 4. Remove `defaultRootObject` from the distribution (S3 handles it)
 5. Remove `errorResponses` (no more masking real errors)
 
-Yes, the bucket is technically public. But the content is a static website — it's meant to be public. The security headers, HTTPS enforcement, and cache policies are all handled at the CloudFront layer regardless of origin type. If your content is meant to be served to the internet, the "private bucket + OAC" approach adds complexity without meaningful security benefit, and breaks multi-page routing in the process.
+Yes, the bucket is technically public. But the content is a static website. It's meant to be public. The security headers, HTTPS enforcement, and cache policies are all handled at the CloudFront layer regardless of origin type. If your content is meant to be served to the internet, the "private bucket + OAC" approach adds complexity without meaningful security benefit, and breaks multi-page routing in the process.
 
 <Callout>
 **alternatives if you really want a private bucket:** you can keep OAC and add a CloudFront Function to rewrite URIs (appending `/index.html` to directory paths). this works but adds another moving part. for most static sites, website hosting is simpler and more reliable.
 </Callout>
 
-### Security Headers
+### security headers
 
 Every response gets hardened headers injected at the CDN level:
 
@@ -266,12 +266,12 @@ const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(
 ```
 
 This gives us:
-- **HSTS** with 2-year max-age, subdomains, and preload — the browser will never make an insecure connection
-- **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing attacks
-- **X-Frame-Options: DENY** — blocks clickjacking
-- **Referrer-Policy** — only sends origin on cross-origin requests
+- **HSTS** with 2-year max-age, subdomains, and preload. The browser will never make an insecure connection.
+- **X-Content-Type-Options: nosniff**. Prevents MIME-type sniffing attacks.
+- **X-Frame-Options: DENY**. Blocks clickjacking.
+- **Referrer-Policy**. Only sends origin on cross-origin requests.
 
-### DNS and TLS
+### dns and tls
 
 ```typescript
 const certificate = new acm.Certificate(this, 'SiteCertificate', {
@@ -288,9 +288,9 @@ new route53.ARecord(this, 'SiteAliasRecord', {
 });
 ```
 
-The ACM certificate covers both the apex domain and `www`. DNS validation via Route53 means certificate renewal is fully automatic — no manual intervention, no expiry surprises.
+The ACM certificate covers both the apex domain and `www`. DNS validation via Route53 means certificate renewal is fully automatic. No manual intervention, no expiry surprises.
 
-### The OIDC Stack
+### the oidc stack
 
 The second stack sets up the trust relationship between GitHub Actions and AWS:
 
@@ -316,38 +316,38 @@ const deployRole = new iam.Role(this, 'GitHubDeployRole', {
 });
 ```
 
-The role's permissions follow **least privilege** — it can only:
+The role's permissions follow **least privilege**. It can only:
 - Read, write, and delete objects in the site bucket
 - List the bucket contents
 - Create CloudFront invalidations
 
 Nothing else. No `s3:*`, no `cloudfront:*`. If the credentials were somehow compromised, the blast radius is limited to this specific bucket and distribution.
 
-## The Full Flow
+## the full flow
 
 Putting it all together, a deploy looks like this:
 
-1. **`git push origin main`** — triggers the workflow
-2. **Build** — pnpm installs dependencies, Astro builds static files to `dist/`
-3. **OIDC exchange** — GitHub token → temporary AWS credentials (STS)
-4. **S3 sync phase 1** — hashed assets with immutable cache headers
-5. **S3 sync phase 2** — HTML and root files with must-revalidate headers
-6. **CloudFront invalidation** — clears cached versions of `/`, `/index.html`, favicons
-7. **Live** — the site is updated, typically under 2 minutes end-to-end
+1. **`git push origin main`**: triggers the workflow
+2. **Build**: pnpm installs dependencies, Astro builds static files to `dist/`
+3. **OIDC exchange**: GitHub token → temporary AWS credentials (STS)
+4. **S3 sync phase 1**: hashed assets with immutable cache headers
+5. **S3 sync phase 2**: HTML and root files with must-revalidate headers
+6. **CloudFront invalidation**: clears cached versions of `/`, `/index.html`, favicons
+7. **Live**: the site is updated, typically under 2 minutes end-to-end
 
 The entire pipeline is reproducible, auditable, and runs without any stored secrets. The CDK stacks can be torn down and recreated at any time, and the GitHub Actions workflow is self-contained.
 
-## Cost
+## cost
 
 For a personal portfolio with modest traffic, the monthly AWS bill is under **$1**:
 
-- **S3** — pennies for storage and requests
-- **CloudFront** — free tier covers 1TB/month of data transfer
-- **Route53** — $0.50/month for the hosted zone
-- **ACM** — free for public certificates
+- **S3**: pennies for storage and requests
+- **CloudFront**: free tier covers 1TB/month of data transfer
+- **Route53**: $0.50/month for the hosted zone
+- **ACM**: free for public certificates
 
 The GitHub Actions minutes are free for public repos.
 
 ---
 
-*If you're deploying a static site to AWS and want to avoid the common pitfalls — broken subpage routing with OAC, long-lived credentials, stale caches — this setup is a solid starting point. The full source code for both the site and infrastructure is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*
+*If you're deploying a static site to AWS and want to avoid the common pitfalls (broken subpage routing with OAC, long-lived credentials, stale caches), this setup is a solid starting point. The full source code for both the site and infrastructure is on [GitHub](https://github.com/FlorianRiquelme/friquelme.dev).*

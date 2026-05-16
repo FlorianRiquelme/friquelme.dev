@@ -11,10 +11,10 @@ import Callout from '../components/blog/Callout.astro';
 import claudefuelBar from '../assets/images/blog/claudefuel-bar.png';
 
 <Callout>
-**tldr:** a status bar is not a UI. it's a console for someone who already knows what they want to see. five design constraints from [claudefuel](https://github.com/FlorianRiquelme/claudefuel) — the three-line status bar i built so i'd stop running out of claude at 3 PM.
+**tldr:** a status bar is not a UI. it's a console for someone who already knows what they want to see. five design constraints from [claudefuel](https://github.com/FlorianRiquelme/claudefuel), the three-line status bar i built so i'd stop running out of claude at 3 PM.
 </Callout>
 
-## The Difference Between a UI and a Console
+## the difference between a ui and a console
 
 A user opens a UI to find out what's available. An operator opens a console to find out what's *changed*.
 
@@ -24,11 +24,11 @@ That distinction does most of the work. UIs explain themselves; they have onboar
 
 That changes everything about how it should be designed.
 
-## Operators Don't Read; They Scan
+## operators don't read; they scan
 
 The first version of any status bar reads like a spec: every field labeled, every number padded, everything visible at all times. It works on the screenshot. It fails in the field.
 
-The operator isn't reading the bar. They glanced at it for 200ms while typing. Whatever isn't immediately *recognizable* — by position, by shape, by color — is invisible. Labels are a tax. So is precision when only an order of magnitude matters.
+The operator isn't reading the bar. They glanced at it for 200ms while typing. Whatever isn't immediately *recognizable*, by position, by shape, by color, is invisible. Labels are a tax. So is precision when only an order of magnitude matters.
 
 The version of claudefuel I ship has three lines:
 
@@ -37,7 +37,7 @@ The version of claudefuel I ship has three lines:
   formats={['avif', 'webp']}
   widths={[600, 900, 1200]}
   sizes="(max-width: 768px) 100vw, 900px"
-  alt="claudefuel status bar — three lines. line 1: yellow [fresh] tag, blue 'Opus 4.7 (1M context)', green ctx fill at 83k/1.0m, thinking on, effort xhigh. line 2: 5h usage 6%, 7d usage 12%, extra spend $0.00/$170.00. line 3: reset times — 5h at 11:00am, 7d may 15 10:00pm, extra jun 1."
+  alt="claudefuel status bar with three lines. line 1: yellow [fresh] tag, blue 'Opus 4.7 (1M context)', green ctx fill at 83k/1.0m, thinking on, effort xhigh. line 2: 5h usage 6%, 7d usage 12%, extra spend $0.00/$170.00. line 3: reset times for 5h at 11:00am, 7d may 15 10:00pm, extra jun 1."
   loading="lazy"
   decoding="async"
   class="my-4 rounded border border-border-primary"
@@ -47,70 +47,70 @@ Every position is fixed. Same field in the same column every time. The operator 
 
 > *if the user has to read the labels to understand the data, the bar has failed.*
 
-## Color That Earns Its Place
+## color that earns its place
 
-Look at the screenshot again. The labels (`ctx`, `5h`, `7d`, `extra`, `thinking:`, `effort:`), the separators (`|`), the reset glyphs (`↻`), the dates and times — all gray. That's the scaffolding, and it's most of the bar.
+Look at the screenshot again. The labels (`ctx`, `5h`, `7d`, `extra`, `thinking:`, `effort:`), the separators (`|`), the reset glyphs (`↻`), the dates and times: all gray. That's the scaffolding, and it's most of the bar.
 
-The non-gray bits split into two layers. One is structural and stays put — the model name in blue, the session tag (`[fresh]`) in yellow. Things that identify *what's running*. The other layer is urgency-coded: the usage circles, the percentages, the raw token count, the spend number, the `On` / `Off` after `thinking:`. Those start green at low usage and shift through yellow, orange, and red as you burn through limits.
+The non-gray bits split into two layers. One is structural and stays put: the model name in blue, the session tag (`[fresh]`) in yellow. Things that identify *what's running*. The other layer is urgency-coded: the usage circles, the percentages, the raw token count, the spend number, the `On` / `Off` after `thinking:`. Those start green at low usage and shift through yellow, orange, and red as you burn through limits.
 
-There isn't a strict taxonomy here — no "blue means model identity, yellow means session state" doctrine to learn. What there is, is the rule that color costs bandwidth. If a label can stay gray, it stays gray. If a value is the thing the operator is actually scanning for, it gets pulled out of the gray. The bar is colorful only because there are several kinds of values worth scanning for, not because color is decoration.
+There isn't a strict taxonomy here. No "blue means model identity, yellow means session state" doctrine to learn. What there is, is the rule that color costs bandwidth. If a label can stay gray, it stays gray. If a value is the thing the operator is actually scanning for, it gets pulled out of the gray. The bar is colorful only because there are several kinds of values worth scanning for, not because color is decoration.
 
 The urgency layer is what makes the bar a fuel gauge instead of a dashboard. The chrome holds still; the values change temperature. The number on the right is there for confirmation. The color shift is the actual signal.
 
 > *gray is the substrate. color is what you're actually looking for.*
 
-## Predictive Signals Without Precision Theater
+## predictive signals without precision theater
 
 The 5-hour rate limit is the one that bites. You're three hours into a coding session, the bar says you've used 60%, and the obvious question is: am I going to make it to reset?
 
-The naive solution is to do the math and show a precise prediction: "you will hit 100% at 14:47". That's wrong for two reasons. First, the model can't actually predict your next hour — it could be reading code (cheap) or running a long agent (expensive). Second, a precise number invites trust the system hasn't earned. The operator reads "14:47" and plans against it. When the wall hits at 14:23 instead, the bar lost its credibility — not because the prediction was bad, but because *it pretended to be precise*.
+The naive solution is to do the math and show a precise prediction: "you will hit 100% at 14:47". That's wrong for two reasons. First, the model can't actually predict your next hour. It could be reading code (cheap) or running a long agent (expensive). Second, a precise number invites trust the system hasn't earned. The operator reads "14:47" and plans against it. When the wall hits at 14:23 instead, the bar lost its credibility, not because the prediction was bad, but because *it pretended to be precise*.
 
-claudefuel's answer is the `~cap HH:MM-HH:MM` segment. It only renders when you're burning faster than reset-pace. The tilde signals "this is an estimate." The range — say `~cap 14:30-15:15` — says "somewhere in this window, given current pace." The operator doesn't need a point estimate. They need to know whether to slow down, switch tasks, or push through. The range answers that without overselling.
+claudefuel's answer is the `~cap HH:MM-HH:MM` segment. It only renders when you're burning faster than reset-pace. The tilde signals "this is an estimate." The range, say `~cap 14:30-15:15`, says "somewhere in this window, given current pace." The operator doesn't need a point estimate. They need to know whether to slow down, switch tasks, or push through. The range answers that without overselling.
 
 Two design moves are doing the work:
 
 1. The signal only appears when it's actionable. No prediction when you're on pace. No noise.
-2. The format — a range with a tilde — *announces its own uncertainty*. The visual carries the epistemic warning so the operator doesn't have to.
+2. The format, a range with a tilde, *announces its own uncertainty*. The visual carries the epistemic warning so the operator doesn't have to.
 
 Precision theater is the failure mode where a system shows three decimal places to imply accuracy it doesn't have. The fix isn't to be vaguer. It's to make the format match the actual confidence.
 
 > *match the format to the certainty. the tilde is a contract.*
 
-## The Tilde Matters
+## the tilde matters
 
 Spend a few minutes near the bar and the tilde starts doing real work. It's one character. It says "I'm an estimate." It separates `~cap 14:30` (a prediction) from `↻ 15:30` (a known reset time) without a label, without a tooltip, without a legend.
 
-This is what compression looks like in practice. Every character is asked to earn its line. If a glyph can replace a label, the glyph wins — but only if the glyph is conventional enough that the operator already knows it. `↻` for reset works because every monitoring tool uses it. `↗` for "an update is available" works because the arrow says "go this way." `~` for estimate works because every back-of-envelope calculation uses it.
+This is what compression looks like in practice. Every character is asked to earn its line. If a glyph can replace a label, the glyph wins, but only if the glyph is conventional enough that the operator already knows it. `↻` for reset works because every monitoring tool uses it. `↗` for "an update is available" works because the arrow says "go this way." `~` for estimate works because every back-of-envelope calculation uses it.
 
-When I considered adding a sparkline, I scrapped it. It would have been pretty. It would have eaten a line. And the operator already had what they needed from the existing fill bar and the trend they'd built in their head. Adding a sparkline would have been UI thinking — *show more so the user understands more*. The console version is: trust the operator. They've been watching this bar all week. They don't need the chart.
+When I considered adding a sparkline, I scrapped it. It would have been pretty. It would have eaten a line. And the operator already had what they needed from the existing fill bar and the trend they'd built in their head. Adding a sparkline would have been UI thinking: *show more so the user understands more*. The console version is: trust the operator. They've been watching this bar all week. They don't need the chart.
 
 > *a character earns its place by replacing a label without confusing the operator.*
 
-## Restraint as the Dominant Aesthetic
+## restraint as the dominant aesthetic
 
 The hard part of operator UI isn't building the bar. It's the months of pull-requests where someone wants to add a field, a color, a metric, a clever animation. Each one is reasonable in isolation. Each one is a tax in aggregate.
 
-claudefuel's design contract — explicit, in the repo — is that the bar fits in three terminal lines and uses four colors. Adding a fifth color requires removing a fourth. Adding a fourth line requires merging two existing ones. The constraint isn't aesthetic preference; it's protection against creep.
+claudefuel's design contract, explicit, in the repo, is that the bar fits in three terminal lines and uses four colors. Adding a fifth color requires removing a fourth. Adding a fourth line requires merging two existing ones. The constraint isn't aesthetic preference; it's protection against creep.
 
-The same logic governs the install path. claudefuel ships as a single markdown file — a *promptfile* — that a Claude Code session reads and executes. No installer binary, no plugin manifest, no settings UI. The whole tool is a shell script, five slash commands, and one key in your `settings.json`. If you want it gone, the uninstall is also one paste line. The surface area is the contract.
+The same logic governs the install path. claudefuel ships as a single markdown file, a *promptfile*, that a Claude Code session reads and executes. No installer binary, no plugin manifest, no settings UI. The whole tool is a shell script, five slash commands, and one key in your `settings.json`. If you want it gone, the uninstall is also one paste line. The surface area is the contract.
 
 This is what I mean by restraint as authority. The bar isn't impressive because of what it shows; it's impressive because of what it leaves out. Every operator-facing tool I've built has the same property: the design isn't the features. It's the refusals.
 
 > *the operator wants compression, not chrome.*
 
-## A Smaller Note on Multi-Account Isolation
+## a smaller note on multi-account isolation
 
 One implementation detail is worth pulling out, because it shows how operator constraints shape the underlying code.
 
-A lot of people who use Claude Code seriously have multiple profiles — work, personal, an OSS side identity. Each is a separate `CLAUDE_CONFIG_DIR` with its own keychain credentials. The naive status bar would show usage from one account regardless of which terminal tab you're in. That's the wrong default; it tells you the wrong story half the time.
+A lot of people who use Claude Code seriously have multiple profiles: work, personal, an OSS side identity. Each is a separate `CLAUDE_CONFIG_DIR` with its own keychain credentials. The naive status bar would show usage from one account regardless of which terminal tab you're in. That's the wrong default; it tells you the wrong story half the time.
 
-claudefuel derives the keychain service name the same way Claude Code does — `Claude Code-credentials-<first-8-of-sha256>` — and reads the correct credential per profile, per terminal tab. The first time it works correctly is invisible. You don't *notice* the bar showing the right number, because the right number is what you expected. You only notice the wrong number.
+claudefuel derives the keychain service name the same way Claude Code does (`Claude Code-credentials-<first-8-of-sha256>`) and reads the correct credential per profile, per terminal tab. The first time it works correctly is invisible. You don't *notice* the bar showing the right number, because the right number is what you expected. You only notice the wrong number.
 
 That's the operator-UX bar. The system has to be *quietly* right, often, before it earns the right to be *loudly* useful.
 
-## Why This Generalizes
+## why this generalizes
 
-The five constraints — scan-not-read, color as priority, predictions without precision theater, glyphs over labels, restraint as the contract — aren't claudefuel-specific. They're how I think about any tool designed for someone already inside the work.
+The five constraints (scan-not-read, color as priority, predictions without precision theater, glyphs over labels, restraint as the contract) aren't claudefuel-specific. They're how I think about any tool designed for someone already inside the work.
 
 Most AI tooling right now is greenfield: shiny dashboards, generous onboarding, marketing-grade UIs. That's fine for the first ten minutes. After a hundred hours, the operator wants the bar at the bottom of their terminal to be three lines of compressed truth. The tool that survives in the operator's daily loop is the one that respects how little of their attention it deserves.
 
@@ -118,4 +118,4 @@ claudefuel is small. That's the point.
 
 ---
 
-*repo at [github.com/FlorianRiquelme/claudefuel](https://github.com/FlorianRiquelme/claudefuel). install line, slash commands, the multi-account trick — all in the README. if your team is shipping AI tooling and could use a brownfield AI engineer who designs like this, the contact form is on the [homepage](/#contact).*
+*repo at [github.com/FlorianRiquelme/claudefuel](https://github.com/FlorianRiquelme/claudefuel). install line, slash commands, the multi-account trick: all in the README. if your team is shipping AI tooling and could use a brownfield AI engineer who designs like this, the contact form is on the [homepage](/#contact).*

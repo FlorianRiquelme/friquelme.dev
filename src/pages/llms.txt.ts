@@ -10,11 +10,11 @@ export async function GET(context: APIContext) {
   lines.push('# friquelme.dev');
   lines.push('');
   lines.push(
-    '> Personal site of Florian Riquelme — senior software engineer at digital-masters in Hamburg, Germany. Writing about brownfield AI: integrating LLMs into existing production codebases without breaking trust.',
+    '> Personal site of Florian Riquelme, senior software engineer at digital-masters in Hamburg, Germany. Writing about brownfield AI: integrating LLMs into existing production codebases without breaking trust.',
   );
   lines.push('');
   lines.push(
-    'Florian is a full-stack engineer (PHP, React, TypeScript, Go, AWS) with 9+ years of experience shipping SaaS platforms, e-commerce, and web applications. He maintains open-source tooling around autonomous AI workflows (nachtschicht, ddev-claude) and writes about the operational reality of running AI inside real codebases — eval-gated rollouts, reversibility, and trust-building patterns.',
+    'Florian is a full-stack engineer (PHP, React, TypeScript, Go, AWS) with 9+ years of experience shipping SaaS platforms, e-commerce, and web applications. He maintains open-source tooling around autonomous AI workflows (nachtschicht, ddev-claude) and writes about the operational reality of running AI inside real codebases: eval-gated rollouts, reversibility, and trust-building patterns.',
   );
   lines.push('');
   lines.push('## Pages');

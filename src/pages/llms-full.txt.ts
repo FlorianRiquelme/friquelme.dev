@@ -2,7 +2,7 @@ import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { getPublishedPosts } from '../utils/blog';
 
-// Emits raw MDX bodies (JSX literals like <Callout> are kept verbatim — LLMs tolerate them).
+// Emits raw MDX bodies (JSX literals like <Callout> are kept verbatim, LLMs tolerate them).
 export async function GET(_context: APIContext) {
   const posts = getPublishedPosts(await getCollection('blog'));
 
