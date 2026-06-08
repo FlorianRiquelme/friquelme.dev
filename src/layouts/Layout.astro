@@ -69,17 +69,9 @@ const ogType = seo?.type ?? type;
     <script>
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      function animateSkillBars(parent: HTMLElement) {
-        parent.querySelectorAll<HTMLElement>('[data-animate-skill]').forEach((el) => {
-          const target = Number(el.dataset.targetWidth ?? 0);
-          el.style.transform = `scaleX(${Math.max(0, Math.min(100, target)) / 100})`;
-        });
-      }
-
       if (reduced) {
         document.querySelectorAll<HTMLElement>('[data-animate]').forEach((el) => {
           el.classList.add('is-visible');
-          animateSkillBars(el);
         });
       } else {
         const observer = new IntersectionObserver(
@@ -88,7 +80,6 @@ const ogType = seo?.type ?? type;
               if (!entry.isIntersecting) return;
               const el = entry.target as HTMLElement;
               el.classList.add('is-visible');
-              animateSkillBars(el);
               observer.unobserve(el);
             });
           },

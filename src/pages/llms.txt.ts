@@ -19,7 +19,7 @@ export async function GET(context: APIContext) {
   lines.push('');
   lines.push('## Pages');
   lines.push('');
-  lines.push(`- [Homepage](${site}/): About, current work, skills, projects, contact.`);
+  lines.push(`- [Homepage](${site}/): About, current work, projects, contact.`);
   lines.push(`- [Blog](${site}/blog/): Index of all posts.`);
   lines.push('');
   lines.push('## Blog posts');

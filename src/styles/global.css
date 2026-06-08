@@ -74,10 +74,6 @@
     animation: none;
   }
 
-  [data-animate-skill] {
-    transition: none !important;
-  }
-
   .terminal-reveal { animation: none; }
 
   .animate-blink,
