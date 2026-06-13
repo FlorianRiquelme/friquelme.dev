@@ -23,7 +23,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@iconify-json/lucide": "^1.2.111",
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.4",
     "astro-icon": "^1.1.5",
     "hastscript": "^9.0.1",
