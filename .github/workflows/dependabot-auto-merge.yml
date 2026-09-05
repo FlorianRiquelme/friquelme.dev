@@ -1,0 +1,27 @@
+name: Dependabot auto-merge
+
+on: pull_request
+
+# Dependabot-triggered workflows get a read-only token unless the workflow
+# asks for more. Merging needs both scopes below.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'FlorianRiquelme/friquelme.dev'
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Majors are left for the weekly review automation. Auto-merge only
+      # arms the merge; the main ruleset still requires the CI jobs to pass.
+      - if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
