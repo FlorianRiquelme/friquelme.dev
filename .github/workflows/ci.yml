@@ -22,6 +22,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec astro check
       - run: pnpm test
       - run: pnpm build
 
@@ -41,4 +42,5 @@ jobs:
       # astro's, so the root workspace has to be installed as well.
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C infra install --frozen-lockfile
+      - run: pnpm -C infra exec tsc --noEmit
       - run: pnpm -C infra test
