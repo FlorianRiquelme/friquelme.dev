@@ -58,6 +58,12 @@ Tailwind CSS 4 with a custom dark theme. Tokens are declared in `@theme` blocks 
 - `data-animate-skill` for skill bar width transitions
 - Always respect `prefers-reduced-motion` — existing CSS handles this
 
+## Dependencies
+
+Dependabot opens grouped PRs weekly. Nothing merges automatically: a daily Orca automation running the `omp` agent reviews each PR against `.github/automation/dependabot-review.md`, verifies it locally, and merges only what passes. A ruleset on `main` requires the `site` and `infra` checks and blocks force pushes, so a red PR cannot be merged by anyone.
+
+Do not merge Dependabot PRs by hand and do not add GitHub-native auto-merge. Merges to `main` deploy to production, so every merge is a release. When you change the review prompt, push the file and also update the automation's stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/dependabot-review.md)"`.
+
 ## Infrastructure (infra/)
 
 AWS CDK stacks in TypeScript. Separate `package.json` with its own dependencies.
