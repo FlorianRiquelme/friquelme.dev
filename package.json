@@ -17,33 +17,33 @@
     "test:infra": "pnpm -C infra test"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.10",
     "@astrojs/mdx": "^6.0.2",
-    "@astrojs/rss": "^4.0.18",
-    "@astrojs/sitemap": "^3.7.3",
-    "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@iconify-json/lucide": "^1.2.111",
-    "@tailwindcss/vite": "^4.3.0",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@iconify-json/lucide": "^1.2.128",
+    "@tailwindcss/vite": "^4.3.3",
     "astro": "^6.4.4",
-    "astro-icon": "^1.1.5",
+    "astro-icon": "^1.2.0",
     "hastscript": "^9.0.1",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "satori": "^0.26.0",
+    "satori": "^0.33.4",
     "satori-html": "^0.3.2",
-    "tailwindcss": "^4.3.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "devDependencies": {
-    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/vitest-runner": "^9.6.1",
-    "happy-dom": "20.10.1",
-    "sharp": "^0.34.5",
-    "vitest": "^4.1.8"
+    "happy-dom": "20.12.2",
+    "sharp": "^0.35.4",
+    "vitest": "^4.1.11"
   },
   "pnpm": {
     "overrides": {
