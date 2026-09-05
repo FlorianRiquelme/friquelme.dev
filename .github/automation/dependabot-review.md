@@ -22,8 +22,9 @@ Start from `gh pr list --author app/dependabot --state open --json number,title,
 2. **CI.** Both the `site` and `infra` checks are SUCCESS on the current head. Never merge with a check pending, failed, or missing.
 3. **Advisories.** The incoming version must carry no open advisory:
    `gh api "/advisories?ecosystem=npm&affects=<package>@<new-version>&per_page=100" --jq '[.[] | select(.withdrawn_at==null)] | map(.ghsa_id) | join(",")'`
+   Use `ecosystem=actions` and the action name for GitHub Actions bumps.
    A non-empty result means do not merge. Comment with the advisory IDs. Report it even when the bump still reduces the advisory count, because merging would ship a known-vulnerable version.
-4. **Local verification.** Check out the PR branch in this worktree and run `pnpm install --frozen-lockfile && pnpm test && pnpm build`. When the PR touches `infra/`, also run `pnpm -C infra install --frozen-lockfile && pnpm -C infra test`. Every command must exit zero. A green CI check does not excuse you from this.
+4. **Local verification.** Check out the PR branch in this worktree and run `pnpm install --frozen-lockfile && pnpm exec astro check && pnpm test && pnpm build`. When the PR touches `infra/`, also run `pnpm -C infra install --frozen-lockfile && pnpm -C infra exec tsc --noEmit && pnpm -C infra test`. Every command must exit zero. A green CI check does not excuse you from this.
 5. **Breaking changes, majors only.** Read the release notes. Grep `src/`, `astro.config.mjs`, `tests/`, and `infra/` for each documented breaking change. Merge a major only when nothing in this codebase touches one. Otherwise comment with what would have to change and leave it open.
 
 Merge with `gh pr merge <n> --squash`. Merge one pull request at a time. After each merge the other open lockfiles are stale, so re-check mergeability; for any that became conflicted, post `@dependabot rebase` and leave them for tomorrow's run rather than resolving conflicts yourself.
