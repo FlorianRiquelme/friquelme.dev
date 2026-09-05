@@ -6,7 +6,7 @@ Personal portfolio site for Florian Riquelme — senior software engineer based 
 
 ## Tech Stack
 
-- **Framework:** [Astro 5](https://astro.build) (static output)
+- **Framework:** [Astro 6](https://astro.build) (static output)
 - **Styling:** [Tailwind CSS 4](https://tailwindcss.com) via Vite plugin
 - **Icons:** [astro-icon](https://github.com/natemoo-re/astro-icon) with Lucide
 - **Font:** JetBrains Mono
@@ -33,8 +33,8 @@ src/
 │   ├── forms/           # InputGroup, SearchField, TextareaGroup
 │   ├── nav/             # HeaderBar, Footer, Logo, NavItem
 │   └── ui/              # Badge, Button variants, Tag, Divider
-├── layouts/Layout.astro # Base HTML layout with meta, fonts, analytics
-├── pages/index.astro    # Single-page site (hero, skills, projects, contact)
+├── layouts/Layout.astro # Base HTML layout with meta, fonts, PostHog analytics
+├── pages/index.astro    # Portfolio homepage (hero, projects, contact)
 └── styles/global.css    # Tailwind theme, animations, base styles
 
 infra/                   # AWS CDK stacks

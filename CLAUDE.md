@@ -2,7 +2,7 @@
 
 ## Quick Context
 
-Astro 5 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
+Astro 6 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public, so never commit keys, handoff notes, or analytics exports.
 
 ## Design Context
 
@@ -30,18 +30,20 @@ Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIG
 - `pnpm test:mutation` — Stryker mutation tests on `src/lib/seo.ts` + `src/lib/security/csp.ts`
 - `pnpm test:infra` — run CDK assertion tests in `infra/`
 
+`.nvmrc` pins Node 24. On a machine with Node 22 pnpm prints an "Unsupported engine" warning; install, tests, and build still work, so ignore it.
+
 ## Architecture
 
 Multi-page static site with two main areas:
 
-- **Portfolio** (`src/pages/index.astro`) — four scroll sections: hero (#about), skills (#skills), projects (#projects), contact (#contact)
+- **Portfolio** (`src/pages/index.astro`) — three scroll sections: hero (#about), projects (#projects), contact (#contact). The skills section was removed in June 2026; do not reintroduce it.
 - **Blog** (`src/pages/blog/`) — listing page (`index.astro`) and dynamic post pages (`[slug].astro`). Posts are MDX files in `src/blog/` using Astro content collections.
 
 All components are `.astro` files (no client-side framework). Client-side JS is minimal and inline — a typing animation in the hero and an IntersectionObserver for scroll-triggered animations.
 
 ### Component Organization
 
-- `src/components/content/` — domain components (ProjectCard, SkillBar, TerminalWindow, SectionHeader)
+- `src/components/content/` — domain components (ProjectCard, TerminalWindow, SectionHeader, SurfaceCard, MetricCard, ListItem, TableRow)
 - `src/components/blog/` — blog components (BlogPostCard, BlogFeaturedCard, ArticleHero, Callout, TableOfContents, AuthorCard, PostNavigation, RelatedPosts)
 - `src/components/ui/` — generic primitives (Badge, ButtonPrimary, ButtonSecondary, ButtonGhost, ButtonSmall, Tag, Divider, StatusIndicator)
 - `src/components/nav/` — navigation (HeaderBar, Footer, Logo, NavItem)
@@ -55,8 +57,15 @@ Tailwind CSS 4 with a custom dark theme. Tokens are declared in `@theme` blocks 
 
 - `data-animate` attribute + `is-visible` class triggers `fadeInUp` via IntersectionObserver
 - `stagger-1`, `stagger-2`, `stagger-3` classes for cascading delays
-- `data-animate-skill` for skill bar width transitions
 - Always respect `prefers-reduced-motion` — existing CSS handles this
+
+## Analytics (PostHog)
+
+- Loaded from `src/components/posthog.astro` via `Layout.astro`, EU cloud (`eu.i.posthog.com`), cookieless (`persistence: 'memory'`). Only the public project token is in the repo; that is intended.
+- Cookieless means every page load is a new anonymous person. Expect pageviews, pageleaves, and autocapture clicks, but no cross-session retention or per-user funnels. Say so before proposing analyses that need identity.
+- No custom events are captured yet. Add `posthog.capture()` calls only when a concrete question requires them.
+- Any new third-party host must also be added to the CSP builder in `src/lib/security/csp.ts` and its test, or the build's CSP will block it.
+- Agents read PostHog through the PostHog MCP server (`https://mcp.posthog.com/mcp`), configured per user, never in the repo. If the server is not connected, say so and ask instead of guessing at numbers.
 
 ## Infrastructure (infra/)
 
