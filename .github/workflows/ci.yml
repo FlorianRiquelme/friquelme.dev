@@ -34,6 +34,11 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: pnpm
-          cache-dependency-path: infra/pnpm-lock.yaml
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            infra/pnpm-lock.yaml
+      # The CDK stack imports the site's CSP builder, whose tsconfig extends
+      # astro's, so the root workspace has to be installed as well.
+      - run: pnpm install --frozen-lockfile
       - run: pnpm -C infra install --frozen-lockfile
       - run: pnpm -C infra test
