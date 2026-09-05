@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            infra/pnpm-lock.yaml
+      # The CDK stack imports the site's CSP builder, whose tsconfig extends
+      # astro's, so the root workspace has to be installed as well.
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C infra install --frozen-lockfile
+      - run: pnpm -C infra test
