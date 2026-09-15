@@ -43,7 +43,7 @@
     "@stryker-mutator/vitest-runner": "^9.6.1",
     "happy-dom": "20.14.3",
     "sharp": "^0.35.4",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "pnpm": {
     "overrides": {
