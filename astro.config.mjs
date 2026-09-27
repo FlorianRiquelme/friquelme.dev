@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.mjs';
 import { loadPostsFromDir, serializeSitemapEntry } from './src/plugins/sitemap-serialize.mjs';
@@ -24,7 +25,16 @@ export default defineConfig({
   },
   integrations: [
     icon(),
-    mdx({
+    mdx(),
+    sitemap({
+      serialize(item) {
+        return serializeSitemapEntry(item, postsBySlug);
+      },
+    })
+  ],
+  markdown: {
+    processor: unified({
+      remarkPlugins: [remarkReadingTime],
       rehypePlugins: [
         rehypeSlug,
         [
@@ -41,17 +51,9 @@ export default defineConfig({
         ],
       ],
     }),
-    sitemap({
-      serialize(item) {
-        return serializeSitemapEntry(item, postsBySlug);
-      },
-    })
-  ],
-  markdown: {
     shikiConfig: {
       theme: 'github-dark-default',
       wrap: true,
     },
-    remarkPlugins: [remarkReadingTime],
   },
 });

@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect, beforeAll } from 'vitest';
 import sharp from 'sharp';
+import { Window } from 'happy-dom';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '../../..');
 const DIST = resolve(ROOT, 'dist');
@@ -82,6 +83,32 @@ describe('astro build output', () => {
       const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
       expect(h1Match).not.toBeNull();
       expect(h1Match![1]).toContain('shipping products');
+    });
+  });
+
+  describe('MDX rendering', () => {
+    it('preserves reading time, heading links, code highlighting, and Astro components', async () => {
+      const window = new Window();
+      try {
+        const document = window.document;
+        document.body.innerHTML = readFileSync(
+          resolve(DIST, 'blog/seo-for-astro-sites/index.html'), 'utf-8',
+        );
+
+        expect(document.body.textContent).toMatch(/\b[1-9]\d* min read\b/);
+        const heading = document.querySelector('h2#the-goal');
+        expect(heading).not.toBeNull();
+        const anchor = heading?.querySelector('a.heading-anchor');
+        expect(anchor?.getAttribute('href')).toBe('#the-goal');
+        expect(anchor?.getAttribute('aria-hidden')).toBe('true');
+        expect(anchor?.getAttribute('tabindex')).toBe('-1');
+        expect(document.querySelector('pre.astro-code code span[style]')).not.toBeNull();
+        const callout = document.querySelector('div.border-green-primary\\/20');
+        expect(callout?.textContent).toContain('tldr:');
+        expect(callout?.querySelector('strong')?.textContent).toBe('tldr:');
+      } finally {
+        await window.happyDOM.abort();
+      }
     });
   });
 
