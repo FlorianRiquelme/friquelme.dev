@@ -3,6 +3,8 @@
     "target": "ES2022",
     "module": "commonjs",
     "lib": ["ES2022"],
+    "types": ["node"],
+    "rootDir": "..",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -15,5 +17,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+  "include": ["bin/**/*.ts", "lib/**/*.ts", "../src/lib/security/*.ts"]
 }
