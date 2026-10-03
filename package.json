@@ -17,8 +17,10 @@
     "test:infra": "pnpm -C infra test",
     "test:dist": "vitest run --config vitest.build.config.ts",
     "test:browser": "pnpm build && e2e run",
+    "test:browser:smoke": "pnpm build && e2e run --target desktop-chromium",
     "verify": "node scripts/verify.mjs",
     "verify:reports": "node --test --test-reporter=tap tests/verification/report-outcomes.test.mjs",
+    "verify:controls": "node scripts/negative-controls.mjs",
     "verify:infra": "node scripts/verify.mjs --infra"
   },
   "dependencies": {
