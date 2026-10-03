@@ -70,7 +70,7 @@ Do not merge Dependabot PRs by hand and do not add GitHub-native auto-merge. Mer
 
 ## Scheduled checks
 
-An Orca automation running the `claude` agent audits the live site with squirrelscan (`squirrel.toml`) per `.github/automation/site-audit.md`. It triages new findings itself: fix PRs, baseline PRs, or `site-audit` issues for real decisions. Triaged findings live in `.github/automation/site-audit-baseline.json`, diffed by `scripts/site-audit-diff.mjs`. When you change the prompt, push the file and also update the stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/site-audit.md)"`.
+An Orca automation running the `claude` agent audits the live site with squirrelscan (`squirrel.toml`) per `.github/automation/site-audit.md`. It triggers hourly; its precheck lets a run through only within an hour of a successful deploy or at 09:00 Europe/Berlin. It triages new findings itself: fix PRs, baseline PRs, or `site-audit` issues for real decisions. Triaged findings live in `.github/automation/site-audit-baseline.json`, diffed by `scripts/site-audit-diff.mjs`. When you change the prompt, push the file and also update the stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/site-audit.md)"`.
 
 ## Infrastructure (infra/)
 
