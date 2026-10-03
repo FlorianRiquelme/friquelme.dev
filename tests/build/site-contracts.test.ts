@@ -44,6 +44,20 @@ describe('all built pages', () => {
     expect([...routes].sort()).toEqual(builtPages.sort());
   });
   for (const route of routes) {
+    // script-src has no 'unsafe-inline' (src/lib/security/csp.ts): inline code would be blocked in production.
+    it(`${route} runs no inline script under the CSP`, async () => {
+      const window = readDocument(route);
+      try {
+        const scripts = [...window.document.querySelectorAll('script')]
+          .filter(script => script.getAttribute('type') !== 'application/ld+json')
+          .map(script => script.getAttribute('src') ?? `inline: ${script.textContent.slice(0, 60)}`);
+        expect(scripts.length).toBeGreaterThan(0);
+        expect(scripts.filter(src => !src.startsWith('/_astro/'))).toEqual([]);
+        const handlers = [...window.document.querySelectorAll('*')]
+          .flatMap(el => [...el.attributes].filter(a => a.name.startsWith('on')).map(a => `${el.tagName} ${a.name}`));
+        expect(handlers).toEqual([]);
+      } finally { await window.happyDOM.abort(); }
+    });
     it(`${route} has exact canonical metadata, valid structured data and reachable internal links`, async () => {
       const window = readDocument(route);
       try {
