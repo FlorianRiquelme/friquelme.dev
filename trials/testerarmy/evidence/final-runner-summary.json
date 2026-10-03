@@ -1,0 +1,34 @@
+{
+  "id": "2026-10-03T11-24-02.318Z-control-de376633",
+  "startedAt": "2026-10-03T11:24:02.330Z",
+  "finishedAt": "2026-10-03T11:24:44.097Z",
+  "runtime": "v22.23.2",
+  "sourceHash": "504916ae38542be7b8613a338668acdbc51affe64df02d97c3e2796b86d8b8da",
+  "sourceUnchanged": true,
+  "runs": [
+    {
+      "label": "healthy",
+      "exitCode": 0,
+      "durationMs": 6066,
+      "expectationMet": true
+    },
+    {
+      "label": "wrong-link",
+      "exitCode": 1,
+      "durationMs": 20409,
+      "expectationMet": true
+    },
+    {
+      "label": "mobile-overlay",
+      "exitCode": 1,
+      "durationMs": 8596,
+      "expectationMet": true
+    },
+    {
+      "label": "restored",
+      "exitCode": 0,
+      "durationMs": 5950,
+      "expectationMet": true
+    }
+  ]
+}

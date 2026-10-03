@@ -46,6 +46,8 @@ infra/                   # AWS CDK stacks
 
 ## Deployment
 
+The manual [TesterArmy verification trial](trials/testerarmy/README.md) has an isolated setup, fault controls and evidence. Its completed ChatGPT-subscription evaluation includes live/cache runs, fault detection and reviewed exploration; it is not a required CI check.
+
 Pushes to `main` trigger the GitHub Actions workflow which:
 
 1. Builds the static site with Astro

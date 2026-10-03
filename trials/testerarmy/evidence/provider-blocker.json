@@ -1,0 +1,69 @@
+{
+  "id": "2026-10-03T11-11-47.010Z-probe-9c5c4b88",
+  "provider": null,
+  "model": null,
+  "runtime": "v22.23.2",
+  "exitCode": 2,
+  "report": {
+    "status": "error",
+    "errors": [
+      {
+        "category": "configuration",
+        "code": "MODEL_UNAVAILABLE",
+        "message": "the agent fixture requires a model, and agents.default has none: set model on it to an AI SDK model instance, e.g. agents: { default: { model: gateway('openai/gpt-6-luna-fast') } }",
+        "retryable": false
+      }
+    ],
+    "summary": {
+      "discovered": 2,
+      "selected": 1,
+      "executed": 1,
+      "passed": 0,
+      "failed": 1,
+      "flaky": 0,
+      "skipped": 1
+    },
+    "usage": {
+      "discoveredResults": 2,
+      "maxAgentContextBytes": 0,
+      "maxLedgerBytes": 0,
+      "maxObservationBytes": 0,
+      "artifactBytes": 34289,
+      "downloads": 0,
+      "events": 0,
+      "modelTokens": 0,
+      "maxModelCallsInStep": 0,
+      "maxActionStepsInStep": 0
+    },
+    "engine": [
+      {
+        "name": "web",
+        "version": "0.11.2",
+        "spiVersion": 1
+      }
+    ],
+    "results": [
+      {
+        "title": "mobile pinned essay title is readable and unobscured",
+        "status": "interrupted",
+        "firstAttempt": "interrupted",
+        "attempts": [
+          {
+            "index": 0,
+            "status": "interrupted",
+            "durationMs": 232,
+            "error": {
+              "category": "interrupted",
+              "code": "INTERRUPTED",
+              "message": "run interrupted in phase body",
+              "retryable": false,
+              "phase": "body"
+            },
+            "steps": []
+          }
+        ]
+      }
+    ]
+  },
+  "sourceUnchanged": true
+}
