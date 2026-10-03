@@ -8,3 +8,4 @@ Capture is not authorization to implement broader fixes. Trial friction is in [F
 - **I04 — exploration:** pending an authorized model. No claim that passing deterministic tests establishes broad coverage.
 
 The prior shared buffer lives in another private workspace and is not published here. This file is the transferable collection for this trial; no unrelated context is copied.
+- **I05 — remote push security notice (unverified):** GitHub reported one high-severity advisory on the default branch when this feature branch was pushed. The advisory content/state was not inspected and no change is authorized by this observation. Source notice links to [Dependabot alert 153](https://github.com/FlorianRiquelme/friquelme.dev/security/dependabot/153). Keep separate from trial correctness and review jointly.

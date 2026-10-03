@@ -22,3 +22,5 @@ Human interventions: initial task and Luna preference only as of this selection.
 Component evidence: isolated test discovery/type checking pass. Feature evidence: deterministic browser flow and both negative controls executed; agent feature is **partial**, blocked on provider authorization/login. Passing deterministic control does not establish agent accuracy or complete website coverage.
 
 11:21 UTC follow-up: temporary e2e deterministic API probe passed both desktop and mobile cases, exercising exact assertions and screenshot APIs. Temporary test removed; full report retained in the private archive. Agent calls still unexecuted. Final reproduction/type-check checks pass, with no trial server left listening.
+
+Final local control validation `2026-10-03T11-24-02.318Z-control-de376633` returns success only after validating the exact expected defect reports/retries and healthy outcomes. Commit `f08c37f` pushed to the isolated branch; draft [PR 76](https://github.com/FlorianRiquelme/friquelme.dev/pull/76) opened. No merge/deployment. GitHub's incidental advisory notice captured in findings without implementing an unrelated fix.
