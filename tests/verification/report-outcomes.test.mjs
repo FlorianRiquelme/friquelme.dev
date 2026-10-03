@@ -64,6 +64,7 @@ if (args[1] === 'e2e') {
   // Each model marker is checked independently: the step kind and the agent API name.
   if (scenario === 'model-step') run.results[0].attempts[0].steps.push({ kind: 'agent', api: 'act', status: 'passed' });
   if (scenario === 'agent-api') run.results[0].attempts[0].steps.push({ kind: 'assertion', api: 'agent.assert', status: 'passed' });
+  if (scenario === 'model-field') run.results[0].attempts[0].steps.push({ kind: 'assertion', api: 'app.assert', model: 'provider/model', status: 'passed' });
   if (scenario === 'model-metrics') run.results[0].attempts[0].steps[0].metrics = { modelCalls: 1 };
   if (scenario === 'failed-run') run.status = 'failed';
   if (scenario === 'cleanup-failed') run.results[0].attempts[0].cleanup = 'failed';
@@ -152,12 +153,12 @@ const browserReasons = {
   'flaky-browser': /counts indicate|unretried successful verdict/, 'focused-browser': /counts indicate/, 'focused-only': /counts indicate/,
   'engine-error': /operational errors/, 'teardown-error': /clean successful verdict/, 'cleanup-failed': /clean successful verdict/,
   'attempt-error': /clean successful verdict/, 'retried-attempt': /clean successful verdict/, 'failed-run': /run did not pass/,
-  'model-step': /used a model/, 'agent-api': /used a model/, 'model-usage': /used a model/, 'model-metrics': /used a model/, 'explore-run': /Exploration/,
+  'model-step': /used a model/, 'agent-api': /used a model/, 'model-field': /used a model/, 'model-usage': /used a model/, 'model-metrics': /used a model/, 'explore-run': /Exploration/,
   'setup-result': /unretried successful verdict/, 'missing-target': /targets differ/, 'extra-target': /targets differ/,
   'duplicate-result': /exactly once/,
 };
 
-for (const scenario of ['success', 'missing-unit', 'malformed-unit', 'empty-unit', 'skipped-unit', 'todo-unit', 'inconsistent-unit', 'missing-browser', 'malformed-browser', 'empty-browser', 'failed-browser', 'skipped-browser', 'flaky-browser', 'focused-browser', 'engine-error', 'teardown-error', 'model-step', 'model-usage', 'model-metrics', 'agent-api', 'failed-run', 'cleanup-failed', 'attempt-error', 'retried-attempt', 'focused-only', 'setup-result', 'extra-target', 'explore-run', 'process-failure', 'missing-target', 'duplicate-result', 'stale-browser', 'empty-report-tests']) {
+for (const scenario of ['success', 'missing-unit', 'malformed-unit', 'empty-unit', 'skipped-unit', 'todo-unit', 'inconsistent-unit', 'missing-browser', 'malformed-browser', 'empty-browser', 'failed-browser', 'skipped-browser', 'flaky-browser', 'focused-browser', 'engine-error', 'teardown-error', 'model-step', 'model-usage', 'model-metrics', 'model-field', 'agent-api', 'failed-run', 'cleanup-failed', 'attempt-error', 'retried-attempt', 'focused-only', 'setup-result', 'extra-target', 'explore-run', 'process-failure', 'missing-target', 'duplicate-result', 'stale-browser', 'empty-report-tests']) {
   test(`verification wrapper ${scenario === 'success' ? 'accepts complete execution' : `rejects ${scenario}`}`, async () => {
     const fixture = await createFixture();
     try {
