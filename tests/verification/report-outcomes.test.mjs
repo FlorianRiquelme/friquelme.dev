@@ -80,8 +80,9 @@ test('interrupting verification between stages rejects success', async () => {
       fs.promises.readFile = async (path, ...args) => {
         const result = await original(path, ...args);
         if (String(path).endsWith('/unit.json')) {
-          process.kill(process.pid, 'SIGTERM');
-          await new Promise(done => setImmediate(done));
+          // Deliver the event at this exact boundary. An OS signal may arrive in a later stage;
+          // actual process-group termination is covered by the separate active-child test.
+          process.emit('SIGTERM');
         }
         return result;
       };
