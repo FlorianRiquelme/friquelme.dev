@@ -46,6 +46,8 @@ infra/                   # AWS CDK stacks
 
 ## Deployment
 
+Deterministic browser tests run with TesterArmy as part of `pnpm verify`; see [VERIFICATION.md](VERIFICATION.md). The separate model-backed [TesterArmy trial](trials/testerarmy/README.md) keeps its isolated setup, fault controls and reviewed evidence; it is optional and not a required CI check.
+
 Pushes to `main` trigger the GitHub Actions workflow which:
 
 1. Builds the static site with Astro

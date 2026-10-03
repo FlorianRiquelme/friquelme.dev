@@ -12,9 +12,14 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:build": "vitest run --config vitest.build.config.ts",
+    "test:build": "pnpm build && pnpm test:dist",
     "test:mutation": "stryker run",
-    "test:infra": "pnpm -C infra test"
+    "test:infra": "pnpm -C infra test",
+    "test:dist": "vitest run --config vitest.build.config.ts",
+    "test:browser": "pnpm build && e2e run",
+    "verify": "node scripts/verify.mjs",
+    "verify:reports": "node --test --test-reporter=tap tests/verification/report-outcomes.test.mjs",
+    "verify:infra": "node scripts/verify.mjs --infra"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
@@ -39,10 +44,15 @@
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "devDependencies": {
+    "@e2e-dev/web": "0.11.2",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/vitest-runner": "^9.6.1",
+    "@types/node": "24.10.1",
+    "axe-core": "4.13.0",
+    "e2e": "0.16.0",
     "happy-dom": "20.14.3",
+    "playwright": "1.63.0",
     "sharp": "^0.35.4",
     "vitest": "^5.0.1"
   },
@@ -57,6 +67,9 @@
       "brace-expansion@<5.0.9": ">=5.0.9",
       "@babel/core@<7.29.6": ">=7.29.6",
       "esbuild@<0.28.1": ">=0.28.1"
+    },
+    "patchedDependencies": {
+      "e2e@0.16.0": "patches/e2e@0.16.0.patch"
     }
   }
 }

@@ -1,0 +1,2 @@
+patchedDependencies:
+  e2e@0.16.0: patches/e2e@0.16.0.patch

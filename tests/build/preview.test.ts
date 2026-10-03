@@ -1,52 +1,25 @@
-import { spawn, type ChildProcess } from 'node:child_process';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import type { ChildProcess } from 'node:child_process';
+import { previewHost, startPreview, waitForPreview } from '../../scripts/preview.mjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-const ROOT = resolve(fileURLToPath(import.meta.url), '../../..');
 const PORT = 14321;
-const BASE = `http://localhost:${PORT}`;
+const BASE = `http://${previewHost}:${PORT}`;
 
 let server: ChildProcess | null = null;
 
-async function waitForServer(timeoutMs = 30_000): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(BASE);
-      if (res.status >= 200 && res.status < 500) return;
-    } catch {
-      // not yet ready
-    }
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  throw new Error(`preview server did not start within ${timeoutMs}ms`);
-}
-
 describe('astro preview server', () => {
   beforeAll(async () => {
-    server = spawn(
-      'pnpm',
-      [
-        'exec',
-        'astro',
-        'preview',
-        '--host',
-        '127.0.0.1',
-        '--port',
-        String(PORT),
-      ],
-      {
-        cwd: ROOT,
-        stdio: 'inherit',
-        env: { ...process.env, FORCE_COLOR: '0' },
-      },
-    );
-    await waitForServer();
+    server = startPreview(PORT);
+    await waitForPreview(server, PORT);
   });
 
-  afterAll(() => {
-    server?.kill('SIGTERM');
+  afterAll(async () => {
+    if (!server || server.exitCode !== null || server.signalCode !== null) return;
+    await new Promise<void>(done => {
+      server!.once('exit', () => { clearTimeout(timer); done(); });
+      const timer = setTimeout(() => server!.kill('SIGKILL'), 3_000);
+      server!.kill('SIGTERM');
+    });
   });
 
   it('serves the homepage with HTTP 200 and HTML content-type', async () => {
@@ -58,6 +31,31 @@ describe('astro preview server', () => {
   it('serves /blog/ with HTTP 200', async () => {
     const res = await fetch(`${BASE}/blog/`);
     expect(res.status).toBe(200);
+  });
+
+  it('refuses an occupied preview port instead of falling back to another server', async () => {
+    const collision = startPreview(PORT);
+    try {
+      await expect(waitForPreview(collision, PORT, 8_000)).rejects.toThrow('Preview exited before readiness');
+      expect(collision.exitCode).toBe(1);
+    } finally {
+      if (collision.exitCode === null && collision.signalCode === null) {
+        await new Promise<void>(done => { collision.once('exit', () => done()); collision.kill('SIGTERM'); });
+      }
+    }
+  });
+
+  it.each([
+    ['/rss.xml', 'xml'],
+    ['/sitemap-index.xml', 'xml'],
+    ['/sitemap-0.xml', 'xml'],
+    ['/llms.txt', 'text/plain'],
+    ['/llms-full.txt', 'text/plain'],
+  ])('serves %s with its expected media type', async (path, type) => {
+    const res = await fetch(`${BASE}${path}`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain(type);
+    expect((await res.text()).trim()).not.toBe('');
   });
 
   it('serves /og/index.png with HTTP 200 and PNG content-type', async () => {

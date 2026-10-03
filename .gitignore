@@ -44,3 +44,12 @@ PORTFOLIO_REFRESH.md
 GEO-AUDIT-REPORT.md
 squirrel.toml
 .gstack/
+
+# Browser verification output
+playwright-report/
+test-results/
+.verification.lock
+.verification-infra.lock
+
+# TesterArmy default output (the suite writes to reports/browser)
+.e2e/

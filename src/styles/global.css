@@ -68,7 +68,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-animate] {
+  [data-animate],
+  [data-animate].is-visible {
     opacity: 1;
     transform: none;
     animation: none;

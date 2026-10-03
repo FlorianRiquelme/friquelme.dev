@@ -1,0 +1,14 @@
+diff --git a/dist/internal/urls.js b/dist/internal/urls.js
+index 5fe03a74c62be347e9d63e72164c5015e147740d..ced552300377d4aae765d8a857234b7f44c71b68 100644
+--- a/dist/internal/urls.js
++++ b/dist/internal/urls.js
+@@ -28,7 +28,8 @@ export function normalizeBaseUrl(raw) {
+     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+         throw new ConfigurationError('INVALID_APP_URL', `app URL must be http(s): ${raw}`);
+     }
+-    if (url.protocol === 'http:' && !isLoopbackHost(url.hostname)) {
++    // agent-server preview policy requires this exact tailnet host (see VERIFICATION.md).
++    if (url.protocol === 'http:' && !isLoopbackHost(url.hostname) && url.hostname !== '100.84.161.116') {
+         throw new ConfigurationError('INVALID_APP_URL', `plain HTTP is allowed only for loopback hosts: ${raw}`);
+     }
+     if (url.port === '0' && !isLoopbackAddress(url.hostname)) {
