@@ -22,9 +22,15 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec astro check
-      - run: pnpm test
-      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm verify
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: website-verification
+          path: reports/
+          retention-days: 7
+          if-no-files-found: error
 
   infra:
     runs-on: ubuntu-latest
@@ -42,5 +48,11 @@ jobs:
       # astro's, so the root workspace has to be installed as well.
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C infra install --frozen-lockfile
-      - run: pnpm -C infra exec tsc --noEmit
-      - run: pnpm -C infra test
+      - run: pnpm verify:infra
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: infrastructure-verification
+          path: reports/verification-infra/
+          retention-days: 7
+          if-no-files-found: error

@@ -1,8 +1,7 @@
-import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import sharp from 'sharp';
 import { Window } from 'happy-dom';
 
@@ -10,10 +9,6 @@ const ROOT = resolve(fileURLToPath(import.meta.url), '../../..');
 const DIST = resolve(ROOT, 'dist');
 
 describe('astro build output', () => {
-  beforeAll(() => {
-    execSync('pnpm exec astro build', { cwd: ROOT, stdio: 'inherit' });
-  });
-
   describe('trailing slash', () => {
     it('emits dist/blog/index.html', () => {
       expect(existsSync(resolve(DIST, 'blog/index.html'))).toBe(true);

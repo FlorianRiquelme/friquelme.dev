@@ -2,7 +2,7 @@
 
 ## Quick Context
 
-Astro 5 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
+Astro 7 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
 
 ## Design Context
 
@@ -23,8 +23,10 @@ Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIG
 
 ## Commands
 
-- `pnpm dev` — local dev server at localhost:4321
-- `pnpm build` — build to `./dist/` (use this to verify changes compile)
+- `pnpm dev --host 100.84.161.116` — agent-server development preview (other hosts follow their machine policy)
+- `pnpm build` — build to `./dist/`
+- `pnpm verify` — required deterministic site gate; see `AGENTS.md` and `VERIFICATION.md`
+- `pnpm verify:infra` — infrastructure type and assertion checks, without deployment
 - `pnpm preview` — preview production build locally
 - `pnpm test` — run Vitest unit + Astro Container tests
 - `pnpm test:mutation` — Stryker mutation tests on `src/lib/seo.ts` + `src/lib/security/csp.ts`
@@ -34,7 +36,7 @@ Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIG
 
 Multi-page static site with two main areas:
 
-- **Portfolio** (`src/pages/index.astro`) — four scroll sections: hero (#about), skills (#skills), projects (#projects), contact (#contact)
+- **Portfolio** (`src/pages/index.astro`) — three scroll sections: hero (#about), projects (#projects), contact (#contact)
 - **Blog** (`src/pages/blog/`) — listing page (`index.astro`) and dynamic post pages (`[slug].astro`). Posts are MDX files in `src/blog/` using Astro content collections.
 
 All components are `.astro` files (no client-side framework). Client-side JS is minimal and inline — a typing animation in the hero and an IntersectionObserver for scroll-triggered animations.
@@ -81,4 +83,4 @@ CDK changes are deployed manually, not through CI. Don't modify infra unless exp
 - Images go through Astro's `<Picture>` component for automatic optimization (AVIF/WebP)
 - Project images are SVGs in `src/assets/images/`
 - Blog posts are `.mdx` files in `src/blog/` with frontmatter (title, description, pubDate, author, heroImage, tags)
-- Tests live in `tests/` (unit + Astro Container) and `infra/test/` (CDK assertions). Run `pnpm test` and `pnpm test:infra` before commits
+- Tests live in `tests/` (unit + Astro Container) and `infra/test/` (CDK assertions). Run `pnpm verify` and `pnpm verify:infra` before commits. Agents resolve routine failures; follow `AGENTS.md` for implementation and review
