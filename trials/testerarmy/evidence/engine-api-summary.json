@@ -1,0 +1,107 @@
+{
+  "id": "2026-10-03T11-21-13.394Z-api-probe",
+  "status": "passed",
+  "summary": {
+    "discovered": 4,
+    "selected": 2,
+    "executed": 2,
+    "passed": 2,
+    "failed": 0,
+    "flaky": 0,
+    "skipped": 2
+  },
+  "usage": {
+    "discoveredResults": 4,
+    "maxAgentContextBytes": 0,
+    "maxLedgerBytes": 0,
+    "maxObservationBytes": 0,
+    "artifactBytes": 1788932,
+    "downloads": 0,
+    "events": 0,
+    "modelTokens": 0,
+    "maxModelCallsInStep": 0,
+    "maxActionStepsInStep": 0
+  },
+  "results": [
+    {
+      "title": [
+        "runtime API: desktop route and exact selectors"
+      ],
+      "status": "passed",
+      "steps": [
+        {
+          "api": "app.open",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toBeVisible",
+          "status": "passed"
+        },
+        {
+          "api": "locator.click",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toHaveURL",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toBeVisible",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toHaveAttribute",
+          "status": "passed"
+        },
+        {
+          "api": "locator.click",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toHaveURL",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toBeVisible",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toBeVisible",
+          "status": "passed"
+        },
+        {
+          "api": "app.screenshot",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "title": [
+        "runtime API: mobile selector and screenshot"
+      ],
+      "status": "passed",
+      "steps": [
+        {
+          "api": "browser.setViewport",
+          "status": "passed"
+        },
+        {
+          "api": "app.open",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toHaveURL",
+          "status": "passed"
+        },
+        {
+          "api": "expect.toBeVisible",
+          "status": "passed"
+        },
+        {
+          "api": "app.screenshot",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

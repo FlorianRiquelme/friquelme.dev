@@ -1,0 +1,165 @@
+{
+  "id": "2026-10-03T11-10-22.461Z-control-97dbac27",
+  "startedAt": "2026-10-03T11:10:22.469Z",
+  "finishedAt": "2026-10-03T11:11:02.333Z",
+  "runtime": "v22.23.2",
+  "versions": {
+    "@ai-sdk/openai": "4.0.83",
+    "@e2e-dev/web": "0.11.2",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "ai": "7.0.127",
+    "e2e": "0.16.0",
+    "typescript": "6.0.3"
+  },
+  "retries": 1,
+  "commit": "46c31e224e995231dd0f0b1b1083f001ae03b131",
+  "sourceHash": "504916ae38542be7b8613a338668acdbc51affe64df02d97c3e2796b86d8b8da",
+  "sourceUnchanged": true,
+  "runs": [
+    {
+      "label": "healthy",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 5769,
+      "expectationMet": true,
+      "tests": [
+        {
+          "title": "desktop: homepage navigation opens the pinned essay",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1578,
+              "error": ""
+            }
+          ]
+        },
+        {
+          "title": "mobile: the pinned essay title fits and remains reachable at 390\u00d7844",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1059,
+              "error": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "wrong-link",
+      "variant": "wrong-link",
+      "exitCode": 1,
+      "durationMs": 19790,
+      "expectationMet": true,
+      "tests": [
+        {
+          "title": "desktop: homepage navigation opens the pinned essay",
+          "final": "unexpected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "failed",
+              "durationMs": 6428,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected: \u001b[32m\"http://100.84.161.116:14375/blog/\u001b[7mdesigning-for-the-operator\u001b[27m/\"\u001b[39m\nReceived: \u001b[31m\"http://100.84.161.116:14375/blog/\u001b[7mbrownfield-ai\u001b[27m/\"\u001b[39m\nTimeout:  5000ms"
+            },
+            {
+              "retry": 1,
+              "status": "failed",
+              "durationMs": 6519,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected: \u001b[32m\"http://100.84.161.116:14375/blog/\u001b[7mdesigning-for-the-operator\u001b[27m/\"\u001b[39m\nReceived: \u001b[31m\"http://100.84.161.116:14375/blog/\u001b[7mbrownfield-ai\u001b[27m/\"\u001b[39m\nTimeout:  5000ms"
+            }
+          ]
+        },
+        {
+          "title": "mobile: the pinned essay title fits and remains reachable at 390\u00d7844",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1134,
+              "error": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile-overlay",
+      "variant": "mobile-overlay",
+      "exitCode": 1,
+      "durationMs": 8080,
+      "expectationMet": true,
+      "tests": [
+        {
+          "title": "desktop: homepage navigation opens the pinned essay",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1487,
+              "error": ""
+            }
+          ]
+        },
+        {
+          "title": "mobile: the pinned essay title fits and remains reachable at 390\u00d7844",
+          "final": "unexpected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "failed",
+              "durationMs": 1090,
+              "error": "Error: title point (132, 489) should hit the pinned essay\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
+            },
+            {
+              "retry": 1,
+              "status": "failed",
+              "durationMs": 1153,
+              "error": "Error: title point (132, 489) should hit the pinned essay\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "restored",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 5509,
+      "expectationMet": true,
+      "tests": [
+        {
+          "title": "desktop: homepage navigation opens the pinned essay",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1507,
+              "error": ""
+            }
+          ]
+        },
+        {
+          "title": "mobile: the pinned essay title fits and remains reachable at 390\u00d7844",
+          "final": "expected",
+          "attempts": [
+            {
+              "retry": 0,
+              "status": "passed",
+              "durationMs": 1049,
+              "error": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
