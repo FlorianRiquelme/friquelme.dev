@@ -1,6 +1,6 @@
 # TesterArmy trial — friquelme.dev issue 75
 
-Local/manual experiment for [issue 75](https://github.com/FlorianRiquelme/friquelme.dev/issues/75). The AI evaluation is **pending provider authorization/login**. The deterministic control and controlled defects have been executed; see [ASSESSMENT.md](ASSESSMENT.md). Nothing here installs a CI gate or changes the shipped website.
+Local/manual experiment for [issue 75](https://github.com/FlorianRiquelme/friquelme.dev/issues/75). The ChatGPT-subscription trial is **complete**: three live and three cached healthy runs, both controlled failures/retries, restoration and reviewed exploration; see [ASSESSMENT.md](ASSESSMENT.md). Nothing here installs a CI gate or changes the shipped website.
 
 ## Acceptance examples (declared before implementation)
 
@@ -30,16 +30,16 @@ The default fixture URL is `http://100.84.161.116:14375`. Each runner starts and
 
 No upstream initializer is run, so no skills/MCP/harness configuration is written. e2e's default HTTP URL policy conflicts with the machine preview rule. The committed pnpm patch permits **only** `100.84.161.116` in `normalizeBaseUrl`; it does not change global loopback detection, credentials, navigation, judgments or cache eligibility. The explicit app environment is `test`. This makes results those of **0.16.0 plus the committed URL patch**, not unmodified upstream.
 
-## Provider setup (requires Florian's choice)
+## Provider setup
 
-Do not read/import personal Codex/Claude harness credentials. There is no e2e OAuth login or API key in this session. Configure one authorized provider:
+Do not read/import personal Codex/Claude harness credentials. This trial used its own supported device login, approved by Florian, and `gpt-6-luna`. A ChatGPT subscription removes the separate API-key requirement, but the tool still needs authentication. On a new machine, configure one authorized provider:
 
 ```sh
 # ChatGPT subscription: its own supported login, completed by the human.
 E2E_TELEMETRY_DISABLED=1 pnpm exec e2e login openai --device
 E2E_TELEMETRY_DISABLED=1 pnpm exec e2e models openai
 export TRIAL_PROVIDER=chatgpt
-export TRIAL_MODEL='<an available image/tool-capable model ID>'
+export TRIAL_MODEL=gpt-6-luna # used in this trial; confirm account availability
 
 # Alternative: securely export OPENAI_API_KEY in the launching environment.
 export TRIAL_PROVIDER=openai
@@ -48,7 +48,7 @@ export TRIAL_MODEL='<an authorized image/tool-capable model ID>'
 
 The subscription uses `~/.config/e2e/oauth.json` (or XDG config location), outside git. No hosted signup is needed. The model is deliberately not defaulted: select one available to the approved account. A different provider requires explicit choice and adapting the config. Package docs: [subscriptions](https://e2e.tester.army/docs/subscriptions), [models](https://e2e.tester.army/docs/models).
 
-After authorization/login:
+After login:
 
 ```sh
 pnpm trial matrix
@@ -58,7 +58,13 @@ pnpm trial explore
 
 `matrix` runs three healthy live cases, a separate cache warm-up, three healthy cache-enabled cases, both defects live, restoration live, and a three-step/180-second exploration at 390×844. Inspect actual `step.cache` outcomes; enabling cache is not evidence that replay occurred. AI assertions still run live. Retries are explicitly **one whole-test retry**; report first attempts separately. e2e also has up to five SDK retries for transient provider failures, bounded by the step deadline. Exploration disables cache/test retries. Agent calls have a ten-action/ten-model-call ceiling per step, judgment timeout 60 seconds and test deadline 180 seconds. Exploration has no statistical coverage claim.
 
-Every invocation creates `results/<timestamp>-<mode>-<uuid>/`, with commands, timings, full reports, screenshots, traces and AI trace. The cache stays at `.e2e/cache/` independently of unique output directories. `.trial.lock` prevents concurrent runners sharing the port/cache; after a hard kill, verify the old processes are stopped before removing that lock. The runner rejects missing reports and distinguishes expected product assertions from provider/engine errors. For detailed usage, inspect `summary.json` and per-step metrics; absent cost data means unknown, not zero. Raw results/AI traces are git-ignored and must be reviewed before publishing any selection.
+Every invocation creates `results/<timestamp>-<mode>-<uuid>/`, with commands, timings, full reports, screenshots, traces and AI trace. The cache stays at `.e2e/cache/` independently of unique output directories. `.trial.lock` prevents concurrent runners sharing the port/cache; after a hard kill, verify the old processes are stopped before removing that lock. The runner rejects missing reports and distinguishes expected product assertions from provider/engine errors. For detailed usage, inspect `summary.json` and per-step metrics; absent cost data means unknown, not zero. Raw results/AI traces are git-ignored and must stay private. Export a finished run's allowlisted outcomes, accounting and selected public-site screenshots, then review before publishing:
+
+```sh
+pnpm export:evidence '<timestamp>-matrix-<uuid>'
+```
+
+The exporter excludes model turns, reasoning events, prompt/credential fields and command logs. Free-form errors and finding descriptions still require manual privacy review; exporting is not a redaction guarantee. The actual trial's reviewed selection contains public-site outcomes and is linked from the assessment.
 
 ## Review evidence and session record
 

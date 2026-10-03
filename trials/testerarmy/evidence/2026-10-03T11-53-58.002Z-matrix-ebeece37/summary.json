@@ -1,0 +1,1033 @@
+{
+  "id": "2026-10-03T11-53-58.002Z-matrix-ebeece37",
+  "startedAt": "2026-10-03T11:53:58.015Z",
+  "finishedAt": "2026-10-03T11:59:06.201Z",
+  "runtime": "v22.23.2",
+  "provider": "chatgpt",
+  "model": "gpt-6-luna",
+  "versions": {
+    "@ai-sdk/openai": "4.0.83",
+    "@e2e-dev/web": "0.11.2",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "ai": "7.0.127",
+    "e2e": "0.16.0",
+    "typescript": "6.0.3"
+  },
+  "retries": 1,
+  "commit": "f0a9a8dfe7e8620efbd9856c04a57571d8ad7a59",
+  "sourceHash": "504916ae38542be7b8613a338668acdbc51affe64df02d97c3e2796b86d8b8da",
+  "sourceUnchanged": true,
+  "note": "Calls are summed from reported agent steps, including the exploration planner and charters. Provider prompt-cache tokens differ from action replay. Raw traces stay private. No reported USD price means unknown, not zero.",
+  "runs": [
+    {
+      "label": "live-1",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 25089,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:54:01.171Z",
+      "finishedAt": "2026-10-03T11:54:23.218Z",
+      "modelCalls": 5,
+      "modelTokens": 27933,
+      "providerCachedInputTokens": 8704,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 15213,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 5836,
+                  "calls": 2,
+                  "inputTokens": 10936,
+                  "outputTokens": 64,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6288,
+                  "calls": 2,
+                  "inputTokens": 14584,
+                  "outputTokens": 75,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 4517,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 3801,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 59,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "live-2",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 22697,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:54:26.263Z",
+      "finishedAt": "2026-10-03T11:54:46.098Z",
+      "modelCalls": 5,
+      "modelTokens": 27972,
+      "providerCachedInputTokens": 5632,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 14025,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6671,
+                  "calls": 2,
+                  "inputTokens": 10976,
+                  "outputTokens": 63,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 5059,
+                  "calls": 2,
+                  "inputTokens": 14582,
+                  "outputTokens": 74,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 3807,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 3047,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 62,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "live-3",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 26804,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:54:49.022Z",
+      "finishedAt": "2026-10-03T11:55:13.053Z",
+      "modelCalls": 5,
+      "modelTokens": 27891,
+      "providerCachedInputTokens": 8704,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 17856,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6204,
+                  "calls": 2,
+                  "inputTokens": 10892,
+                  "outputTokens": 64,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 9245,
+                  "calls": 2,
+                  "inputTokens": 14584,
+                  "outputTokens": 75,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 4416,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 3660,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 61,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "cache-warmup",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 23824,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:55:16.302Z",
+      "finishedAt": "2026-10-03T11:55:37.038Z",
+      "modelCalls": 5,
+      "modelTokens": 27814,
+      "providerCachedInputTokens": 5632,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 15737,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6461,
+                  "calls": 2,
+                  "inputTokens": 10834,
+                  "outputTokens": 59,
+                  "tokenAccounting": "provider",
+                  "cache": {
+                    "mode": "missed",
+                    "reason": "no-entry",
+                    "replayedActions": 0,
+                    "totalActions": 0
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6871,
+                  "calls": 2,
+                  "inputTokens": 14574,
+                  "outputTokens": 73,
+                  "tokenAccounting": "provider",
+                  "cache": {
+                    "mode": "missed",
+                    "reason": "no-entry",
+                    "replayedActions": 0,
+                    "totalActions": 0
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 3054,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 2334,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 59,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "cache-1",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 13534,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:55:40.094Z",
+      "finishedAt": "2026-10-03T11:55:50.741Z",
+      "modelCalls": 1,
+      "modelTokens": 2275,
+      "providerCachedInputTokens": 0,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 3452,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 833,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 852,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 5151,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 4412,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 60,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "cache-2",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 12409,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:55:53.573Z",
+      "finishedAt": "2026-10-03T11:56:03.289Z",
+      "modelCalls": 1,
+      "modelTokens": 2278,
+      "providerCachedInputTokens": 0,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 3396,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 807,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 830,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 4412,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 3683,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 63,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "cache-3",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 13490,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:56:06.223Z",
+      "finishedAt": "2026-10-03T11:56:16.928Z",
+      "modelCalls": 1,
+      "modelTokens": 2273,
+      "providerCachedInputTokens": 0,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 3244,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 787,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 757,
+                  "calls": 0,
+                  "inputTokens": 0,
+                  "outputTokens": 0,
+                  "tokenAccounting": null,
+                  "cache": {
+                    "mode": "self-finalized",
+                    "replayedActions": 1,
+                    "totalActions": 1
+                  },
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 5210,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 4469,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 58,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "wrong-link",
+      "variant": "wrong-link",
+      "exitCode": 1,
+      "durationMs": 31093,
+      "expectationMet": true,
+      "status": "failed",
+      "startedAt": "2026-10-03T11:56:19.826Z",
+      "finishedAt": "2026-10-03T11:56:48.157Z",
+      "modelCalls": 4,
+      "modelTokens": 21934,
+      "providerCachedInputTokens": 5632,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "failed",
+          "firstAttempt": "failed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "failed",
+              "durationMs": 13928,
+              "error": {
+                "code": "ASSERTION_FAILED",
+                "message": "expect.toHaveAttribute failed\nlocator: getByRole(\"link\", name: \"open pinned essay: designing for the operator\")\nexpected: attribute \"href\" \"/blog/designing-for-the-operator/\"\nobserved: attribute \"href\" \"/blog/brownfield-ai/\" (match count 1)"
+              },
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 6394,
+                  "calls": 2,
+                  "inputTokens": 10974,
+                  "outputTokens": 64,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "failed",
+              "durationMs": 12230,
+              "error": {
+                "code": "ASSERTION_FAILED",
+                "message": "expect.toHaveAttribute failed\nlocator: getByRole(\"link\", name: \"open pinned essay: designing for the operator\")\nexpected: attribute \"href\" \"/blog/designing-for-the-operator/\"\nobserved: attribute \"href\" \"/blog/brownfield-ai/\" (match count 1)"
+              },
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 5069,
+                  "calls": 2,
+                  "inputTokens": 10832,
+                  "outputTokens": 64,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile-overlay",
+      "variant": "mobile-overlay",
+      "exitCode": 1,
+      "durationMs": 18277,
+      "expectationMet": true,
+      "status": "failed",
+      "startedAt": "2026-10-03T11:56:51.020Z",
+      "finishedAt": "2026-10-03T11:57:06.582Z",
+      "modelCalls": 2,
+      "modelTokens": 4733,
+      "providerCachedInputTokens": 0,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "failed",
+          "firstAttempt": "failed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "failed",
+              "durationMs": 7441,
+              "error": {
+                "code": "ASSERTION_FAILED",
+                "message": "The pinned essay card is only partly visible near the bottom of the viewport, and its heading “designing for the operator” does not appear on screen."
+              },
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "failed",
+                  "durationMs": 6211,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 196,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": {
+                    "code": "ASSERTION_FAILED",
+                    "message": "The pinned essay card is only partly visible near the bottom of the viewport, and its heading “designing for the operator” does not appear on screen."
+                  }
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "failed",
+              "durationMs": 6092,
+              "error": {
+                "code": "ASSERTION_FAILED",
+                "message": "The pinned essay heading is not visible in the screenshot at this viewport, so it is not fully readable."
+              },
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "failed",
+                  "durationMs": 5207,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 107,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": {
+                    "code": "ASSERTION_FAILED",
+                    "message": "The pinned essay heading is not visible in the screenshot at this viewport, so it is not fully readable."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "restored",
+      "variant": "healthy",
+      "exitCode": 0,
+      "durationMs": 21357,
+      "expectationMet": true,
+      "status": "passed",
+      "startedAt": "2026-10-03T11:57:09.368Z",
+      "finishedAt": "2026-10-03T11:57:28.121Z",
+      "modelCalls": 5,
+      "modelTokens": 27826,
+      "providerCachedInputTokens": 7424,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "homepage to blog to the pinned operator essay",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 12532,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 5120,
+                  "calls": 2,
+                  "inputTokens": 10834,
+                  "outputTokens": 64,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 5256,
+                  "calls": 2,
+                  "inputTokens": 14584,
+                  "outputTokens": 73,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "mobile pinned essay title is readable and unobscured",
+          "status": "passed",
+          "firstAttempt": "passed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "passed",
+              "durationMs": 4057,
+              "error": null,
+              "agentSteps": [
+                {
+                  "api": "agent.assert",
+                  "status": "passed",
+                  "durationMs": 3294,
+                  "calls": 1,
+                  "inputTokens": 2215,
+                  "outputTokens": 56,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "exploration",
+      "variant": "healthy",
+      "exitCode": 1,
+      "durationMs": 97854,
+      "expectationMet": null,
+      "status": "failed",
+      "startedAt": "2026-10-03T11:57:31.118Z",
+      "finishedAt": "2026-10-03T11:59:06.066Z",
+      "modelCalls": 16,
+      "modelTokens": 133195,
+      "providerCachedInputTokens": 40448,
+      "estimatedCostUsd": null,
+      "errors": [],
+      "tests": [
+        {
+          "title": "Explore the homepage, blog listing and pinned operator essay as a first-time reader. Check navigation and mobile readability. Stay on this site; do not follow external links, submit forms or modify data.",
+          "status": "failed",
+          "firstAttempt": "failed",
+          "attempts": [
+            {
+              "index": 0,
+              "status": "failed",
+              "durationMs": 94732,
+              "error": {
+                "code": "ASSERTION_FAILED",
+                "message": "exploration found 1 issue(s): [severity 3] Mobile menu blocks access to pinned essay link"
+              },
+              "agentSteps": [
+                {
+                  "api": "agent.extract",
+                  "status": "passed",
+                  "durationMs": 8605,
+                  "calls": 1,
+                  "inputTokens": 2162,
+                  "outputTokens": 177,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 38812,
+                  "calls": 8,
+                  "inputTokens": 69282,
+                  "outputTokens": 317,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": true,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.extract",
+                  "status": "passed",
+                  "durationMs": 12473,
+                  "calls": 1,
+                  "inputTokens": 5403,
+                  "outputTokens": 247,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.act",
+                  "status": "passed",
+                  "durationMs": 20889,
+                  "calls": 5,
+                  "inputTokens": 52639,
+                  "outputTokens": 281,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                },
+                {
+                  "api": "agent.extract",
+                  "status": "passed",
+                  "durationMs": 10422,
+                  "calls": 1,
+                  "inputTokens": 2384,
+                  "outputTokens": 303,
+                  "tokenAccounting": "provider",
+                  "cache": null,
+                  "visionInput": false,
+                  "visionDegraded": null,
+                  "error": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exploration": {
+        "ended": "time",
+        "budgets": {
+          "maxSteps": 3,
+          "timeoutMs": 180000
+        },
+        "steps": [
+          {
+            "index": 1,
+            "title": "Blog listing",
+            "status": "passed",
+            "durationMs": 38814
+          },
+          {
+            "index": 2,
+            "title": "Homepage navigation",
+            "status": "passed",
+            "durationMs": 20891
+          }
+        ],
+        "findings": [
+          {
+            "id": "01a101a0-fa78-770e-88ba-13129195eb8a",
+            "kind": "issue",
+            "severity": 3,
+            "title": "Mobile menu blocks access to pinned essay link",
+            "path": "/blog/",
+            "expected": "The pinned essay link should remain accessible or the menu should close so the reader can open it.",
+            "actual": "With the navigation dialog open, tapping the pinned essay link times out because the dialog intercepts pointer events; the menu remains open.",
+            "reproduction": [
+              "Open the homepage and tap read_blog.",
+              "Open Toggle menu.",
+              "Tap open pinned essay: designing for the operator."
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

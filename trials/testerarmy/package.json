@@ -5,7 +5,8 @@
   "scripts": {
     "test": "e2e run",
     "control": "playwright test",
-    "trial": "node scripts/run.mjs"
+    "trial": "node scripts/run.mjs",
+    "export:evidence": "node scripts/export-evidence.mjs"
   },
   "devDependencies": {
     "@ai-sdk/openai": "4.0.83",

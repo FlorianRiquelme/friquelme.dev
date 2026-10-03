@@ -46,7 +46,7 @@ infra/                   # AWS CDK stacks
 
 ## Deployment
 
-The manual [TesterArmy verification trial](trials/testerarmy/README.md) has an isolated setup, fault controls and evidence. Its AI evaluation is pending provider authorization; it is not a required CI check.
+The manual [TesterArmy verification trial](trials/testerarmy/README.md) has an isolated setup, fault controls and evidence. Its completed ChatGPT-subscription evaluation includes live/cache runs, fault detection and reviewed exploration; it is not a required CI check.
 
 Pushes to `main` trigger the GitHub Actions workflow which:
 
