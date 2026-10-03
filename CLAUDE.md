@@ -26,6 +26,8 @@ Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIG
 - `pnpm dev --host 100.84.161.116` — agent-server development preview (other hosts follow their machine policy)
 - `pnpm build` — build to `./dist/`
 - `pnpm verify` — required deterministic site gate; see `AGENTS.md` and `VERIFICATION.md`
+- `pnpm test:browser:smoke` — fast single-target (desktop-chromium) browser run; not a gate
+- `pnpm verify:controls` — negative controls proving the gate fails for the expected reasons (~80 s, not part of verify)
 - `pnpm verify:infra` — infrastructure type and assertion checks, without deployment
 - `pnpm preview` — preview production build locally
 - `pnpm test` — run Vitest unit + Astro Container tests
