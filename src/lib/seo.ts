@@ -117,7 +117,7 @@ export function getSeoMeta(input: SeoInput, ctx: SeoContext): SeoOutput {
         author: {
           '@type': 'Person',
           '@id': PERSON_ID,
-          name: input.author,
+          name: PUBLISHER_NAME,
           url: siteOrigin,
         },
         publisher: {

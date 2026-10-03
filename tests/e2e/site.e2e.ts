@@ -94,11 +94,12 @@ test('homepage to blog to the exact pinned essay and back', async ({ app, browse
   await expect(blog).toHaveAttribute('href', '/blog/');
   await blog.tap();
   await expect(browser).toHaveURL('/blog/');
-  const pinned = screen.getByRole('link', 'open pinned essay: designing for the operator');
-  await expect(pinned).toHaveAttribute('href', '/blog/designing-for-the-operator/');
+  // The pinned card's accessible name comes from its visible text (WCAG 2.5.3), so locate it by target.
+  const pinned = browser.locator('a[href="/blog/designing-for-the-operator/"]');
+  await expect(pinned).toContainText('// pinned');
   await pinned.getByRole('heading').scrollIntoView();
   expect(await browser.evaluate(() => {
-    const element = document.querySelector('a[aria-label="open pinned essay: designing for the operator"] :is(h1, h2, h3, h4, h5, h6)')!;
+    const element = document.querySelector('a[href="/blog/designing-for-the-operator/"] :is(h1, h2, h3, h4, h5, h6)')!;
     const rect = element.getBoundingClientRect();
     return [0.2, 0.5, 0.8].every(fraction => element.contains(document.elementFromPoint(rect.left + rect.width * fraction, rect.top + rect.height / 2)));
   }), 'pinned heading is not covered').toBe(true);
