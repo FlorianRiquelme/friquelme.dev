@@ -1,7 +1,9 @@
 ---
 // src/components/posthog.astro
 ---
-<script is:inline type="text/javascript" id="posthog-js">
+<!-- Bundled by Astro into /_astro/*.js so script-src needs no 'unsafe-inline'. -->
+<script>
+  // @ts-nocheck -- PostHog's vendor snippet, kept verbatim.
   !(function(t, e) {
     var o, n, p, r;
     e.__SV ||

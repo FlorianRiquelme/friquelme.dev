@@ -17,8 +17,10 @@ describe('buildCsp', () => {
       expect(directive('connect-src')).toContain('https://*.posthog.com');
     });
 
-    it("includes 'unsafe-inline' in script-src for the PostHog bootstrap", () => {
-      expect(directive('script-src')).toContain("'unsafe-inline'");
+    it("script-src is exactly 'self' plus PostHog, without 'unsafe-inline'", () => {
+      expect(directive('script-src')).toBe(
+        "script-src 'self' https://*.posthog.com",
+      );
     });
 
     it('allows blob: and data: in worker-src for rrweb session-replay', () => {
@@ -82,10 +84,8 @@ describe('buildCsp', () => {
       expect(csp).not.toContain('posthog');
     });
 
-    it("script-src is exactly \"'self' 'unsafe-inline'\"", () => {
-      expect(directive('script-src')).toBe(
-        "script-src 'self' 'unsafe-inline'",
-      );
+    it("script-src is exactly \"'self'\"", () => {
+      expect(directive('script-src')).toBe("script-src 'self'");
     });
 
     it("connect-src is exactly \"'self'\"", () => {
