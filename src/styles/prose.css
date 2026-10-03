@@ -3,6 +3,12 @@
   font-size: 14px;
   line-height: 1.8;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Long identifiers and URLs must wrap at 320px (WCAG 1.4.10 reflow). */
+  overflow-wrap: break-word;
+}
+
+.prose :is(th, td) {
+  overflow-wrap: anywhere;
 }
 
 .prose h2 {
