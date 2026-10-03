@@ -1,0 +1,94 @@
+{
+  "$comment": "Triaged squirrelscan findings the scheduled site audit must not re-report. Fingerprints come from scripts/site-audit-diff.mjs; '<rule> :: *' covers every finding of a rule. verdict: false-positive (rule is wrong here), accepted (true but intended), tracked (an open issue owns it; drop the entry when the issue is fixed).",
+  "known": [
+    {
+      "fingerprint": "a11y/color-contrast :: *",
+      "verdict": "false-positive",
+      "reason": "Class-name heuristic that cannot resolve Tailwind tokens; every item says 'may have'. Real contrast is enforced by axe WCAG AA on every route in the browser gate (tests/e2e/site.e2e.ts)."
+    },
+    {
+      "fingerprint": "a11y/aria-hidden-focus :: *",
+      "verdict": "false-positive",
+      "reason": "Heading anchors are aria-hidden with tabindex=-1, the accepted pattern. axe aria-hidden-focus in the browser gate covers real regressions."
+    },
+    {
+      "fingerprint": "content/date-agreement :: *",
+      "verdict": "false-positive",
+      "reason": "Every post renders its date in a visible <time> in ArticleHero; the rule flags some posts and not others with identical markup."
+    },
+    {
+      "fingerprint": "perf/lazy-above-fold :: /_astro/claudefuel-bar.C66grZCQ_ZIzT2u.png",
+      "verdict": "false-positive",
+      "reason": "Image sits several paragraphs into designing-for-the-operator, below the fold on every viewport."
+    },
+    {
+      "fingerprint": "perf/critical-request-chains :: *",
+      "verdict": "accepted",
+      "reason": "Astro emits one render-blocking CSS bundle by design; the asset hash changes per build."
+    },
+    {
+      "fingerprint": "perf/dom-size :: *",
+      "verdict": "accepted",
+      "reason": "Long articles put every paragraph in one prose container; 70-80 children is not a performance problem."
+    },
+    {
+      "fingerprint": "content/word-count :: https://friquelme.dev/blog/",
+      "verdict": "accepted",
+      "reason": "Blog index is a listing page, not content."
+    },
+    {
+      "fingerprint": "ax/token-weight :: *",
+      "verdict": "accepted",
+      "reason": "Markup weight is the terminal design; agents get clean content from /llms.txt."
+    },
+    {
+      "fingerprint": "ax/agents-md :: (site)",
+      "verdict": "accepted",
+      "reason": "Not useful for a portfolio and blog; /llms.txt covers agents."
+    },
+    {
+      "fingerprint": "ax/markdown-response :: (site)",
+      "verdict": "accepted",
+      "reason": "Static S3 hosting cannot negotiate Accept: text/markdown; /llms.txt covers agents."
+    },
+    {
+      "fingerprint": "eeat/about-page :: (site)",
+      "verdict": "accepted",
+      "reason": "About is the #about section of the homepage."
+    },
+    {
+      "fingerprint": "eeat/contact-page :: (site)",
+      "verdict": "accepted",
+      "reason": "Contact is the #contact section of the homepage."
+    },
+    {
+      "fingerprint": "schema/entity-publisher-mismatch :: (site)",
+      "verdict": "accepted",
+      "reason": "Personal site: the publisher is the person, not an organization."
+    },
+    {
+      "fingerprint": "security/csp :: (site)",
+      "verdict": "tracked",
+      "issue": 80,
+      "reason": "script-src 'unsafe-inline'; spike in #80."
+    },
+    {
+      "fingerprint": "legal/privacy-policy :: (site)",
+      "verdict": "tracked",
+      "issue": 82,
+      "reason": "Legal page requirements under review in #82."
+    },
+    {
+      "fingerprint": "eeat/privacy-policy :: (site)",
+      "verdict": "tracked",
+      "issue": 82,
+      "reason": "Legal page requirements under review in #82."
+    },
+    {
+      "fingerprint": "legal/subprocessor-disclosure :: (site)",
+      "verdict": "tracked",
+      "issue": 82,
+      "reason": "Legal page requirements under review in #82."
+    }
+  ]
+}

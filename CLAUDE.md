@@ -68,6 +68,10 @@ Dependabot opens grouped PRs weekly. Nothing merges automatically: a daily Orca 
 
 Do not merge Dependabot PRs by hand and do not add GitHub-native auto-merge. Merges to `main` deploy to production, so every merge is a release. When you change the review prompt, push the file and also update the automation's stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/dependabot-review.md)"`.
 
+## Scheduled checks
+
+An Orca automation running the `claude` agent audits the live site with squirrelscan (`squirrel.toml`) per `.github/automation/site-audit.md`. It triages new findings itself: fix PRs, baseline PRs, or `site-audit` issues for real decisions. Triaged findings live in `.github/automation/site-audit-baseline.json`, diffed by `scripts/site-audit-diff.mjs`. When you change the prompt, push the file and also update the stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/site-audit.md)"`.
+
 ## Infrastructure (infra/)
 
 AWS CDK stacks in TypeScript. Separate `package.json` with its own dependencies.
