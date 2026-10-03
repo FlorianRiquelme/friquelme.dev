@@ -24,7 +24,7 @@ function browserResults(report, expectedTargets) {
   requireCondition(results.every(result => result.kind === 'test' && result.selected === true && result.status === 'passed' && result.attempts?.length === 1), 'Browser results lack an unretried successful verdict');
   const attempts = results.map(result => result.attempts[0]);
   requireCondition(attempts.every(attempt => attempt.index === 0 && attempt.status === 'passed' && attempt.error === undefined && attempt.secondaryErrors?.length === 0 && attempt.cleanup === 'complete'), 'Browser attempts lack a clean successful verdict');
-  requireCondition(run.usage?.modelTokens === 0 && attempts.flatMap(steps).every(step => step.model === undefined && !step.api.startsWith('agent.')), 'Browser run used a model');
+  requireCondition(run.usage?.modelTokens === 0 && attempts.flatMap(steps).every(step => step.kind !== 'agent' && step.model === undefined && !(step.metrics?.modelCalls > 0) && !step.api.startsWith('agent.')), 'Browser run used a model');
   const targets = (run.targets ?? []).map(target => target.id).sort();
   requireCondition(JSON.stringify(targets) === JSON.stringify([...expectedTargets].sort()), `Browser targets differ from the required profiles: ${targets.join(', ')}`);
   const testIds = [...new Set(results.map(result => result.testId))].sort();

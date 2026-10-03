@@ -17,8 +17,8 @@ export const targets = registry.targets;
 /**
  * The Playwright context of the attempt that is running in this worker.
  *
- * TesterArmy 0.16 has no public API for page errors, response statuses or
- * reduced-motion emulation. The fixtures use the context only to observe those
+ * TesterArmy 0.16 has no public API to observe every page error or response,
+ * or to emulate reduced motion. The fixtures use the context only to observe those
  * events and to set media emulation; every navigation, action and assertion goes
  * through the recorded `app`, `screen` and `browser` fixtures.
  */

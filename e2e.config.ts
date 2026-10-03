@@ -6,7 +6,8 @@ const port = 14322;
 const app = {
   url: `http://${previewHost}:${port}`,
   environment: 'test' as const,
-  command: { executable: process.execPath, args: ['scripts/preview.mjs', String(port)], startupTimeout: 30_000 },
+  // TesterArmy passes the app only PATH, HOME, temp directories and `env`.
+  command: { executable: process.execPath, args: ['scripts/preview.mjs', String(port)], env: { ASTRO_TELEMETRY_DISABLED: '1' }, startupTimeout: 30_000 },
 };
 
 // Deterministic browser suite: no agents are configured, so no test can call a model.

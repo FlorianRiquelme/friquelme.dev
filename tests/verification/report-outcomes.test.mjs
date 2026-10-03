@@ -38,7 +38,7 @@ if (args[1] === 'vitest') {
 if (args[1] === 'e2e') {
   const result = target => ({
     kind: 'test', testId: 'tests/e2e/site.e2e.ts::page', targetId: target.name, selected: true, status: 'passed',
-    attempts: [{ index: 0, status: 'passed', secondaryErrors: [], cleanup: 'complete', steps: [{ api: 'app.open', status: 'passed', steps: [] }] }],
+    attempts: [{ index: 0, status: 'passed', secondaryErrors: [], cleanup: 'complete', steps: [{ kind: 'app', api: 'app.open', status: 'passed' }] }],
   });
   const results = browserTargets.map(result);
   const count = results.length;
@@ -61,7 +61,17 @@ if (args[1] === 'e2e') {
   if (scenario === 'focused-browser') run.summary.discovered++;
   if (scenario === 'engine-error') run.errors = [{ code: 'ENGINE_FAILURE', message: 'Browser launch failed' }];
   if (scenario === 'teardown-error') run.results[0].attempts[0].secondaryErrors = [{ code: 'ASSERTION_FAILED' }];
-  if (scenario === 'model-step') run.results[0].attempts[0].steps[0].steps = [{ api: 'agent.act', status: 'passed', model: { id: 'model' }, steps: [] }];
+  // Each model marker is checked independently: the step kind and the agent API name.
+  if (scenario === 'model-step') run.results[0].attempts[0].steps.push({ kind: 'agent', api: 'act', status: 'passed' });
+  if (scenario === 'agent-api') run.results[0].attempts[0].steps.push({ kind: 'assertion', api: 'agent.assert', status: 'passed' });
+  if (scenario === 'model-metrics') run.results[0].attempts[0].steps[0].metrics = { modelCalls: 1 };
+  if (scenario === 'failed-run') run.status = 'failed';
+  if (scenario === 'cleanup-failed') run.results[0].attempts[0].cleanup = 'failed';
+  if (scenario === 'attempt-error') run.results[0].attempts[0].error = { code: 'ASSERTION_FAILED' };
+  if (scenario === 'retried-attempt') run.results[0].attempts[0].index = 1;
+  if (scenario === 'focused-only') { run.results.push({ ...result(browserTargets[0]), testId: 'other', selected: false, status: 'skipped', attempts: [] }); run.summary.discovered++; run.summary.skipped++; }
+  if (scenario === 'setup-result') run.results[0].kind = 'setup';
+  if (scenario === 'extra-target') run.targets.push({ id: 'extra' });
   if (scenario === 'model-usage') run.usage.modelTokens = 1;
   if (scenario === 'explore-run') run.explore = {};
   if (scenario === 'missing-target') { run.results.pop(); run.targets.pop(); for (const key of ['discovered', 'selected', 'executed', 'passed']) run.summary[key]--; }
@@ -135,7 +145,19 @@ for (const scenario of ['success', 'missing-unit', 'empty-unit', 'skipped-unit',
   });
 }
 
-for (const scenario of ['success', 'missing-unit', 'malformed-unit', 'empty-unit', 'skipped-unit', 'todo-unit', 'inconsistent-unit', 'missing-browser', 'malformed-browser', 'empty-browser', 'failed-browser', 'skipped-browser', 'flaky-browser', 'focused-browser', 'engine-error', 'teardown-error', 'model-step', 'model-usage', 'explore-run', 'process-failure', 'missing-target', 'duplicate-result', 'stale-browser', 'empty-report-tests']) {
+// Each browser scenario must fail for its own reason, so overlapping checks cannot hide a removed one.
+const browserReasons = {
+  'missing-browser': /ENOENT/, 'stale-browser': /ENOENT/, 'malformed-browser': /not a TesterArmy report-1/,
+  'empty-browser': /executed no tests/, 'failed-browser': /unretried successful verdict/, 'skipped-browser': /counts indicate/,
+  'flaky-browser': /counts indicate|unretried successful verdict/, 'focused-browser': /counts indicate/, 'focused-only': /counts indicate/,
+  'engine-error': /operational errors/, 'teardown-error': /clean successful verdict/, 'cleanup-failed': /clean successful verdict/,
+  'attempt-error': /clean successful verdict/, 'retried-attempt': /clean successful verdict/, 'failed-run': /run did not pass/,
+  'model-step': /used a model/, 'agent-api': /used a model/, 'model-usage': /used a model/, 'model-metrics': /used a model/, 'explore-run': /Exploration/,
+  'setup-result': /unretried successful verdict/, 'missing-target': /targets differ/, 'extra-target': /targets differ/,
+  'duplicate-result': /exactly once/,
+};
+
+for (const scenario of ['success', 'missing-unit', 'malformed-unit', 'empty-unit', 'skipped-unit', 'todo-unit', 'inconsistent-unit', 'missing-browser', 'malformed-browser', 'empty-browser', 'failed-browser', 'skipped-browser', 'flaky-browser', 'focused-browser', 'engine-error', 'teardown-error', 'model-step', 'model-usage', 'model-metrics', 'agent-api', 'failed-run', 'cleanup-failed', 'attempt-error', 'retried-attempt', 'focused-only', 'setup-result', 'extra-target', 'explore-run', 'process-failure', 'missing-target', 'duplicate-result', 'stale-browser', 'empty-report-tests']) {
   test(`verification wrapper ${scenario === 'success' ? 'accepts complete execution' : `rejects ${scenario}`}`, async () => {
     const fixture = await createFixture();
     try {
@@ -156,6 +178,7 @@ for (const scenario of ['success', 'missing-unit', 'malformed-unit', 'empty-unit
         const expectedStage = scenario === 'process-failure' ? 'build' : scenario === 'empty-report-tests' ? 'report-contracts' : scenario.includes('unit') ? 'unit' : 'browser';
         assert.equal(summary.stages.at(-1).name, expectedStage, 'must fail at the intended boundary');
         assert.equal(summary.stages.at(-1).status, 'failed');
+        if (browserReasons[scenario]) assert.match(summary.error, browserReasons[scenario]);
         assert.ok(summary.stages.slice(0, -1).every(stage => stage.status === 'passed'), 'earlier stages must execute successfully');
       }
     } finally { await rm(fixture, { recursive: true, force: true }); }

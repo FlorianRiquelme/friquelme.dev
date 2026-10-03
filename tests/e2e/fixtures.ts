@@ -29,7 +29,7 @@ export const test = base.extend<{ motion: Motion }>({
     await browser.route(/^https:\/\/eu(-assets)?\.i\.posthog\.com\//, route => route.fulfill({ status: 200, headers: { 'content-type': 'text/javascript' }, body: '' }));
     // Media emulation needs a page; the first app.open() reuses this one.
     await browser.goto('about:blank');
-    const motion: Motion = { set: reducedMotion => context.pages()[0].emulateMedia({ reducedMotion }) };
+    const motion: Motion = { set: async reducedMotion => { await Promise.all(context.pages().map(page => page.emulateMedia({ reducedMotion }))); } };
     await motion.set('reduce');
     await use(motion);
     expect(errors).toEqual([]);
@@ -67,14 +67,17 @@ export function axeViolations(browser: Browser, tags: string[]) {
   }, { source: axeSource, tags });
 }
 
-/** True while any part of the element intersects the viewport, as Playwright's toBeInViewport. */
+/** True while any part of the element is visible in the viewport, measured as Playwright's toBeInViewport: an IntersectionObserver ratio above zero, so clipping ancestors count. */
 export function inViewport(browser: Browser, selector: string) {
-  return browser.evaluate((selector: string) => {
+  return browser.evaluate((selector: string) => new Promise<boolean>(resolve => {
     const element = selector.startsWith('#') ? document.getElementById(decodeURIComponent(selector.slice(1))) : document.querySelector(selector);
-    if (!element) return false;
-    const rect = element.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
-  }, selector);
+    if (!element) return resolve(false);
+    const observer = new IntersectionObserver(([entry]) => {
+      observer.disconnect();
+      resolve(entry.intersectionRatio > 0);
+    });
+    observer.observe(element);
+  }), selector);
 }
 
 export function viewportWidth(browser: Browser) {

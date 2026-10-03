@@ -42,7 +42,7 @@ for (const route of routes) {
     const heading = screen.getByRole('heading', { level: 1 });
     await expect(heading).toHaveCount(1);
     await expect(heading).toBeVisible();
-    expect(await heading.textContent()).not.toBe('');
+    await expect(heading).toHaveText(/\S/);
     await expect(browser.locator('link[rel="canonical"]')).toHaveAttribute('href', `${siteOrigin}${route}`);
     const images = await browser.evaluate(() => document.images.length);
     for (let index = 0; index < images; index++) {
@@ -90,7 +90,9 @@ test('homepage to blog to the exact pinned essay and back', async ({ app, browse
   await app.open('/');
   const mobile = await viewportWidth(browser) < 768;
   if (mobile) await screen.getByRole('button', 'Toggle menu').tap();
-  await browser.locator(`${mobile ? '#mobile-menu' : 'header nav'} a[href="/blog/"]`).tap();
+  const blog = browser.locator(mobile ? '#mobile-menu' : 'header nav').getByRole('link', 'blog');
+  await expect(blog).toHaveAttribute('href', '/blog/');
+  await blog.tap();
   await expect(browser).toHaveURL('/blog/');
   const pinned = screen.getByRole('link', 'open pinned essay: designing for the operator');
   await expect(pinned).toHaveAttribute('href', '/blog/designing-for-the-operator/');
@@ -137,7 +139,9 @@ for (const route of articles) {
 test('navigation works with the keyboard and restores focus', async ({ app, browser, screen }) => {
   await app.open('/');
   if (await viewportWidth(browser) >= 768) {
-    await browser.locator('header nav a[href="/blog/"]').focus();
+    const blog = browser.locator('header nav').getByRole('link', 'blog');
+    await expect(blog).toHaveAttribute('href', '/blog/');
+    await blog.focus();
     await browser.keyboard.press('Enter');
     await expect(browser).toHaveURL('/blog/');
     return;

@@ -17,7 +17,7 @@ overrides:
 
 patchedDependencies:
   e2e@0.16.0:
-    hash: 388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b
+    hash: a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d
     path: patches/e2e@0.16.0.patch
 
 importers:
@@ -84,7 +84,7 @@ importers:
     devDependencies:
       '@e2e-dev/web':
         specifier: 0.11.2
-        version: 0.11.2(e2e@0.16.0(patch_hash=388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b))(playwright@1.63.0)
+        version: 0.11.2(e2e@0.16.0(patch_hash=a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d))(playwright@1.63.0)
       '@fontsource/jetbrains-mono':
         specifier: ^5.3.0
         version: 5.3.0
@@ -102,7 +102,7 @@ importers:
         version: 4.13.0
       e2e:
         specifier: 0.16.0
-        version: 0.16.0(patch_hash=388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b)
+        version: 0.16.0(patch_hash=a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d)
       happy-dom:
         specifier: 20.14.3
         version: 20.14.3
@@ -3866,9 +3866,9 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@e2e-dev/web@0.11.2(e2e@0.16.0(patch_hash=388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b))(playwright@1.63.0)':
+  '@e2e-dev/web@0.11.2(e2e@0.16.0(patch_hash=a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d))(playwright@1.63.0)':
     dependencies:
-      e2e: 0.16.0(patch_hash=388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b)
+      e2e: 0.16.0(patch_hash=a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d)
       playwright: 1.63.0
 
   '@emmetio/abbreviation@2.3.3':
@@ -5061,7 +5061,7 @@ snapshots:
       es-errors: 1.3.0
       gopd: 1.2.0
 
-  e2e@0.16.0(patch_hash=388fcecb1e50fa2aa0077f82557250cb76dd5aee62638b07ee69f3d79c595e5b):
+  e2e@0.16.0(patch_hash=a38f740a19ac3c4ac49a2c590816335957037c65b4cb9a8411bee5ce65abc71d):
     dependencies:
       '@ai-sdk/provider': 4.0.18
       '@clack/prompts': 1.8.1

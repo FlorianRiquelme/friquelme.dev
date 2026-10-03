@@ -7,7 +7,7 @@ index 5fe03a74c62be347e9d63e72164c5015e147740d..ced552300377d4aae765d8a857234b7f
          throw new ConfigurationError('INVALID_APP_URL', `app URL must be http(s): ${raw}`);
      }
 -    if (url.protocol === 'http:' && !isLoopbackHost(url.hostname)) {
-+    // Issue 75 local trial: shared machine policy requires this exact tailnet host.
++    // agent-server preview policy requires this exact tailnet host (see VERIFICATION.md).
 +    if (url.protocol === 'http:' && !isLoopbackHost(url.hostname) && url.hostname !== '100.84.161.116') {
          throw new ConfigurationError('INVALID_APP_URL', `plain HTTP is allowed only for loopback hosts: ${raw}`);
      }
