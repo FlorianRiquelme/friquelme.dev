@@ -2,6 +2,8 @@
 
 Local/manual experiment for [issue 75](https://github.com/FlorianRiquelme/friquelme.dev/issues/75). The ChatGPT-subscription trial is **complete**: three live and three cached healthy runs, both controlled failures/retries, restoration and reviewed exploration; see [ASSESSMENT.md](ASSESSMENT.md). Nothing here installs a CI gate or changes the shipped website.
 
+Follow-up: the site's required browser gate now runs deterministic TesterArmy tests from the repository root (`tests/e2e/`, see [VERIFICATION.md](../../VERIFICATION.md)), without agents, models or credentials. This directory remains the optional model-backed supplement. Its runner (`scripts/run.mjs`) does not validate `explore` outcomes: an exploration that errors or writes no report is not rejected, so review exploration reports directly rather than relying on the runner's exit status.
+
 ## Acceptance examples (declared before implementation)
 
 - At 1280×900, follow the homepage header's blog link to exactly `/blog/`, then the pinned “designing for the operator” essay to exactly `/blog/designing-for-the-operator/`. Verify the article title and first section heading. Check the actual pinned `href` so an agent cannot compensate for the wrong destination.

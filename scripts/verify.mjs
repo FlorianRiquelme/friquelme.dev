@@ -3,7 +3,7 @@ import { mkdir, open, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkTestResults } from './check-test-results.mjs';
-import { browserProjects } from './browser-projects.mjs';
+import { browserTargets } from './browser-targets.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 process.chdir(root);
@@ -40,7 +40,7 @@ try {
     ['unit', ['exec', 'vitest', 'run', '--reporter=default', '--reporter=json', '--outputFile=reports/verification/unit.json'], 'vitest', 'reports/verification/unit.json'],
     ['build', ['build']],
     ['dist', ['exec', 'vitest', 'run', '--config', 'vitest.build.config.ts', '--reporter=default', '--reporter=json', '--outputFile=reports/verification/dist.json'], 'vitest', 'reports/verification/dist.json'],
-    ['browser', ['exec', 'playwright', 'test'], 'playwright', 'reports/browser/results.json'],
+    ['browser', ['exec', 'e2e', 'run'], 'testerarmy', 'reports/browser/report.json'],
     ['report-contracts', ['verify:reports']],
   ];
   for (const [name, args, format, reportPath] of stages) {
@@ -51,7 +51,7 @@ try {
     let stdout = '';
     try {
       rejectInterrupt();
-      child = spawn('pnpm', args, { cwd: root, env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'], detached: process.platform !== 'win32' });
+      child = spawn('pnpm', args, { cwd: root, env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1', E2E_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'], detached: process.platform !== 'win32' });
       for (const [stream, output] of [[child.stdout, process.stdout], [child.stderr, process.stderr]]) {
         stream.on('data', data => { output.write(data); log.write(data); if (stream === child.stdout) stdout += data; });
       }
@@ -63,7 +63,7 @@ try {
       if (stage.exitCode !== 0) throw new Error(`${name} process failed (${stage.signal ?? stage.exitCode})`);
       if (format) {
         stage.report = reportPath;
-        Object.assign(stage, await checkTestResults(format, resolve(root, reportPath), stage.exitCode, format === 'playwright' ? browserProjects.map(project => project.name) : []));
+        Object.assign(stage, await checkTestResults(format, resolve(root, reportPath), stage.exitCode, format === 'testerarmy' ? browserTargets.map(target => target.name) : []));
       }
       if (name === 'report-contracts') {
         const counts = Object.fromEntries([...stdout.matchAll(/^# (tests|pass|fail|cancelled|skipped|todo) (\d+)$/gm)].map(match => [match[1], Number(match[2])]));

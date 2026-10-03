@@ -46,7 +46,7 @@ infra/                   # AWS CDK stacks
 
 ## Deployment
 
-The manual [TesterArmy verification trial](trials/testerarmy/README.md) has an isolated setup, fault controls and evidence. Its completed ChatGPT-subscription evaluation includes live/cache runs, fault detection and reviewed exploration; it is not a required CI check.
+Deterministic browser tests run with TesterArmy as part of `pnpm verify`; see [VERIFICATION.md](VERIFICATION.md). The separate model-backed [TesterArmy trial](trials/testerarmy/README.md) keeps its isolated setup, fault controls and reviewed evidence; it is optional and not a required CI check.
 
 Pushes to `main` trigger the GitHub Actions workflow which:
 

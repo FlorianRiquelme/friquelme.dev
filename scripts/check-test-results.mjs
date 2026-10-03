@@ -1,20 +1,42 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { browserTargets } from './browser-targets.mjs';
 
 function requireCondition(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function browserTests(suites) {
-  requireCondition(Array.isArray(suites), 'Browser report has no suites');
-  return suites.flatMap(suite => [
-    ...(suite.specs ?? []).flatMap(spec => spec.tests ?? []),
-    ...browserTests(suite.suites ?? []),
-  ]);
+function steps(parent) {
+  return (parent.steps ?? []).flatMap(step => [step, ...steps(step)]);
 }
 
-export async function checkTestResults(format, path, exitCode, expectedProjects = []) {
+function browserResults(report, expectedTargets) {
+  requireCondition(report?.schemaVersion === 'report-1' && report.run?.specVersion === '0.1', 'Browser report is not a TesterArmy report-1 document');
+  const { run } = report;
+  requireCondition(run.status === 'passed' && run.exitCode === 0, `Browser run did not pass (${run.status}, ${run.exitCode})`);
+  requireCondition(Array.isArray(run.errors) && run.errors.length === 0, 'Browser run has operational errors');
+  requireCondition(run.explore === undefined, 'Exploration is not deterministic browser evidence');
+  const results = run.results;
+  requireCondition(Array.isArray(results) && results.length > 0, 'Browser report executed no tests');
+  const { summary } = run;
+  requireCondition([summary?.discovered, summary?.selected, summary?.executed, summary?.passed].every(count => count === results.length) && summary.failed === 0 && summary.flaky === 0 && summary.skipped === 0, 'Browser counts indicate unselected, failed, skipped or flaky tests');
+  requireCondition(results.every(result => result.kind === 'test' && result.selected === true && result.status === 'passed' && result.attempts?.length === 1), 'Browser results lack an unretried successful verdict');
+  const attempts = results.map(result => result.attempts[0]);
+  requireCondition(attempts.every(attempt => attempt.index === 0 && attempt.status === 'passed' && attempt.error === undefined && attempt.secondaryErrors?.length === 0 && attempt.cleanup === 'complete'), 'Browser attempts lack a clean successful verdict');
+  requireCondition(run.usage?.modelTokens === 0 && attempts.flatMap(steps).every(step => step.model === undefined && !step.api.startsWith('agent.')), 'Browser run used a model');
+  const targets = (run.targets ?? []).map(target => target.id).sort();
+  requireCondition(JSON.stringify(targets) === JSON.stringify([...expectedTargets].sort()), `Browser targets differ from the required profiles: ${targets.join(', ')}`);
+  const testIds = [...new Set(results.map(result => result.testId))].sort();
+  for (const target of expectedTargets) {
+    const executed = results.filter(result => result.targetId === target).map(result => result.testId).sort();
+    requireCondition(executed.length > 0, `Browser target did not execute: ${target}`);
+    requireCondition(JSON.stringify(executed) === JSON.stringify(testIds), `Browser target did not execute every test exactly once: ${target}`);
+  }
+  return { tests: results.length, targets };
+}
+
+export async function checkTestResults(format, path, exitCode, expectedTargets = []) {
   requireCondition(exitCode === 0, `Test process exited unsuccessfully (${exitCode})`);
   const report = JSON.parse(await readFile(path, 'utf8'));
   if (format === 'vitest') {
@@ -29,18 +51,12 @@ export async function checkTestResults(format, path, exitCode, expectedProjects 
     requireCondition(report.snapshot?.failure === false && report.snapshot.unmatched === 0, 'Vitest snapshot validation failed');
     return { tests: assertions.length };
   }
-  requireCondition(format === 'playwright', `Unknown report format: ${format}`);
-  requireCondition(Array.isArray(report.errors) && report.errors.length === 0, 'Browser run has operational errors');
-  const tests = browserTests(report.suites);
-  requireCondition(tests.length > 0, 'Browser report executed no tests');
-  requireCondition(report.stats?.expected === tests.length && report.stats.skipped === 0 && report.stats.unexpected === 0 && report.stats.flaky === 0, 'Browser counts indicate failed, skipped or flaky tests');
-  requireCondition(tests.every(test => test.expectedStatus === 'passed' && test.status === 'expected' && test.results?.length === 1 && test.results[0].status === 'passed' && test.results[0].retry === 0 && test.results[0].errors?.length === 0), 'Browser attempts lack an unretried successful verdict');
-  for (const project of expectedProjects) requireCondition(tests.some(test => test.projectName === project), `Browser project did not execute: ${project}`);
-  return { tests: tests.length, projects: [...new Set(tests.map(test => test.projectName))] };
+  requireCondition(format === 'testerarmy', `Unknown report format: ${format}`);
+  return browserResults(report, expectedTargets);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    console.log(JSON.stringify(await checkTestResults(process.argv[2], process.argv[3], Number(process.argv[4] ?? 0))));
+    console.log(JSON.stringify(await checkTestResults(process.argv[2], process.argv[3], Number(process.argv[4] ?? 0), browserTargets.map(target => target.name))));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }
