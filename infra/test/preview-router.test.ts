@@ -46,6 +46,9 @@ describe('preview router', () => {
     ['the preview apex', 'preview.friquelme.dev'],
     ['production', 'friquelme.dev'],
     ['an unrelated label', 'main.preview.friquelme.dev'],
+    ['with an unescaped dot (any character in place of a dot)', 'pr-1Xpreview.friquelme.dev'],
+    ['with an unescaped dot before the domain', 'pr-1.previewXfriquelme.dev'],
+    ['with an unescaped dot before the TLD', 'pr-1.preview.friquelmeXdev'],
     ['an empty host', ''],
   ])('answers 404 for a host %s', (_name, host) => {
     const response = run(host, '/');

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { Template } from 'aws-cdk-lib/assertions';
 import { synthAll, TEST_ACCOUNT } from './app';
 
+const PREVIEW_BUCKET_ARN_EXPORT = 'PortfolioPreviewStack:ExportsOutputFnGetAttPreviewBucketD42A3211Arn6F3420E1';
 const SUB = 'token.actions.githubusercontent.com:sub';
 const AUD = 'token.actions.githubusercontent.com:aud';
 
@@ -57,9 +58,12 @@ describe('GitHubOidcStack', () => {
       expect(statements[0].Effect).toBe('Allow');
       expect(statements[0].Action).toEqual(['s3:PutObject', 's3:DeleteObject', 's3:GetObject', 's3:ListBucket']);
       const serialized = JSON.stringify(statements[0].Resource);
-      expect(serialized).toContain('TestPreview:ExportsOutputFnGetAttPreviewBucket');
-      expect(serialized).not.toContain('SiteBucket');
-      expect(statements[0].Resource).toHaveLength(2);
+      // Resources are imports from the preview stack's exports, never the site stack's.
+      expect(statements[0].Resource).toEqual([
+        { 'Fn::ImportValue': PREVIEW_BUCKET_ARN_EXPORT },
+        { 'Fn::Join': ['', [{ 'Fn::ImportValue': PREVIEW_BUCKET_ARN_EXPORT }, '/*']] },
+      ]);
+      expect(serialized).not.toContain('PortfolioSiteStack');
     });
   });
 
@@ -103,7 +107,14 @@ describe('GitHubOidcStack', () => {
         ['s3:PutObject', 's3:DeleteObject', 's3:GetObject', 's3:ListBucket'],
         'cloudfront:CreateInvalidation',
       ]);
-      expect(JSON.stringify(statements[0].Resource)).not.toContain('TestPreview');
+      const siteBucketArn = { 'Fn::ImportValue': expect.stringMatching(/^PortfolioSiteStack:ExportsOutputFnGetAttSiteBucket\w+Arn\w+$/) };
+      expect(statements[0].Resource).toEqual([
+        siteBucketArn,
+        { 'Fn::Join': ['', [siteBucketArn, '/*']] },
+      ]);
+      expect(statements[1].Resource).toEqual({
+        'Fn::Join': ['', [`arn:aws:cloudfront::${TEST_ACCOUNT}:distribution/`, { 'Fn::ImportValue': expect.stringMatching(/^PortfolioSiteStack:ExportsOutputRefSiteDistribution\w+$/) }]],
+      });
     });
   });
 

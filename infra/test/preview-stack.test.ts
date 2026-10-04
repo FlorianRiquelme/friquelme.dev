@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { synthAll } from './app';
-import { CONTENT_SECURITY_POLICY, PREVIEW_ROBOTS_TAG } from '../../src/lib/security/headers';
+import { CONTENT_SECURITY_POLICY } from '../../src/lib/security/headers';
 
 describe('PreviewStack', () => {
   let site: Template;
@@ -26,7 +26,7 @@ describe('PreviewStack', () => {
     expect(previewRest).toEqual(productionOthers);
     expect(CustomHeadersConfig.Items).toEqual([
       ...productionCustom.Items,
-      { Header: 'X-Robots-Tag', Override: true, Value: PREVIEW_ROBOTS_TAG },
+      { Header: 'X-Robots-Tag', Override: true, Value: 'noindex, nofollow' },
     ]);
     expect(previewRest.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy).toBe(CONTENT_SECURITY_POLICY);
   });

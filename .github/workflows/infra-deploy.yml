@@ -51,10 +51,18 @@ jobs:
 
       - run: pnpm exec playwright install --with-deps chromium
 
+      # Retried for up to ~5 minutes: header changes take time to propagate and
+      # deploy.yml may still be syncing pages that this checkout already knows.
       - name: Verify production
         env:
           DEPLOYED_BASE_URL: https://friquelme.dev
-        run: pnpm verify:deployed
+        run: |
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if pnpm verify:deployed; then exit 0; fi
+            echo "verify:deployed failed (attempt $attempt of 10)" >&2
+            sleep 30
+          done
+          exit 1
 
       - uses: actions/upload-artifact@v7
         if: always()

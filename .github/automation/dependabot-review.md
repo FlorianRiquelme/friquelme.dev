@@ -10,7 +10,7 @@ You are the only gate on dependency updates. Nothing merges unless you merge it,
 - Merge only when every check in the next section passes. If any check is inconclusive, leave the PR open and say why in a comment.
 - Never push to `main`, never force-push, never push to a `dependabot/*` branch, never close a PR, never delete a branch.
 - Never modify branch protection, rulesets, or anything under `.github/`.
-- Never run `cdk deploy` or any AWS command. Infrastructure is deployed by hand.
+- Never run `cdk deploy` or any AWS command. Merges that touch `infra/` are deployed by `infra-deploy.yml`, not by you; `PortfolioOidcStack` is deployed by hand and never by CI.
 - At most one comment per pull request per run.
 - If anything is ambiguous, write it in the digest issue and stop rather than acting.
 
@@ -26,6 +26,8 @@ Start from `gh pr list --author app/dependabot --state open --json number,title,
    A non-empty result means do not merge. Comment with the advisory IDs. Report it even when the bump still reduces the advisory count, because merging would ship a known-vulnerable version.
 4. **Local verification.** Check out the PR branch in this worktree and run `pnpm install --frozen-lockfile && pnpm exec astro check && pnpm test && pnpm build`. When the PR touches `infra/`, also run `pnpm -C infra install --frozen-lockfile && pnpm -C infra exec tsc --noEmit && pnpm -C infra test`. Every command must exit zero. A green CI check does not excuse you from this.
 5. **Breaking changes, majors only.** Read the release notes. Grep `src/`, `astro.config.mjs`, `tests/`, and `infra/` for each documented breaking change. Merge a major only when nothing in this codebase touches one. Otherwise comment with what would have to change and leave it open.
+
+A PR touching `infra/package.json` or `infra/pnpm-lock.yaml` is a production infrastructure deploy: merging it starts `infra-deploy.yml`, which runs `cdk deploy` for `PortfolioSiteStack` and `PortfolioPreviewStack` and then the deployed suite against production. After merging one, watch that run to success (`gh run list --workflow infra-deploy.yml`, then `gh run watch`). A failed or cancelled run is an incident: open an issue labelled `agent-merge` with the run URL and what failed, put it in the digest, and merge nothing further that day.
 
 Merge with `gh pr merge <n> --squash`. Merge one pull request at a time. After each merge the other open lockfiles are stale, so re-check mergeability; for any that became conflicted, post `@dependabot rebase` and leave them for tomorrow's run rather than resolving conflicts yourself.
 

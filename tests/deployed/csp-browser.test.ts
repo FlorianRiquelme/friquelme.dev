@@ -56,6 +56,11 @@ describe(`real CSP in Chromium on ${base.origin}`, () => {
     // The analytics snippet is not stubbed: the real library must load and initialise under the CSP.
     await page.waitForFunction(() => window.posthog?.__loaded === true, undefined, { timeout: 20_000 });
     await page.waitForLoadState('networkidle');
+    // Exercise connect-src from the page. A token-less decide call is rejected by PostHog, so it records no analytics data.
+    const probe = await page.evaluate(() =>
+      fetch('https://eu.i.posthog.com/decide/?v=3', { method: 'POST', mode: 'no-cors', body: '{}' }).then(() => 'sent', error => String(error)),
+    );
+    expect(probe).toBe('sent');
     expect(await violations(page)).toEqual([]);
     expect(pageErrors).toEqual([]);
     visited.push(route);

@@ -18,6 +18,25 @@ stack_output() {
     --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue | [0]" --output text
 }
 
+step "Checking the checkout"
+# The script deploys whatever is checked out, including the OIDC roles, so only run reviewed code.
+if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
+  echo "The working tree is not clean; commit or stash first." >&2
+  exit 1
+fi
+git -C "$ROOT" fetch --quiet origin main
+head_sha="$(git -C "$ROOT" rev-parse HEAD)"
+main_sha="$(git -C "$ROOT" rev-parse origin/main)"
+pr_sha="$(gh pr view 86 --repo "$REPO" --json headRefOid --jq .headRefOid 2>/dev/null || true)"
+if [ "$head_sha" = "$main_sha" ]; then
+  echo "HEAD is the latest origin/main ($head_sha)"
+elif [ -n "$pr_sha" ] && [ "$head_sha" = "$pr_sha" ]; then
+  echo "HEAD is the current head of PR 86 ($head_sha)"
+else
+  echo "HEAD $head_sha is neither the latest origin/main ($main_sha) nor the head of PR 86 (${pr_sha:-unknown}); refusing to deploy." >&2
+  exit 1
+fi
+
 step "Checking AWS credentials"
 account="$(aws sts get-caller-identity --query Account --output text)"
 echo "AWS account: $account"
@@ -69,6 +88,21 @@ while IFS= read -r name; do
     echo "Warning: environment also allows branch '$name'; remove it unless intended" >&2
   fi
 done <<<"$existing_policies"
+
+step "Restricting environment 'production' to main"
+# Without a branch policy any branch's workflow can reach the production deploy role.
+gh api -X PUT "repos/$REPO/environments/production" \
+  -F 'deployment_branch_policy[protected_branches]=false' \
+  -F 'deployment_branch_policy[custom_branch_policies]=true' >/dev/null
+production_policies="$(gh api "repos/$REPO/environments/production/deployment-branch-policies" \
+  --jq '.branch_policies[].name')"
+if grep -qx 'main' <<<"$production_policies"; then
+  echo "Branch policy 'main' already present"
+else
+  gh api -X POST "repos/$REPO/environments/production/deployment-branch-policies" \
+    -f name=main -f type=branch >/dev/null
+  echo "Added branch policy 'main'"
+fi
 
 step "Setting secrets and variable"
 gh secret set AWS_PREVIEW_ROLE_ARN --repo "$REPO" --body "$preview_role"
