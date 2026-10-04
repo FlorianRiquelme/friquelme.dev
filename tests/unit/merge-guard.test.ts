@@ -25,10 +25,11 @@ const state = JSON.parse(readFileSync(dir + '/state.json', 'utf8'));
 if (args[0] === 'pr' && args[1] === 'view') process.stdout.write(JSON.stringify({ headRefOid: state.head, state: state.prState }));
 else if (args[0] === 'api' && args[1] === '-H') {
   if (state.baseKey === undefined) { process.stderr.write('gh: Not Found (HTTP 404)'); process.exit(1); }
+  if (state.keyError === 'ref') { process.stderr.write('gh: No commit found for the ref main (HTTP 404)'); process.exit(1); }
   if (state.keyError) { process.stderr.write('gh: Server Error (HTTP 500)'); process.exit(1); }
   process.stdout.write(state.baseKey);
 }
-else if (args[0] === 'api' && args[1].includes('/pulls/')) process.stdout.write(JSON.stringify({ user: { login: state.author }, base: { ref: 'main', repo: { full_name: 'o/r' } } }));
+else if (args[0] === 'api' && args[1].includes('/pulls/')) process.stdout.write(JSON.stringify({ user: { login: state.author }, base: { ref: state.baseRef ?? 'main', repo: { full_name: 'o/r' } } }));
 else if (args[0] === 'api') process.stdout.write(JSON.stringify(state.pages));
 else if (args[0] === 'pr' && args[1] === 'merge') process.exit(state.mergeExit);
 else process.exit(99);
@@ -70,7 +71,8 @@ function run(args: string[], options: {
   mergeExit?: number;
   key?: string;
   headKey?: string;
-  keyError?: boolean;
+  keyError?: boolean | 'ref';
+  baseRef?: string;
   author?: string;
 } = {}) {
   dir = mkdtempSync(join(tmpdir(), 'merge-guard-'));
@@ -85,6 +87,7 @@ function run(args: string[], options: {
     author: options.author ?? 'FlorianRiquelme',
     baseKey: options.key,
     keyError: options.keyError,
+    baseRef: options.baseRef,
   }));
   if (options.headKey !== undefined) {
     mkdirSync(join(dir, '.github'));
@@ -192,6 +195,18 @@ describe('merge-guard.mjs', () => {
       expect(result.status).toBe(1);
       expect(result.merges).toEqual([]);
       expect(result.stderr).toMatch(/HTTP 500/);
+    });
+
+    it('refuses when the base ref is missing, which answers 404 too', () => {
+      const result = run(['42'], { key: publicPem, keyError: 'ref', author: 'dependabot[bot]' });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+      expect(result.stderr).toMatch(/No commit found/);
+    });
+
+    it('fetches the key from the PR base ref', () => {
+      const result = run(['42'], { baseRef: 'release' });
+      expect(result.calls).toContainEqual(['api', '-H', 'Accept: application/vnd.github.raw', 'repos/{owner}/{repo}/contents/.github/review-verdict-key.pub?ref=release']);
     });
 
     it('still refuses an unsigned PASS when the head worktree has no key file', () => {

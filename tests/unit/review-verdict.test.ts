@@ -440,7 +440,7 @@ describe('CLI', () => {
 
     it('posts success for an unsigned PASS on a Dependabot PR', async () => {
       const { status } = await runSigned(body('PASS', HEAD), 'dependabot[bot]');
-      expect(status).toMatchObject({ state: 'success' });
+      expect(status).toEqual({ state: 'success', context: SIGNED_STATUS_CONTEXT, description: `PASS for ${HEAD.slice(0, 7)} by rev`, target_url: expect.stringContaining('#issuecomment-') });
     });
 
     it('posts the signed context, not review-verdict', async () => {
@@ -479,5 +479,20 @@ describe('documented verdict templates', () => {
   it('the Dependabot automation verdict comment parses once filled in', () => {
     const filled = block('.github/automation/dependabot-review.md').replaceAll('<head sha>', HEAD);
     expect(parseVerdict(filled)).toEqual({ verdict: 'PASS', sha: HEAD, signature: null });
+  });
+});
+
+describe('the Dependabot automation prompt', () => {
+  const prompt = readFileSync(`${root}/.github/automation/dependabot-review.md`, 'utf8');
+
+  it('names exactly the status contexts the check posts', () => {
+    const contexts = new Set([...prompt.matchAll(/`(review-verdict(?:-signed)?)`/g)].map(match => match[1]));
+    expect([...contexts].sort()).toEqual([SIGNED_STATUS_CONTEXT, STATUS_CONTEXT].sort());
+  });
+
+  it('checks the signed context once the key exists on main, and probes that key file', () => {
+    expect(prompt).toContain('`review-verdict-signed` once `.github/review-verdict-key.pub` exists on `main`');
+    expect(prompt).toContain('contents/.github/review-verdict-key.pub?ref=main');
+    expect(prompt).toContain('select(.context=="<required context>")');
   });
 });

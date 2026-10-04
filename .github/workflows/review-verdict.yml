@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verdict:
-    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request
+    if: (github.event_name == 'pull_request_target' && github.event.pull_request.base.ref == github.event.repository.default_branch) || github.event.issue.pull_request
     runs-on: ubuntu-latest
     steps:
       # pull_request_target and issue_comment run the base branch's workflow; this checks out

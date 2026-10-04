@@ -36,7 +36,8 @@ function baseKey(ref) {
   const result = spawnSync('gh', ['api', '-H', 'Accept: application/vnd.github.raw', path], { encoding: 'utf8' });
   if (result.error) throw new Error(`gh api ${path}: ${result.error.message}`);
   if (result.status === 0) return publicKeyFromPem(result.stdout, `${ref}:.github/review-verdict-key.pub`);
-  if (/HTTP 404/.test(result.stderr)) return null;
+  // A missing ref also answers 404 but with "No commit found for the ref", which stays a refusal.
+  if (/Not Found \(HTTP 404\)/.test(result.stderr)) return null;
   throw new Error(`gh api ${path} exited ${result.status}: ${result.stderr.trim()}`);
 }
 

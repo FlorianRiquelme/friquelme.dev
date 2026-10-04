@@ -29,7 +29,7 @@ Start from `gh pr list --author app/dependabot --state open --json number,title,
 
 ## Verdict and merge
 
-You are the independent reviewer for Dependabot PRs. `main` requires the `review-verdict` status, which is green only when a comment carries a PASS marker for the PR's current head.
+You are the independent reviewer for Dependabot PRs. `main` requires the `review-verdict` status (`review-verdict-signed` once `.github/review-verdict-key.pub` exists on `main`; Dependabot PRs are exempt from the signature, so your unsigned verdict still counts), which is green only when a comment carries a PASS marker for the PR's current head.
 
 When all five checks pass, post exactly one comment (`gh pr comment <n> --body-file <file>`) in this format. Replace `<head sha>` on lines 1 and 3 with the full 40-character lowercase head SHA you recorded in step 2. The marker must be the comment's very first line, with nothing before it, and lines 2 and 3 must follow it unchanged:
 
@@ -47,7 +47,7 @@ Commands run: <each command from step 4> → <exit code>
 ```
 
 Then wait until the status is green, checking every 15 seconds for at most 3 minutes:
-`gh api repos/FlorianRiquelme/friquelme.dev/commits/<head sha>/status --jq '.statuses[] | select(.context=="review-verdict") | .state'` must print `success`. Merge with `gh pr merge <n> --squash --match-head-commit <head sha>`. If the head changed, the status stays red or the merge is refused, do not retry: leave the PR for tomorrow's run and put it in the digest. Never set the `review-verdict` status yourself.
+First run `gh api repos/FlorianRiquelme/friquelme.dev/contents/.github/review-verdict-key.pub?ref=main`: when it succeeds the required context is `review-verdict-signed`, when it answers 404 it is `review-verdict`. Then `gh api repos/FlorianRiquelme/friquelme.dev/commits/<head sha>/status --jq '.statuses[] | select(.context=="<required context>") | .state'` must print `success`. Merge with `gh pr merge <n> --squash --match-head-commit <head sha>`. If the head changed, the status stays red or the merge is refused, do not retry: leave the PR for tomorrow's run and put it in the digest. Never set the `review-verdict` or `review-verdict-signed` status yourself.
 
 When a check fails, your one comment explains why instead and carries no PASS marker. Merge one pull request at a time. After each merge the other open lockfiles are stale, so re-check mergeability; for any that became conflicted, post `@dependabot rebase` and leave them for tomorrow's run rather than resolving conflicts yourself.
 
