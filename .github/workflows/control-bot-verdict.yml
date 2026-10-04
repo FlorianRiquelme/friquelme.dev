@@ -1,0 +1,19 @@
+# Negative control for the review-verdict gate; this PR is never merged.
+# Posts a well-formed PASS verdict for the head as github-actions[bot], a non-collaborator.
+name: Control bot verdict
+on:
+  pull_request:
+    types: [opened]
+permissions:
+  pull-requests: write
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          printf '<!-- review-verdict: PASS sha=%s -->\nReview verdict: PASS\nReviewed head: %s\nReviewer: github-actions[bot] (negative control, not a collaborator)\n' "$SHA" "$SHA" > body.md
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file body.md
