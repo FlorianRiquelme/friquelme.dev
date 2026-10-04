@@ -4,6 +4,7 @@ import { Window, type IFetchInterceptor } from 'happy-dom';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { routes, siteOrigin, articles } from '../support/site';
+import { bgPageColor } from '../support/theme';
 
 const dist = resolve('dist');
 function fileFor(pathname: string) {
@@ -53,6 +54,10 @@ describe('all built pages', () => {
         expect(document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()).toBeTruthy();
         expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(`${siteOrigin}${route}`);
         expect(document.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(`${siteOrigin}${route}`);
+        const themeColors = document.querySelectorAll('head meta[name="theme-color"]');
+        expect(themeColors, `theme-color in ${route}`).toHaveLength(1);
+        expect(themeColors[0].hasAttribute('media')).toBe(false);
+        expect(themeColors[0].getAttribute('content')?.toLowerCase()).toBe(bgPageColor);
         for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
           expect(() => JSON.parse(script.textContent ?? '')).not.toThrow();
         }
