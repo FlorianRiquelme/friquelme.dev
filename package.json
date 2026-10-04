@@ -21,7 +21,8 @@
     "verify": "node scripts/verify.mjs",
     "verify:reports": "node --test --test-reporter=tap tests/verification/report-outcomes.test.mjs",
     "verify:controls": "node scripts/negative-controls.mjs",
-    "verify:infra": "node scripts/verify.mjs --infra"
+    "verify:infra": "node scripts/verify.mjs --infra",
+    "verify:deployed": "node scripts/verify.mjs --deployed"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

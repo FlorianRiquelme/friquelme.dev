@@ -146,6 +146,45 @@ for (const scenario of ['success', 'missing-unit', 'empty-unit', 'skipped-unit',
   });
 }
 
+for (const scenario of ['success', 'missing-unit', 'empty-unit', 'skipped-unit', 'inconsistent-unit', 'process-failure']) {
+  test(`deployed gate ${scenario === 'success' ? 'accepts complete execution' : `rejects ${scenario}`}`, async () => {
+    const fixture = await createFixture();
+    try {
+      const result = spawnSync(process.execPath, [resolve(fixture, 'scripts/verify.mjs'), '--deployed'], {
+        env: { ...process.env, DEPLOYED_BASE_URL: 'https://example.invalid', TEST_REPORT_SCENARIO: scenario, PATH: `${fixture}/bin:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+      });
+      assert.equal(result.error, undefined, result.stderr);
+      assert.equal(result.status, scenario === 'success' ? 0 : 1, result.stderr);
+      const summary = JSON.parse(await readFile(resolve(fixture, 'reports/verification-deployed/summary.json'), 'utf8'));
+      assert.equal(summary.status, scenario === 'success' ? 'passed' : 'failed');
+      if (scenario === 'success') assert.deepEqual(summary.stages.map(stage => stage.name), ['build', 'deployed']);
+      else assert.equal(summary.stages.at(-1).name, scenario === 'process-failure' ? 'build' : 'deployed');
+    } finally { await rm(fixture, { recursive: true, force: true }); }
+  });
+}
+
+test('deployed gate fails before any stage when DEPLOYED_BASE_URL is unset', async () => {
+  const fixture = await createFixture();
+  try {
+    const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
+    const result = spawnSync(process.execPath, [resolve(fixture, 'scripts/verify.mjs'), '--deployed'], {
+      env: { ...environment, TEST_REPORT_SCENARIO: 'success', PATH: `${fixture}/bin:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+    });
+    assert.equal(result.status, 1, result.stderr);
+    const summary = JSON.parse(await readFile(resolve(fixture, 'reports/verification-deployed/summary.json'), 'utf8'));
+    assert.equal(summary.status, 'failed');
+    assert.match(summary.error, /DEPLOYED_BASE_URL is not set/);
+    assert.deepEqual(summary.stages, []);
+  } finally { await rm(fixture, { recursive: true, force: true }); }
+});
+
+test('deployed suite fails loudly, not silently, when DEPLOYED_BASE_URL is unset', () => {
+  const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
+  const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vitest.deployed.config.ts'], { cwd: repository, env: environment, encoding: 'utf8', timeout: 60_000 });
+  assert.notEqual(result.status, 0, 'an unconfigured deployed suite must not pass');
+  assert.match(result.stdout + result.stderr, /DEPLOYED_BASE_URL is not set/);
+});
+
 // Each browser scenario must fail for its own reason, so overlapping checks cannot hide a removed one.
 const browserReasons = {
   'missing-browser': /ENOENT/, 'stale-browser': /ENOENT/, 'malformed-browser': /not a TesterArmy report-1/,
