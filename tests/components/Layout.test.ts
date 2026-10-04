@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, it, expect } from 'vitest';
 import Layout from '../../src/layouts/Layout.astro';
 import type { SeoOutput } from '../../src/lib/seo';
+import { bgPageColor } from '../support/theme';
 
 const articleSeo: SeoOutput = {
   canonical: 'https://friquelme.dev/blog/test-post/',
@@ -120,6 +121,19 @@ describe('Layout', () => {
     expect(html).toContain(
       '<meta name="viewport" content="width=device-width, initial-scale=1"',
     );
+  });
+
+  it('renders exactly one theme-color meta matching --color-bg-page, without media', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Layout, {
+      props: { ...baseProps, seo: websiteSeo },
+    });
+
+    const tags = html.match(/<meta[^>]*name="theme-color"[^>]*>/g) ?? [];
+    expect(tags).toHaveLength(1);
+    const tag = tags[0] ?? '';
+    expect(tag).not.toContain('media=');
+    expect(tag.match(/content="([^"]*)"/)?.[1].toLowerCase()).toBe(bgPageColor);
   });
 
   it('renders sibling BreadcrumbList JSON-LD when seo.breadcrumbsJsonLd is set', async () => {
