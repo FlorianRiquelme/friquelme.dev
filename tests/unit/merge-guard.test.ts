@@ -1,0 +1,153 @@
+import { spawnSync } from 'node:child_process';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterEach, describe, expect, it } from 'vitest';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const guard = join(root, 'scripts/merge-guard.mjs');
+const HEAD = 'a'.repeat(40);
+const OTHER = 'b'.repeat(40);
+const SITE = 'reports/verification/summary.json';
+const INFRA = 'reports/verification-infra/summary.json';
+
+// The stub answers `gh pr view` and `gh api` from state.json, logs every invocation as one JSON line,
+// and exits with MERGE_EXIT for `gh pr merge`.
+const stub = `#!/usr/bin/env node
+const { appendFileSync, readFileSync } = require('node:fs');
+const dir = process.env.STUB_DIR;
+const args = process.argv.slice(2);
+appendFileSync(dir + '/gh.log', JSON.stringify(args) + '\\n');
+const state = JSON.parse(readFileSync(dir + '/state.json', 'utf8'));
+if (args[0] === 'pr' && args[1] === 'view') process.stdout.write(JSON.stringify({ headRefOid: state.head, state: state.prState }));
+else if (args[0] === 'api') process.stdout.write(JSON.stringify(state.pages));
+else if (args[0] === 'pr' && args[1] === 'merge') process.exit(state.mergeExit);
+else process.exit(99);
+`;
+
+const marker = (verdict: string, sha: string, id: number) => ({
+  id,
+  created_at: `2026-10-04T10:0${id}:00Z`,
+  author_association: 'OWNER',
+  user: { login: 'owner' },
+  html_url: `https://example.test/c/${id}`,
+  body: `<!-- review-verdict: ${verdict} sha=${sha} -->\nReview verdict: ${verdict}\nReviewed head: ${sha}\n`,
+});
+
+const summary = (overrides: Record<string, unknown> = {}, git: Record<string, unknown> = {}) => ({
+  status: 'passed',
+  stages: [],
+  git: { headAtStart: HEAD, headAtEnd: HEAD, cleanAtStart: true, cleanAtEnd: true, ...git },
+  ...overrides,
+});
+
+let dir: string;
+afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+function run(args: string[], options: {
+  prState?: string;
+  pages?: unknown[][];
+  site?: unknown;
+  infra?: unknown;
+  mergeExit?: number;
+} = {}) {
+  dir = mkdtempSync(join(tmpdir(), 'merge-guard-'));
+  mkdirSync(join(dir, 'bin'));
+  writeFileSync(join(dir, 'bin/gh'), stub);
+  chmodSync(join(dir, 'bin/gh'), 0o755);
+  writeFileSync(join(dir, 'state.json'), JSON.stringify({
+    head: HEAD,
+    prState: options.prState ?? 'OPEN',
+    pages: options.pages ?? [[marker('FAIL', HEAD, 1)], [marker('PASS', HEAD, 2)]],
+    mergeExit: options.mergeExit ?? 0,
+  }));
+  for (const [file, content] of [[SITE, 'site' in options ? options.site : summary()], [INFRA, 'infra' in options ? options.infra : summary()]] as const) {
+    if (content === undefined) continue;
+    mkdirSync(join(dir, file, '..'), { recursive: true });
+    writeFileSync(join(dir, file), typeof content === 'string' ? content : JSON.stringify(content));
+  }
+  const result = spawnSync(process.execPath, [guard, ...args], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, PATH: `${join(dir, 'bin')}:${process.env.PATH}`, STUB_DIR: dir },
+  });
+  const log = existsSync(join(dir, 'gh.log')) ? readFileSync(join(dir, 'gh.log'), 'utf8').trimEnd().split('\n').map(line => JSON.parse(line)) : [];
+  return { ...result, calls: log as string[][], merges: (log as string[][]).filter(call => call[0] === 'pr' && call[1] === 'merge') };
+}
+
+describe('merge-guard.mjs', () => {
+  it('merges exactly once with the exact arguments when every check passes', () => {
+    const result = run(['42']);
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.calls).toEqual([
+      ['pr', 'view', '42', '--json', 'headRefOid,state'],
+      ['api', '--paginate', '--slurp', 'repos/{owner}/{repo}/issues/42/comments'],
+      ['pr', 'merge', '42', '--squash', '--match-head-commit', HEAD],
+    ]);
+  });
+
+  it("exits with gh pr merge's exit code", () => {
+    const result = run(['42'], { mergeExit: 7 });
+    expect(result.status).toBe(7);
+    expect(result.merges).toHaveLength(1);
+  });
+
+  const refusals: [string, Parameters<typeof run>[1], RegExp][] = [
+    ['infra summary missing', { infra: undefined }, /reports\/verification-infra\/summary\.json: cannot be read \(ENOENT\)/],
+    ['site summary unparseable', { site: '{' }, /reports\/verification\/summary\.json: does not parse as JSON/],
+    ['site summary failed', { site: summary({ status: 'failed' }) }, /reports\/verification\/summary\.json: status is "failed", not "passed"/],
+    ['headAtStart differs from the PR head', { site: summary({}, { headAtStart: OTHER }) }, new RegExp(`reports/verification/summary\\.json: git\\.headAtStart is "${OTHER}", not the PR head ${HEAD}`)],
+    ['headAtEnd differs from the PR head', { infra: summary({}, { headAtEnd: OTHER }) }, new RegExp(`reports/verification-infra/summary\\.json: git\\.headAtEnd is "${OTHER}", not the PR head ${HEAD}`)],
+    ['summary without git state', { infra: summary({ git: undefined }) }, /reports\/verification-infra\/summary\.json: git\.headAtStart is undefined/],
+    ['cleanAtStart false', { site: summary({}, { cleanAtStart: false }) }, /reports\/verification\/summary\.json: git\.cleanAtStart is false, not true/],
+    ['cleanAtEnd false', { infra: summary({}, { cleanAtEnd: false }) }, /reports\/verification-infra\/summary\.json: git\.cleanAtEnd is false, not true/],
+    ['cleanAtEnd null', { site: summary({}, { cleanAtEnd: null }) }, /reports\/verification\/summary\.json: git\.cleanAtEnd is null, not true/],
+    ['latest marker FAIL', { pages: [[marker('PASS', HEAD, 1)], [marker('FAIL', HEAD, 2)]] }, /review verdict: Latest verdict for aaaaaaa is FAIL/],
+    ['no marker for the head', { pages: [[marker('PASS', OTHER, 1)]] }, /review verdict: No PASS verdict for head aaaaaaa/],
+    ['PR not OPEN', { prState: 'MERGED' }, /PR state is MERGED, not OPEN/],
+  ];
+  for (const [cause, options, message] of refusals) {
+    it(`refuses without merging when ${cause}`, () => {
+      const result = run(['42'], options);
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+      expect(result.stderr).toMatch(message);
+      expect(result.stderr).toContain('merge-guard: refusing to merge #42');
+    });
+  }
+
+  it('reads the summaries from the working directory, not the script location', () => {
+    // The guard must judge the gates of the worktree it runs in.
+    const result = run(['42'], { site: undefined, infra: undefined });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toMatch(/reports\/verification\/summary\.json: cannot be read/);
+    expect(result.merges).toEqual([]);
+  });
+
+  for (const args of [[], ['abc'], ['42abc'], ['0'], ['-1'], ['42', '43']]) {
+    it(`exits 2 without calling gh for arguments ${JSON.stringify(args)}`, () => {
+      const result = run(args);
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain('usage: node scripts/merge-guard.mjs <pr-number>');
+      expect(result.calls).toEqual([]);
+    });
+  }
+
+  it('imports evaluate from review-verdict.mjs instead of parsing markers itself', () => {
+    const source = readFileSync(guard, 'utf8');
+    expect(source).toContain("import { evaluate } from './review-verdict.mjs';");
+    expect(source).not.toContain('review-verdict:');
+  });
+});
+
+describe('AGENTS.md merge instruction', () => {
+  it('tells agents to merge through the guard', () => {
+    const agents = readFileSync(join(root, 'AGENTS.md'), 'utf8');
+    const start = agents.indexOf('## Merge and deploy');
+    const section = agents.slice(start, agents.indexOf('\n## ', start + 1));
+    expect(section).toContain('Merge through `node scripts/merge-guard.mjs <n>`, run from the worktree that ran both gates.');
+    expect(section).toContain('Do not call `gh pr merge` directly.');
+    expect(existsSync(join(root, 'scripts/merge-guard.mjs'))).toBe(true);
+  });
+});

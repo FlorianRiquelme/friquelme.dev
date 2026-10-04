@@ -2,8 +2,10 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Window, type IFetchInterceptor } from 'happy-dom';
 import sharp from 'sharp';
+import { parse as parseYaml } from 'yaml';
 import { describe, expect, it } from 'vitest';
 import { routes, siteOrigin, articles } from '../support/site';
+import { bgPageColor } from '../support/theme';
 
 const dist = resolve('dist');
 function fileFor(pathname: string) {
@@ -53,6 +55,10 @@ describe('all built pages', () => {
         expect(document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()).toBeTruthy();
         expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(`${siteOrigin}${route}`);
         expect(document.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(`${siteOrigin}${route}`);
+        const themeColors = document.querySelectorAll('head meta[name="theme-color"]');
+        expect(themeColors, `theme-color in ${route}`).toHaveLength(1);
+        expect(themeColors[0].hasAttribute('media')).toBe(false);
+        expect(themeColors[0].getAttribute('content')?.toLowerCase()).toBe(bgPageColor);
         for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
           expect(() => JSON.parse(script.textContent ?? '')).not.toThrow();
         }
@@ -96,6 +102,24 @@ describe('all built pages', () => {
     expect(links.map(url => url.pathname).sort()).toEqual([...articles].sort());
     expect(links.every(url => url.origin === siteOrigin)).toBe(true);
   });
+  it('RSS items carry exactly their post\'s frontmatter tags as categories, in order', () => {
+    const rss = readFileSync(resolve(dist, 'rss.xml'), 'utf8');
+    const items = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(item => item[1]);
+    expect(items).toHaveLength(articles.length);
+    let total = 0;
+    for (const item of items) {
+      const slug = new URL(item.match(/<link>([^<]+)<\/link>/)![1]).pathname.match(/^\/blog\/([^/]+)\/$/)![1];
+      const file = ['mdx', 'md'].map(ext => resolve('src/blog', `${slug}.${ext}`)).find(existsSync);
+      const source = readFileSync(file!, 'utf8');
+      const tags: string[] = parseYaml(source.match(/^---\n([\s\S]*?)\n---/)![1]).tags ?? [];
+      const categories = [...item.matchAll(/<category>([^<]*)<\/category>/g)].map(match => match[1]);
+      expect(categories, slug).toEqual(tags);
+      total += tags.length;
+    }
+    // Guard against a vacuous pass: the published posts do carry tags.
+    expect(total).toBeGreaterThan(0);
+    expect(rss.match(/<category>/g)?.length ?? 0).toBe(total);
+  });
   it('LLM discovery links and full-text headings cover every published article', async () => {
     const index = readFileSync(resolve(dist, 'llms.txt'), 'utf8');
     const full = readFileSync(resolve(dist, 'llms-full.txt'), 'utf8');
@@ -106,5 +130,22 @@ describe('all built pages', () => {
       try { expect(full).toContain(`# ${window.document.querySelector('h1')!.textContent!.trim()}`); }
       finally { await window.happyDOM.abort(); }
     }
+  });
+});
+
+// The expected origin comes from the built sitemap index, which @astrojs/sitemap derives from `site`.
+describe('robots.txt', () => {
+  const sitemapLines = () => readFileSync(resolve(dist, 'robots.txt'), 'utf8').split(/\r?\n/).filter(line => /^Sitemap:/i.test(line));
+  it('has exactly one Sitemap line', () => expect(sitemapLines()).toHaveLength(1));
+  it('advertises the built sitemap index on the configured site origin', () => {
+    const sitemap = new URL(sitemapLines()[0].replace(/^Sitemap:/i, '').trim());
+    const file = resolve(dist, sitemap.pathname.slice(1));
+    expect(existsSync(file), `${sitemap.pathname} is not in dist/`).toBe(true);
+    const index = readFileSync(file, 'utf8');
+    expect(index).toMatch(/<sitemapindex[\s>]/);
+    const origins = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => new URL(match[1]).origin);
+    expect(origins.length).toBeGreaterThan(0);
+    expect(new Set(origins)).toEqual(new Set([sitemap.origin]));
+    expect(sitemap.href).toBe(`${origins[0]}/sitemap-index.xml`);
   });
 });
