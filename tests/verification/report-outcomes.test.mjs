@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtemp, mkdir, copyFile, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { stripVTControlCharacters } from 'node:util';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -182,8 +183,8 @@ test('deployed suite fails loudly, not silently, when DEPLOYED_BASE_URL is unset
   const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
   const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vitest.deployed.config.ts'], { cwd: repository, env: environment, encoding: 'utf8', timeout: 60_000 });
   assert.notEqual(result.status, 0, 'an unconfigured deployed suite must not pass');
-  // Anchored on the error line: vitest also prints the source line that throws it.
-  assert.match(result.stdout + result.stderr, /^Error: DEPLOYED_BASE_URL is not set/m);
+  // Anchored on the error line: vitest also prints the source line that throws it. CI colours the output, so strip ANSI first.
+  assert.match(stripVTControlCharacters(result.stdout + result.stderr), /^Error: DEPLOYED_BASE_URL is not set/m);
 });
 
 // The bootstrap script deploys the OIDC roles with admin credentials; its checkout guard runs before any AWS call.
@@ -196,12 +197,13 @@ const shims = {
 const bootstrapCases = [
   ['accepts the latest origin/main', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 42],
   ['accepts the head of an open PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 42],
-  ['rejects the head of a merged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 1],
-  ['rejects an unknown commit', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 1],
-  ['rejects an unavailable PR when not on main', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: '' }, 1],
-  ['rejects a dirty working tree', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN aaa', SHIM_DIRTY: ' M file' }, 1],
+  ['rejects the head of a merged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 1, /refusing to deploy/],
+  ['rejects the head of a closed, unmerged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'CLOSED bbb' }, 1, /refusing to deploy/],
+  ['rejects an unknown commit', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 1, /refusing to deploy/],
+  ['rejects an unavailable PR when not on main', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: '' }, 1, /refusing to deploy/],
+  ['rejects a dirty working tree', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN aaa', SHIM_DIRTY: ' M file' }, 1, /not clean/],
 ];
-for (const [name, environment, status] of bootstrapCases) {
+for (const [name, environment, status, message] of bootstrapCases) {
   test(`bootstrap script ${name}`, async () => {
     const bin = await mkdtemp(resolve(tmpdir(), 'bootstrap-shims-'));
     try {
@@ -210,6 +212,7 @@ for (const [name, environment, status] of bootstrapCases) {
         env: { ...process.env, SHIM_DIRTY: '', ...environment, PATH: `${bin}:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
       });
       assert.equal(result.status, status, result.stderr);
+      if (message) assert.match(stripVTControlCharacters(result.stderr), message);
     } finally { await rm(bin, { recursive: true, force: true }); }
   });
 }
