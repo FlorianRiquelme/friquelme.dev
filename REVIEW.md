@@ -29,21 +29,21 @@ Look specifically for:
 
 ## 3. Verification honesty
 
-- Rerun `pnpm verify` (and `pnpm verify:infra` when `infra/` or deploy behaviour changed) on the head. Report exit codes; a run whose failure is hidden behind `| tail` or `echo $?` does not count.
+- Rerun `node scripts/pnpm.mjs verify` on the head. When `infra/` or deploy behaviour changed, also run `node scripts/pnpm.mjs verify:infra`; it needs the root install and `-C infra install --frozen-lockfile` first. Report exit codes; a run whose failure is hidden behind `| tail` or `echo $?` does not count.
 - Check every claim in the PR description against a command you or the transcript actually ran.
 - Flag weakened, skipped, retried or focused tests, and regenerated baselines.
 
 ## 4. Output
 
-Post one PR comment with:
+Return one comment in exactly this format. The implementer posts it unedited, so it must stand on its own:
 
 ```
 Review verdict: PASS | FAIL
 Reviewed head: <full sha>
-Reviewer: <agent/model>
+Reviewer: <agent/model>, fresh context, own worktree (not the implementer)
 
 | Test (file:line) | Mutation | Red? | Verdict |
-...
+...   (or one row "none: no tests added or changed | N/A | N/A | N/A")
 
 Findings (blocking first): file:line — failure — expected behaviour
 Commands run: <command> → <exit code>
