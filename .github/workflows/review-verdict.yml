@@ -1,0 +1,33 @@
+# The verdict is a commit status set through the API: a check run created from an issue_comment
+# event would attach to the default branch, not the PR head. The explicit permissions key also
+# gives Dependabot-triggered runs write access to statuses.
+name: Review verdict
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created, edited, deleted]
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+concurrency:
+  group: review-verdict-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+jobs:
+  verdict:
+    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      # pull_request_target and issue_comment run the base branch's workflow; this checks out
+      # the base branch, never the PR head, so a PR cannot change how its own verdict is judged.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - run: node scripts/review-verdict.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}

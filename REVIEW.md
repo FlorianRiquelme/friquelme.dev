@@ -38,6 +38,7 @@ Look specifically for:
 Return one comment in exactly this format. The implementer posts it unedited, so it must stand on its own:
 
 ```
+<!-- review-verdict: PASS | FAIL sha=<full sha> -->
 Review verdict: PASS | FAIL
 Reviewed head: <full sha>
 Reviewer: <agent/model>, fresh context, own worktree (not the implementer)
@@ -48,5 +49,7 @@ Reviewer: <agent/model>, fresh context, own worktree (not the implementer)
 Findings (blocking first): file:line — failure — expected behaviour
 Commands run: <command> → <exit code>
 ```
+
+The first line is a hidden marker that the required `review-verdict` status check reads (`scripts/review-verdict.mjs`). Write it exactly, on its own line, with one verdict and the 40-character lowercase head SHA, for example `<!-- review-verdict: PASS sha=0123…cdef -->`. It must be the comment's very first line, directly followed by the `Review verdict:` and `Reviewed head:` lines with the same values; otherwise the comment does not count. A verdict quoted further down a comment never counts. Only comments posted by an owner, member or collaborator count, and only the latest verdict for the PR's current head decides; any new push voids it.
 
 FAIL if any finding is blocking: a tautological or weak test protecting changed behaviour, an untested production change that a deterministic test could cover, a failing or unrun gate, or an unbacked claim. Non-blocking suggestions are listed separately.
