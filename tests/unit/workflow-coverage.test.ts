@@ -1,4 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -23,9 +24,14 @@ const filesUnder = (dir: string, extensions: string[]) =>
     .filter(name => extensions.some(extension => name.endsWith(extension)))
     .map(name => join(root, dir, name));
 
-const workflows = readdirSync(join(root, '.github/workflows'), { withFileTypes: true })
-  .filter(entry => entry.isFile())
-  .map(entry => entry.name);
+// GitHub runs only top-level files in .github/workflows/, so subdirectories are not listed.
+const workflowFiles = (dir: string) =>
+  readdirSync(dir, { withFileTypes: true })
+    .filter(entry => entry.isFile())
+    .map(entry => entry.name)
+    .sort();
+
+const workflows = workflowFiles(join(root, '.github/workflows'));
 const testFiles = [...filesUnder('tests', ['.ts', '.mjs']), ...filesUnder('infra/test', ['.ts'])]
   .filter(file => file !== self);
 
@@ -37,9 +43,24 @@ describe('untestedWorkflows', () => {
     ['a reference to a different file does not count', ['deploy.yml'], ["'.github/workflows/ci.yml'"], ['deploy.yml']],
     ['ci.yml is not satisfied by ci.yml.bak', ['ci.yml'], ["'.github/workflows/ci.yml.bak'"], ['ci.yml']],
     ['a bare file name does not count', ['ci.yml'], ["readFileSync('ci.yml')"], ['ci.yml']],
+    ['dots in the name are literal', ['ci.yml'], ["'.github/workflows/ciXyml'"], ['ci.yml']],
     ['each source is searched', ['ci.yml', 'deploy.yml'], ['.github/workflows/ci.yml', '.github/workflows/deploy.yml'], []],
   ])('%s', (_, names, sources, expected) => {
     expect(untestedWorkflows(names, sources)).toEqual(expected);
+  });
+});
+
+describe('workflowFiles', () => {
+  it('lists every top-level file whatever its extension', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'workflows-'));
+    try {
+      for (const name of ['ci.yml', 'release.yaml', 'notes', 'old.yml.bak']) writeFileSync(join(dir, name), '');
+      mkdirSync(join(dir, 'nested'));
+      writeFileSync(join(dir, 'nested', 'inner.yml'), '');
+      expect(workflowFiles(dir)).toEqual(['ci.yml', 'notes', 'old.yml.bak', 'release.yaml']);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 
@@ -49,6 +70,8 @@ describe('workflows in the repository', () => {
     for (const file of ['ci-workflow', 'deploy-workflow', 'review-verdict-workflow']) {
       expect(testFiles).toContain(join(root, `tests/unit/${file}.test.ts`));
     }
+    expect(testFiles).toContain(join(root, 'tests/verification/report-outcomes.test.mjs'));
+    expect(testFiles).toContain(join(root, 'infra/test/static-site-stack.test.ts'));
     expect(testFiles).not.toContain(self);
   });
 
