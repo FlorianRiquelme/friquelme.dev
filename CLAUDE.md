@@ -1,5 +1,7 @@
 # Portfolio — Claude Code Instructions
 
+@AGENTS.md
+
 ## Quick Context
 
 Astro 7 static site with a portfolio homepage and a blog. Tailwind CSS 4, deployed to AWS via GitHub Actions. Site: https://friquelme.dev — repo is public.
