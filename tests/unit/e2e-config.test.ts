@@ -10,12 +10,13 @@ const load = async () => (await import('../../e2e.config')).default;
 
 describe('e2e.config.ts preview port', () => {
   it('uses E2E_PREVIEW_PORT exactly for the app url and the preview command', async () => {
-    process.env.E2E_PREVIEW_PORT = '23456';
+    const requested = '23456';
+    process.env.E2E_PREVIEW_PORT = requested;
     const { targets } = await load();
     expect(targets.length).toBeGreaterThan(0);
     for (const { app } of targets) {
-      expect(app.url).toBe(`http://${previewHost}:23456`);
-      expect(app.command.args).toEqual(['scripts/preview.mjs', '23456']);
+      expect(app.url).toBe(`http://${previewHost}:${requested}`);
+      expect(app.command.args).toEqual(['scripts/preview.mjs', requested]);
     }
   });
 
