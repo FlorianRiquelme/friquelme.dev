@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, open, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +13,16 @@ const directory = resolve(root, reportDirectory);
 const lockPath = resolve(root, infrastructure ? '.verification-infra.lock' : '.verification.lock');
 const lock = await open(lockPath, 'wx');
 await lock.writeFile(String(process.pid));
+// The commit and tree state this run verified, so a merge can be tied to the exact head. Outside a
+// git repository both values are null. Untracked files that are not ignored count as dirty.
+function gitState() {
+  const git = args => spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+  const head = git(['rev-parse', 'HEAD']);
+  if (head.status !== 0) return { head: null, clean: null };
+  const status = git(['status', '--porcelain']);
+  return { head: head.stdout.trim(), clean: status.status === 0 ? status.stdout === '' : null };
+}
+const atStart = gitState();
 const summary = { startedAt: new Date().toISOString(), runtime: process.version, status: 'failed', stages: [] };
 let child;
 let requestedSignal;
@@ -83,6 +93,8 @@ try {
   process.exitCode = 1;
 } finally {
   summary.finishedAt = new Date().toISOString();
+  const atEnd = gitState();
+  summary.git = { headAtStart: atStart.head, headAtEnd: atEnd.head, cleanAtStart: atStart.clean, cleanAtEnd: atEnd.clean };
   await mkdir(directory, { recursive: true });
   await writeFile(resolve(directory, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
   await lock.close();
