@@ -54,3 +54,4 @@ The first line is a hidden marker that the required `review-verdict` status chec
 
 FAIL if any finding is blocking: a tautological or weak test protecting changed behaviour, an untested production change that a deterministic test could cover, a failing or unrun gate, or an unbacked claim. Non-blocking suggestions are listed separately.
 <!-- gate negative control; never merged -->
+<!-- push after the verdict -->
