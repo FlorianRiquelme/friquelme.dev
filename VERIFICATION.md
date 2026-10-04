@@ -22,7 +22,7 @@ Use `node scripts/pnpm.mjs <pnpm arguments>` for local commands. The launcher se
 | Homepage | Section navigation, actual project destinations, contact mail link, terminal completion with ordinary motion and content availability with reduced motion |
 | Navigation | Homepage → blog → exact pinned article → back; mobile opening/closing, Escape, focus cycling/restoration and body scroll unlock; desktop keyboard activation |
 | Every article | Table of contents target navigation, related and adjacent article links, article schema/body, Open Graph image format/dimensions |
-| Build/link graph | Internal page, anchor and asset existence across every sitemap page; nonempty unique sitemap covering every built HTML page, exact RSS article membership and LLM discovery links |
+| Build/link graph | Internal page, anchor and asset existence across every sitemap page; nonempty unique sitemap covering every built HTML page, exact RSS article membership and LLM discovery links; the robots.txt Sitemap line is checked against the built sitemap index (single line, existing file, same origin as its `<loc>` entries) |
 | HTTP surfaces | Homepage/blog and generated images served with correct status/types; discovery/feed endpoints |
 | Domain/components/security | Existing unit, Astro Container and SEO/CSP tests retained |
 | Infrastructure | Existing CDK assertions and TypeScript checks retained in the separate infra gate |
