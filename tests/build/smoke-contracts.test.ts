@@ -1,16 +1,17 @@
 import type { ChildProcess } from 'node:child_process';
-import { previewHost, startPreview, waitForPreview } from '../../scripts/preview.mjs';
+import { freePort, previewHost, startPreview, waitForPreview } from '../../scripts/preview.mjs';
 import { runSmoke } from '../../scripts/smoke-production.mjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { routes, siteOrigin } from '../support/site';
 
-const PORT = 14323;
+let PORT = 0;
 
 let server: ChildProcess | null = null;
 
 // A good build must pass the production smoke contracts, or the deploy would roll itself back.
 describe('production smoke contracts against the built site', () => {
   beforeAll(async () => {
+    PORT = await freePort();
     server = startPreview(PORT);
     await waitForPreview(server, PORT);
   });

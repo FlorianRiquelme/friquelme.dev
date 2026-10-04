@@ -1,14 +1,16 @@
 import type { ChildProcess } from 'node:child_process';
-import { previewHost, startPreview, waitForPreview } from '../../scripts/preview.mjs';
+import { freePort, previewHost, startPreview, waitForPreview } from '../../scripts/preview.mjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-const PORT = 14321;
-const BASE = `http://${previewHost}:${PORT}`;
+let PORT = 0;
+let BASE = '';
 
 let server: ChildProcess | null = null;
 
 describe('astro preview server', () => {
   beforeAll(async () => {
+    PORT = await freePort();
+    BASE = `http://${previewHost}:${PORT}`;
     server = startPreview(PORT);
     await waitForPreview(server, PORT);
   });
