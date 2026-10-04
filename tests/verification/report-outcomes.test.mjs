@@ -182,7 +182,8 @@ test('deployed suite fails loudly, not silently, when DEPLOYED_BASE_URL is unset
   const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
   const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vitest.deployed.config.ts'], { cwd: repository, env: environment, encoding: 'utf8', timeout: 60_000 });
   assert.notEqual(result.status, 0, 'an unconfigured deployed suite must not pass');
-  assert.match(result.stdout + result.stderr, /DEPLOYED_BASE_URL is not set/);
+  // Anchored on the error line: vitest also prints the source line that throws it.
+  assert.match(result.stdout + result.stderr, /^Error: DEPLOYED_BASE_URL is not set/m);
 });
 
 // Each browser scenario must fail for its own reason, so overlapping checks cannot hide a removed one.
