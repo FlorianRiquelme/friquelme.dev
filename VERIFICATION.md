@@ -12,6 +12,7 @@ Use `node scripts/pnpm.mjs <pnpm arguments>` for local commands. The launcher se
 - `pnpm test:browser` builds once and runs the browser suite with TesterArmy (`e2e run`). `pnpm exec e2e run --target mobile-chromium` is a focused rerun against an existing build; the gate rejects such partial runs.
 - `pnpm test:browser:smoke` builds and runs the browser suite on `desktop-chromium` only, for fast feedback while editing or checking ports. It is not a gate: the validator rejects partial runs.
 - `pnpm verify:controls` proves the gate can fail. Against a fresh build it runs each negative control (mutated pinned link, injected page error, deleted local asset, occupied port 14322, passing single-target run, missing report) and asserts the exact failure: e2e exit code, executed-test count, error code/message (`ASSERTION_FAILED`, `APP_ALREADY_RUNNING`) and rejection by `scripts/check-test-results.mjs`. A configuration error (`INVALID_CONFIG`, exit 2) fails the script instead of counting as a control. It restores `dist/` byte-identically and writes logs under `reports/controls/`. It takes about 80 s and stays out of `pnpm verify` and CI; run it when changing the browser suite, `e2e.config.ts`, the validator or the TesterArmy version.
+- `node scripts/measure-csp.mjs` serves an existing build with the production CSP header (minus `upgrade-insecure-requests`, which breaks plain HTTP) and prints, for `/`, `/blog/` and one article, CSP violations, console errors, the PostHog scripts loaded and the capture requests (answered locally, so no events reach PostHog). It exits non-zero on any violation or missing capture. It loads PostHog's real scripts, so it is not a gate; run it when changing `src/lib/security/csp.ts` or how scripts are emitted.
 - `pnpm test:mutation` remains the existing focused mutation suite for SEO/CSP. It supplements the ordinary gate and is appropriate when changing those contracts.
 
 ## Coverage
@@ -22,7 +23,7 @@ Use `node scripts/pnpm.mjs <pnpm arguments>` for local commands. The launcher se
 | Homepage | Section navigation, actual project destinations, contact mail link, terminal completion with ordinary motion and content availability with reduced motion |
 | Navigation | Homepage → blog → exact pinned article → back; mobile opening/closing, Escape, focus cycling/restoration and body scroll unlock; desktop keyboard activation |
 | Every article | Table of contents target navigation, related and adjacent article links, article schema/body, Open Graph image format/dimensions |
-| Build/link graph | Internal page, anchor and asset existence across every sitemap page; nonempty unique sitemap covering every built HTML page, exact RSS article membership and LLM discovery links |
+| Build/link graph | Internal page, anchor and asset existence across every sitemap page; nonempty unique sitemap covering every built HTML page, exact RSS article membership and LLM discovery links; no inline executable script or inline event handler, since the CSP's `script-src` has no `'unsafe-inline'` |
 | HTTP surfaces | Homepage/blog and generated images served with correct status/types; discovery/feed endpoints |
 | Domain/components/security | Existing unit, Astro Container and SEO/CSP tests retained |
 | Infrastructure | Existing CDK assertions and TypeScript checks retained in the separate infra gate |

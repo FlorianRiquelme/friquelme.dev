@@ -10,7 +10,7 @@ export function buildCsp(options: CspOptions): string {
 
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${posthogScript}`,
+    `script-src 'self'${posthogScript}`,
     `connect-src 'self'${posthogConnect}`,
     "img-src 'self' data: https:",
     "style-src 'self' 'unsafe-inline'",

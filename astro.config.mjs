@@ -22,6 +22,11 @@ export default defineConfig({
   prefetch: true,
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Never inline scripts: the CSP's script-src has no 'unsafe-inline', so every
+      // script must be an /_astro/*.js file covered by 'self'. Other assets keep the default.
+      assetsInlineLimit: (file) => (file.endsWith('.js') ? false : undefined),
+    },
   },
   integrations: [
     icon(),
