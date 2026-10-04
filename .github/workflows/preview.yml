@@ -16,12 +16,14 @@ concurrency:
 jobs:
   preview:
     # Fork and Dependabot runs get no OIDC token or secrets; skip them.
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     env:
       PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}.preview.friquelme.dev
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: pnpm/action-setup@v6
 
@@ -71,8 +73,9 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+      # A cancelled run was superseded by a newer push, whose run owns the comment.
       - name: Update preview comment
-        if: always()
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SUITE_OUTCOME: ${{ steps.suite.outcome }}

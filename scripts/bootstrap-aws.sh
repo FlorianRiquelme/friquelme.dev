@@ -27,13 +27,15 @@ fi
 git -C "$ROOT" fetch --quiet origin main
 head_sha="$(git -C "$ROOT" rev-parse HEAD)"
 main_sha="$(git -C "$ROOT" rev-parse origin/main)"
-pr_sha="$(gh pr view 86 --repo "$REPO" --json headRefOid --jq .headRefOid 2>/dev/null || true)"
+pr_info="$(gh pr view 86 --repo "$REPO" --json headRefOid,state --jq '.state + " " + .headRefOid' 2>/dev/null || true)"
+pr_state="${pr_info%% *}"
+pr_sha="${pr_info#* }"
 if [ "$head_sha" = "$main_sha" ]; then
   echo "HEAD is the latest origin/main ($head_sha)"
-elif [ -n "$pr_sha" ] && [ "$head_sha" = "$pr_sha" ]; then
-  echo "HEAD is the current head of PR 86 ($head_sha)"
+elif [ "$pr_state" = "OPEN" ] && [ "$head_sha" = "$pr_sha" ]; then
+  echo "HEAD is the head of PR 86, which is still open ($head_sha)"
 else
-  echo "HEAD $head_sha is neither the latest origin/main ($main_sha) nor the head of PR 86 (${pr_sha:-unknown}); refusing to deploy." >&2
+  echo "HEAD $head_sha is neither the latest origin/main ($main_sha) nor the head of the open PR 86 (${pr_info:-unknown}); refusing to deploy." >&2
   exit 1
 fi
 
@@ -99,8 +101,11 @@ production_policies="$(gh api "repos/$REPO/environments/production/deployment-br
 if grep -qx 'main' <<<"$production_policies"; then
   echo "Branch policy 'main' already present"
 else
-  gh api -X POST "repos/$REPO/environments/production/deployment-branch-policies" \
-    -f name=main -f type=branch >/dev/null
+  if ! gh api -X POST "repos/$REPO/environments/production/deployment-branch-policies" \
+    -f name=main -f type=branch >/dev/null; then
+    echo "Adding the 'main' policy failed: environment 'production' now allows NO branch, so production deploys are blocked. Re-run this script." >&2
+    exit 1
+  fi
   echo "Added branch policy 'main'"
 fi
 

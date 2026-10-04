@@ -186,6 +186,34 @@ test('deployed suite fails loudly, not silently, when DEPLOYED_BASE_URL is unset
   assert.match(result.stdout + result.stderr, /^Error: DEPLOYED_BASE_URL is not set/m);
 });
 
+// The bootstrap script deploys the OIDC roles with admin credentials; its checkout guard runs before any AWS call.
+// PATH shims stand in for git, gh and aws; the aws shim exits 42 to show the guard let the script through.
+const shims = {
+  git: 'case "$*" in *status*) printf "%s" "$SHIM_DIRTY";; *"rev-parse HEAD"*) echo "$SHIM_HEAD";; *"rev-parse origin/main"*) echo "$SHIM_MAIN";; esac',
+  gh: 'echo "$SHIM_PR"',
+  aws: 'exit 42',
+};
+const bootstrapCases = [
+  ['accepts the latest origin/main', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 42],
+  ['accepts the head of an open PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 42],
+  ['rejects the head of a merged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 1],
+  ['rejects an unknown commit', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 1],
+  ['rejects an unavailable PR when not on main', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: '' }, 1],
+  ['rejects a dirty working tree', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN aaa', SHIM_DIRTY: ' M file' }, 1],
+];
+for (const [name, environment, status] of bootstrapCases) {
+  test(`bootstrap script ${name}`, async () => {
+    const bin = await mkdtemp(resolve(tmpdir(), 'bootstrap-shims-'));
+    try {
+      for (const [command, body] of Object.entries(shims)) await writeFile(resolve(bin, command), `#!/usr/bin/env bash\n${body}\n`, { mode: 0o755 });
+      const result = spawnSync('bash', [resolve(repository, 'scripts/bootstrap-aws.sh')], {
+        env: { ...process.env, SHIM_DIRTY: '', ...environment, PATH: `${bin}:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+      });
+      assert.equal(result.status, status, result.stderr);
+    } finally { await rm(bin, { recursive: true, force: true }); }
+  });
+}
+
 // Each browser scenario must fail for its own reason, so overlapping checks cannot hide a removed one.
 const browserReasons = {
   'missing-browser': /ENOENT/, 'stale-browser': /ENOENT/, 'malformed-browser': /not a TesterArmy report-1/,
