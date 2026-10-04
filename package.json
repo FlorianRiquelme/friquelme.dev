@@ -56,7 +56,8 @@
     "happy-dom": "20.14.3",
     "playwright": "1.63.0",
     "sharp": "^0.35.4",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "yaml": "2.9.0"
   },
   "pnpm": {
     "overrides": {

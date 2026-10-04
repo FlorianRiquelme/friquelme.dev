@@ -45,6 +45,7 @@ describe('parseVerdict', () => {
     ['marker inside text', `see <!-- review-verdict: PASS sha=${HEAD} --> here`],
     ['uppercase sha', `<!-- review-verdict: PASS sha=${HEAD.toUpperCase()} -->`],
     ['39-char sha', `<!-- review-verdict: PASS sha=${HEAD.slice(1)} -->`],
+    ['text after the marker', `<!-- review-verdict: PASS sha=${HEAD} --> ignore`],
   ])('rejects %s', (_name, marker) => {
     const text = [marker, 'Review verdict: PASS', `Reviewed head: ${HEAD}`].join('\n');
     expect(parseVerdict(text)).toBeNull();
@@ -61,6 +62,38 @@ describe('parseVerdict', () => {
 
   it('rejects a Reviewed head naming another sha', () => {
     expect(parseVerdict(body('PASS', HEAD).replace(`Reviewed head: ${HEAD}`, `Reviewed head: ${OLD}`))).toBeNull();
+  });
+
+  it('rejects a verdict quoted below the first line, as in a code fence', () => {
+    const quoted = `Example of what the reviewer returns:\n\`\`\`\n${body('PASS', HEAD)}\n\`\`\``;
+    expect(parseVerdict(quoted)).toBeNull();
+    expect(evaluate({ headSha: HEAD, comments: [comment({ body: quoted })] }).state).toBe('failure');
+    expect(parseVerdict(`\n${body('PASS', HEAD)}`)).toBeNull();
+  });
+
+  it('rejects visible lines that do not directly follow the marker', () => {
+    const [marker, ...rest] = body('PASS', HEAD).split('\n');
+    expect(parseVerdict([marker, '', ...rest].join('\n'))).toBeNull();
+  });
+
+  it('rejects a marker below otherwise well-placed visible lines', () => {
+    const text = ['Note', 'Review verdict: PASS', `Reviewed head: ${HEAD}`, `<!-- review-verdict: PASS sha=${HEAD} -->`].join('\n');
+    expect(parseVerdict(text)).toBeNull();
+  });
+
+  it('rejects a Review verdict line that is not the second line', () => {
+    const text = [`<!-- review-verdict: PASS sha=${HEAD} -->`, 'Note', `Reviewed head: ${HEAD}`, 'Review verdict: PASS'].join('\n');
+    expect(parseVerdict(text)).toBeNull();
+  });
+
+  it('rejects a Reviewed head line that is not the third line', () => {
+    const text = [`<!-- review-verdict: PASS sha=${HEAD} -->`, 'Review verdict: PASS', 'Note', `Reviewed head: ${HEAD}`].join('\n');
+    expect(parseVerdict(text)).toBeNull();
+  });
+
+  it('tolerates trailing whitespace on the visible lines', () => {
+    const padded = body('PASS', HEAD).replace('Review verdict: PASS', 'Review verdict: PASS  ').replace(`Reviewed head: ${HEAD}`, `Reviewed head: ${HEAD}\t`);
+    expect(parseVerdict(padded)).toEqual({ verdict: 'PASS', sha: HEAD });
   });
 
   it('rejects a visible verdict that disagrees with the marker', () => {

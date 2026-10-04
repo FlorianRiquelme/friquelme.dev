@@ -6,14 +6,16 @@ export const TRUSTED_ASSOCIATIONS = ['OWNER', 'MEMBER', 'COLLABORATOR'];
 
 const MARKER = /^<!-- review-verdict: (PASS|FAIL) sha=([0-9a-f]{40}) -->$/;
 
+// The marker counts only as the comment's first line, directly followed by the visible verdict and
+// head lines, so a verdict quoted further down (in a code fence, say) never counts.
 export function parseVerdict(body) {
   const lines = String(body ?? '').split(/\r?\n/);
-  const markers = lines.map(line => MARKER.exec(line)).filter(Boolean);
-  if (markers.length !== 1) return null;
-  const [, verdict, sha] = markers[0];
-  const trimmed = lines.map(line => line.trimEnd());
-  if (!trimmed.includes(`Review verdict: ${verdict}`)) return null;
-  if (!trimmed.includes(`Reviewed head: ${sha}`)) return null;
+  if (lines.filter(line => MARKER.test(line)).length !== 1) return null;
+  const marker = MARKER.exec(lines[0]);
+  if (!marker) return null;
+  const [, verdict, sha] = marker;
+  if (lines[1]?.trimEnd() !== `Review verdict: ${verdict}`) return null;
+  if (lines[2]?.trimEnd() !== `Reviewed head: ${sha}`) return null;
   return { verdict, sha };
 }
 
