@@ -6,6 +6,6 @@ export default getViteConfig({
     allowOnly: false,
     passWithNoTests: false,
     include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-    exclude: ['tests/build/**', 'tests/e2e/**', 'node_modules/**'],
+    exclude: ['tests/build/**', 'tests/deployed/**', 'tests/e2e/**', 'node_modules/**'],
   },
 });

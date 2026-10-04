@@ -8,9 +8,10 @@ import { browserTargets } from './browser-targets.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url));
 process.chdir(root);
 const infrastructure = process.argv.includes('--infra');
-const reportDirectory = infrastructure ? 'reports/verification-infra' : 'reports/verification';
+const deployed = process.argv.includes('--deployed');
+const reportDirectory = infrastructure ? 'reports/verification-infra' : deployed ? 'reports/verification-deployed' : 'reports/verification';
 const directory = resolve(root, reportDirectory);
-const lockPath = resolve(root, infrastructure ? '.verification-infra.lock' : '.verification.lock');
+const lockPath = resolve(root, infrastructure ? '.verification-infra.lock' : deployed ? '.verification-deployed.lock' : '.verification.lock');
 const lock = await open(lockPath, 'wx');
 await lock.writeFile(String(process.pid));
 const summary = { startedAt: new Date().toISOString(), runtime: process.version, status: 'failed', stages: [] };
@@ -28,11 +29,16 @@ for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => {
 });
 try {
   await rm(directory, { recursive: true, force: true });
-  if (!infrastructure) await rm(resolve(root, 'reports/browser'), { recursive: true, force: true });
+  if (!infrastructure && !deployed) await rm(resolve(root, 'reports/browser'), { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
   const required = Number((await readFile(resolve(root, '.nvmrc'), 'utf8')).trim());
   if (Number(process.versions.node.split('.')[0]) !== required) throw new Error(`Use repository Node ${required}; the agent must select that runtime before verification`);
-  const stages = infrastructure ? [
+  if (deployed && !process.env.DEPLOYED_BASE_URL) throw new Error('DEPLOYED_BASE_URL is not set; point it at the deployment to verify, e.g. https://friquelme.dev');
+  const stages = deployed ? [
+    // The route list comes from the built sitemap, so build first.
+    ['build', ['build']],
+    ['deployed', ['exec', 'vitest', 'run', '--config', 'vitest.deployed.config.ts', '--reporter=default', '--reporter=json', `--outputFile=${resolve(directory, 'deployed.json')}`], 'vitest', `${reportDirectory}/deployed.json`],
+  ] : infrastructure ? [
     ['infra-types', ['-C', 'infra', 'exec', 'tsc', '--noEmit']],
     ['infra-tests', ['-C', 'infra', 'exec', 'vitest', 'run', '--reporter=default', '--reporter=json', `--outputFile=${resolve(directory, 'infra.json')}`], 'vitest', `${reportDirectory}/infra.json`],
   ] : [

@@ -6,12 +6,9 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
-import { buildCsp } from '../../src/lib/security/csp';
+import { securityHeadersPolicyProps } from './security-headers';
 
-const PERMISSIONS_POLICY =
-  'camera=(), microphone=(), geolocation=(), interest-cohort=()';
-
-const DOMAIN_NAME = 'friquelme.dev';
+export const DOMAIN_NAME = 'friquelme.dev';
 
 export class StaticSiteStack extends cdk.Stack {
   public readonly bucket: s3.Bucket;
@@ -42,43 +39,11 @@ export class StaticSiteStack extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(hostedZone),
     });
 
-    // Security headers response policy
+    // Security headers response policy (shared with the preview stack)
     const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(
       this,
       'SecurityHeaders',
-      {
-        securityHeadersBehavior: {
-          strictTransportSecurity: {
-            accessControlMaxAge: cdk.Duration.seconds(63072000), // 2 years
-            includeSubdomains: true,
-            preload: true,
-            override: true,
-          },
-          contentTypeOptions: { override: true },
-          frameOptions: {
-            frameOption: cloudfront.HeadersFrameOption.DENY,
-            override: true,
-          },
-          referrerPolicy: {
-            referrerPolicy:
-              cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
-            override: true,
-          },
-          contentSecurityPolicy: {
-            contentSecurityPolicy: buildCsp({ posthog: 'eu' }),
-            override: true,
-          },
-        },
-        customHeadersBehavior: {
-          customHeaders: [
-            {
-              header: 'Permissions-Policy',
-              value: PERMISSIONS_POLICY,
-              override: true,
-            },
-          ],
-        },
-      },
+      securityHeadersPolicyProps(),
     );
 
     // CloudFront distribution

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtemp, mkdir, copyFile, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { stripVTControlCharacters } from 'node:util';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -143,6 +144,76 @@ for (const scenario of ['success', 'missing-unit', 'empty-unit', 'skipped-unit',
       if (scenario === 'success') assert.equal(summary.stages.length, 2);
       else assert.equal(summary.stages.at(-1).name, scenario === 'process-failure' ? 'infra-types' : 'infra-tests');
     } finally { await rm(fixture, { recursive: true, force: true }); }
+  });
+}
+
+for (const scenario of ['success', 'missing-unit', 'empty-unit', 'skipped-unit', 'inconsistent-unit', 'process-failure']) {
+  test(`deployed gate ${scenario === 'success' ? 'accepts complete execution' : `rejects ${scenario}`}`, async () => {
+    const fixture = await createFixture();
+    try {
+      const result = spawnSync(process.execPath, [resolve(fixture, 'scripts/verify.mjs'), '--deployed'], {
+        env: { ...process.env, DEPLOYED_BASE_URL: 'https://example.invalid', TEST_REPORT_SCENARIO: scenario, PATH: `${fixture}/bin:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+      });
+      assert.equal(result.error, undefined, result.stderr);
+      assert.equal(result.status, scenario === 'success' ? 0 : 1, result.stderr);
+      const summary = JSON.parse(await readFile(resolve(fixture, 'reports/verification-deployed/summary.json'), 'utf8'));
+      assert.equal(summary.status, scenario === 'success' ? 'passed' : 'failed');
+      if (scenario === 'success') assert.deepEqual(summary.stages.map(stage => stage.name), ['build', 'deployed']);
+      else assert.equal(summary.stages.at(-1).name, scenario === 'process-failure' ? 'build' : 'deployed');
+    } finally { await rm(fixture, { recursive: true, force: true }); }
+  });
+}
+
+test('deployed gate fails before any stage when DEPLOYED_BASE_URL is unset', async () => {
+  const fixture = await createFixture();
+  try {
+    const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
+    const result = spawnSync(process.execPath, [resolve(fixture, 'scripts/verify.mjs'), '--deployed'], {
+      env: { ...environment, TEST_REPORT_SCENARIO: 'success', PATH: `${fixture}/bin:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+    });
+    assert.equal(result.status, 1, result.stderr);
+    const summary = JSON.parse(await readFile(resolve(fixture, 'reports/verification-deployed/summary.json'), 'utf8'));
+    assert.equal(summary.status, 'failed');
+    assert.match(summary.error, /DEPLOYED_BASE_URL is not set/);
+    assert.deepEqual(summary.stages, []);
+  } finally { await rm(fixture, { recursive: true, force: true }); }
+});
+
+test('deployed suite fails loudly, not silently, when DEPLOYED_BASE_URL is unset', () => {
+  const { DEPLOYED_BASE_URL: _removed, ...environment } = process.env;
+  const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vitest.deployed.config.ts'], { cwd: repository, env: environment, encoding: 'utf8', timeout: 60_000 });
+  assert.notEqual(result.status, 0, 'an unconfigured deployed suite must not pass');
+  // Anchored on the error line: vitest also prints the source line that throws it. CI colours the output, so strip ANSI first.
+  assert.match(stripVTControlCharacters(result.stdout + result.stderr), /^Error: DEPLOYED_BASE_URL is not set/m);
+});
+
+// The bootstrap script deploys the OIDC roles with admin credentials; its checkout guard runs before any AWS call.
+// PATH shims stand in for git, gh and aws; the aws shim exits 42 to show the guard let the script through.
+const shims = {
+  git: 'case "$*" in *status*) printf "%s" "$SHIM_DIRTY";; *"rev-parse HEAD"*) echo "$SHIM_HEAD";; *"rev-parse origin/main"*) echo "$SHIM_MAIN";; esac',
+  gh: 'echo "$SHIM_PR"',
+  aws: 'exit 42',
+};
+const bootstrapCases = [
+  ['accepts the latest origin/main', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 42],
+  ['accepts the head of an open PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 42],
+  ['rejects the head of a merged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'MERGED bbb' }, 1, /refusing to deploy/],
+  ['rejects the head of a closed, unmerged PR 86', { SHIM_HEAD: 'bbb', SHIM_MAIN: 'aaa', SHIM_PR: 'CLOSED bbb' }, 1, /refusing to deploy/],
+  ['rejects an unknown commit', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN bbb' }, 1, /refusing to deploy/],
+  ['rejects an unavailable PR when not on main', { SHIM_HEAD: 'ccc', SHIM_MAIN: 'aaa', SHIM_PR: '' }, 1, /refusing to deploy/],
+  ['rejects a dirty working tree', { SHIM_HEAD: 'aaa', SHIM_MAIN: 'aaa', SHIM_PR: 'OPEN aaa', SHIM_DIRTY: ' M file' }, 1, /not clean/],
+];
+for (const [name, environment, status, message] of bootstrapCases) {
+  test(`bootstrap script ${name}`, async () => {
+    const bin = await mkdtemp(resolve(tmpdir(), 'bootstrap-shims-'));
+    try {
+      for (const [command, body] of Object.entries(shims)) await writeFile(resolve(bin, command), `#!/usr/bin/env bash\n${body}\n`, { mode: 0o755 });
+      const result = spawnSync('bash', [resolve(repository, 'scripts/bootstrap-aws.sh')], {
+        env: { ...process.env, SHIM_DIRTY: '', ...environment, PATH: `${bin}:${process.env.PATH}` }, encoding: 'utf8', timeout: 15_000,
+      });
+      assert.equal(result.status, status, result.stderr);
+      if (message) assert.match(stripVTControlCharacters(result.stderr), message);
+    } finally { await rm(bin, { recursive: true, force: true }); }
   });
 }
 

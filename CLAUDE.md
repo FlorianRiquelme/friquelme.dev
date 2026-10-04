@@ -31,6 +31,7 @@ Regenerate via `$impeccable teach` (PRODUCT.md) or `$impeccable document` (DESIG
 - `pnpm test:browser:smoke` — fast single-target (desktop-chromium) browser run; not a gate
 - `pnpm verify:controls` — negative controls proving the gate fails for the expected reasons (~80 s, not part of verify)
 - `pnpm verify:infra` — infrastructure type and assertion checks, without deployment
+- `DEPLOYED_BASE_URL=<url> pnpm verify:deployed` — header contract and real-CSP browser check against a deployed environment (a PR preview or production)
 - `pnpm preview` — preview production build locally
 - `pnpm test` — run Vitest unit + Astro Container tests
 - `pnpm test:mutation` — Stryker mutation tests on `src/lib/seo.ts` + `src/lib/security/csp.ts`
@@ -75,9 +76,11 @@ Do not merge Dependabot PRs by hand and do not add GitHub-native auto-merge. Mer
 AWS CDK stacks in TypeScript. Separate `package.json` with its own dependencies.
 
 - `static-site-stack.ts` — S3 bucket, CloudFront distribution, Route53 DNS, ACM certificate
-- `github-oidc-stack.ts` — IAM role for GitHub Actions deploys via OIDC
+- `preview-stack.ts` — private bucket, CloudFront distribution and `*.preview.friquelme.dev` wildcard for per-PR previews; `functions/preview-router.js` maps `pr-<N>` hosts to bucket prefixes
+- `security-headers.ts` — the response headers policy shared by production and previews; its values live in `src/lib/security/headers.ts`
+- `github-oidc-stack.ts` — IAM roles for GitHub Actions via OIDC (production deploy, preview publish, infra deploy)
 
-CDK changes are deployed manually, not through CI. Don't modify infra unless explicitly asked.
+Infra changes merged to `main` deploy through `.github/workflows/infra-deploy.yml` (`PortfolioSiteStack` and `PortfolioPreviewStack` only). `PortfolioOidcStack` defines the CI roles and is deployed manually by Florian (`scripts/bootstrap-aws.sh`). Don't modify infra unless explicitly asked.
 
 ## Conventions
 

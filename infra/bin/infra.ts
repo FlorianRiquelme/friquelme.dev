@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { StaticSiteStack } from '../lib/static-site-stack';
-import { GitHubOidcStack } from '../lib/github-oidc-stack';
+import { buildApp } from '../lib/app';
 
 const app = new cdk.App();
 
@@ -12,10 +11,4 @@ const env: cdk.Environment = {
   region: 'us-east-1',
 };
 
-const site = new StaticSiteStack(app, 'PortfolioSiteStack', { env });
-
-new GitHubOidcStack(app, 'PortfolioOidcStack', {
-  env,
-  bucket: site.bucket,
-  distribution: site.distribution,
-});
+buildApp(app, env);

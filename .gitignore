@@ -53,3 +53,4 @@ test-results/
 
 # TesterArmy default output (the suite writes to reports/browser)
 .e2e/
+.verification-deployed.lock

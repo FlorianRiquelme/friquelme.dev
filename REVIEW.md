@@ -30,6 +30,7 @@ Look specifically for:
 ## 3. Verification honesty
 
 - Rerun `node scripts/pnpm.mjs verify` on the head. When `infra/` or deploy behaviour changed, also run `node scripts/pnpm.mjs verify:infra`; it needs the root install and `-C infra install --frozen-lockfile` first. Report exit codes; a run whose failure is hidden behind `| tail` or `echo $?` does not count.
+- Check the head's CI result with `gh pr checks <n>`. A red required check is blocking even when your local runs pass: local runs differ from CI in TTY, colour and environment.
 - Check every claim in the PR description against a command you or the transcript actually ran.
 - Flag weakened, skipped, retried or focused tests, and regenerated baselines.
 
