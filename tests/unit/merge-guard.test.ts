@@ -1,9 +1,11 @@
 import { spawnSync } from 'node:child_process';
+import { generateKeyPairSync, sign } from 'node:crypto';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
+import { signedPayload } from '../../scripts/review-verdict.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const guard = join(root, 'scripts/merge-guard.mjs');
@@ -21,6 +23,7 @@ const args = process.argv.slice(2);
 appendFileSync(dir + '/gh.log', JSON.stringify(args) + '\\n');
 const state = JSON.parse(readFileSync(dir + '/state.json', 'utf8'));
 if (args[0] === 'pr' && args[1] === 'view') process.stdout.write(JSON.stringify({ headRefOid: state.head, state: state.prState }));
+else if (args[0] === 'api' && args[1].includes('/pulls/')) process.stdout.write(JSON.stringify({ user: { login: state.author }, base: { repo: { full_name: 'o/r' } } }));
 else if (args[0] === 'api') process.stdout.write(JSON.stringify(state.pages));
 else if (args[0] === 'pr' && args[1] === 'merge') process.exit(state.mergeExit);
 else process.exit(99);
@@ -34,6 +37,15 @@ const marker = (verdict: string, sha: string, id: number) => ({
   html_url: `https://example.test/c/${id}`,
   body: `<!-- review-verdict: ${verdict} sha=${sha} -->\nReview verdict: ${verdict}\nReviewed head: ${sha}\n`,
 });
+
+const keys = generateKeyPairSync('ed25519');
+const publicPem = keys.publicKey.export({ type: 'spki', format: 'pem' }) as string;
+const signedMarker = (verdict: string, sha: string, id: number, pr = '42') => {
+  const base = marker(verdict, sha, id);
+  const signature = sign(null, Buffer.from(signedPayload({ repo: 'o/r', pr, verdict, sha }), 'utf8'), keys.privateKey).toString('base64');
+  const [first, second, third, ...rest] = base.body.split('\n');
+  return { ...base, body: [first, second, third, `<!-- review-verdict-signature: ${signature} -->`, ...rest].join('\n') };
+};
 
 const summary = (overrides: Record<string, unknown> = {}, git: Record<string, unknown> = {}) => ({
   status: 'passed',
@@ -51,6 +63,8 @@ function run(args: string[], options: {
   site?: unknown;
   infra?: unknown;
   mergeExit?: number;
+  key?: string;
+  author?: string;
 } = {}) {
   dir = mkdtempSync(join(tmpdir(), 'merge-guard-'));
   mkdirSync(join(dir, 'bin'));
@@ -61,7 +75,12 @@ function run(args: string[], options: {
     prState: options.prState ?? 'OPEN',
     pages: options.pages ?? [[marker('FAIL', HEAD, 1)], [marker('PASS', HEAD, 2)]],
     mergeExit: options.mergeExit ?? 0,
+    author: options.author ?? 'FlorianRiquelme',
   }));
+  if (options.key !== undefined) {
+    mkdirSync(join(dir, '.github'));
+    writeFileSync(join(dir, '.github/review-verdict-key.pub'), options.key);
+  }
   for (const [file, content] of [[SITE, 'site' in options ? options.site : summary()], [INFRA, 'infra' in options ? options.infra : summary()]] as const) {
     if (content === undefined) continue;
     mkdirSync(join(dir, file, '..'), { recursive: true });
@@ -83,6 +102,7 @@ describe('merge-guard.mjs', () => {
     expect(result.calls).toEqual([
       ['pr', 'view', '42', '--json', 'headRefOid,state'],
       ['api', '--paginate', '--slurp', 'repos/{owner}/{repo}/issues/42/comments'],
+      ['api', 'repos/{owner}/{repo}/pulls/42'],
       ['pr', 'merge', '42', '--squash', '--match-head-commit', HEAD],
     ]);
   });
@@ -125,6 +145,39 @@ describe('merge-guard.mjs', () => {
     expect(result.merges).toEqual([]);
   });
 
+  describe('with .github/review-verdict-key.pub in the working directory', () => {
+    it('merges on a signed PASS', () => {
+      const result = run(['42'], { key: publicPem, pages: [[signedMarker('PASS', HEAD, 1)]] });
+      expect(result.status, result.stderr).toBe(0);
+      expect(result.merges).toHaveLength(1);
+    });
+
+    it('refuses an unsigned PASS', () => {
+      const result = run(['42'], { key: publicPem });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+      expect(result.stderr).toMatch(/review verdict: No signed PASS verdict for head aaaaaaa/);
+    });
+
+    it('refuses a signature made for another PR number', () => {
+      const result = run(['42'], { key: publicPem, pages: [[signedMarker('PASS', HEAD, 1, '43')]] });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+    });
+
+    it('accepts an unsigned PASS on a Dependabot PR', () => {
+      const result = run(['42'], { key: publicPem, author: 'dependabot[bot]' });
+      expect(result.status, result.stderr).toBe(0);
+      expect(result.merges).toHaveLength(1);
+    });
+
+    it('refuses when the key file does not load', () => {
+      const result = run(['42'], { key: 'not a key', author: 'dependabot[bot]' });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+    });
+  });
+
   for (const args of [[], ['abc'], ['42abc'], ['0'], ['-1'], ['42', '43']]) {
     it(`exits 2 without calling gh for arguments ${JSON.stringify(args)}`, () => {
       const result = run(args);
@@ -136,7 +189,7 @@ describe('merge-guard.mjs', () => {
 
   it('imports evaluate from review-verdict.mjs instead of parsing markers itself', () => {
     const source = readFileSync(guard, 'utf8');
-    expect(source).toContain("import { evaluate } from './review-verdict.mjs';");
+    expect(source).toContain("import { evaluate, loadPublicKey } from './review-verdict.mjs';");
     expect(source).not.toContain('review-verdict:');
   });
 });

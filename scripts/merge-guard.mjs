@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { evaluate } from './review-verdict.mjs';
+import { evaluate, loadPublicKey } from './review-verdict.mjs';
 
 // Merges a PR only when both local gates passed on its current head in a clean tree and the head has
 // a PASS review verdict. Run it from the worktree that ran `verify` and `verify:infra`.
@@ -53,7 +53,8 @@ function main(argv) {
     }
     // --slurp wraps the pages in one outer array, so every page's comments are evaluated together.
     const pages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/issues/${pr}/comments`]));
-    const verdict = evaluate({ headSha, comments: pages.flat() });
+    const { user, base } = JSON.parse(gh(['api', `repos/{owner}/{repo}/pulls/${pr}`]));
+    const verdict = evaluate({ headSha, comments: pages.flat(), publicKey: loadPublicKey(), repo: base.repo.full_name, pr, prAuthor: user?.login });
     if (verdict.state !== 'success') failures.push(`review verdict: ${verdict.description}`);
     if (failures.length) return refuse(failures);
     const merge = spawnSync('gh', ['pr', 'merge', pr, '--squash', '--match-head-commit', headSha], { stdio: 'inherit' });

@@ -35,7 +35,7 @@ Look specifically for:
 
 ## 4. Output
 
-Return one comment in exactly this format. The implementer posts it unedited, so it must stand on its own:
+Return one comment in exactly this format. The implementer posts it unedited, so it must stand on its own. For PRs of dispatcher workers the reviewer instead writes this verdict to a file, and the agent dispatcher posts it and signs it:
 
 ```
 <!-- review-verdict: PASS | FAIL sha=<full sha> -->
@@ -50,6 +50,6 @@ Findings (blocking first): file:line — failure — expected behaviour
 Commands run: <command> → <exit code>
 ```
 
-The first line is a hidden marker that the required `review-verdict` status check reads (`scripts/review-verdict.mjs`). Write it exactly, on its own line, with one verdict and the 40-character lowercase head SHA, for example `<!-- review-verdict: PASS sha=0123…cdef -->`. It must be the comment's very first line, directly followed by the `Review verdict:` and `Reviewed head:` lines with the same values; otherwise the comment does not count. A verdict quoted further down a comment never counts. Only comments posted by an owner, member or collaborator count, and only the latest verdict for the PR's current head decides; any new push voids it.
+The first line is a hidden marker that the required `review-verdict` status check reads (`scripts/review-verdict.mjs`). Write it exactly, on its own line, with one verdict and the 40-character lowercase head SHA, for example `<!-- review-verdict: PASS sha=0123…cdef -->`. It must be the comment's very first line, directly followed by the `Review verdict:` and `Reviewed head:` lines with the same values; otherwise the comment does not count. A verdict quoted further down a comment never counts. Only comments posted by an owner, member or collaborator count, and only the latest verdict for the PR's current head decides; any new push voids it. Once `.github/review-verdict-key.pub` exists on the base branch, only signed verdicts count: the dispatcher adds a `<!-- review-verdict-signature: … -->` line as the comment's fourth line. Verdicts on Dependabot PRs are exempt, because the separate dependabot-review automation posts them.
 
 FAIL if any finding is blocking: a tautological or weak test protecting changed behaviour, an untested production change that a deterministic test could cover, a failing or unrun gate, or an unbacked claim. Non-blocking suggestions are listed separately.

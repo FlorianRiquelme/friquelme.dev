@@ -1,8 +1,28 @@
+import { createPublicKey, verify } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 
 export const STATUS_CONTEXT = 'review-verdict';
 export const TRUSTED_ASSOCIATIONS = ['OWNER', 'MEMBER', 'COLLABORATOR'];
+
+export const PUBLIC_KEY_FILE = '.github/review-verdict-key.pub';
+const SIGNATURE = /^<!-- review-verdict-signature: ([A-Za-z0-9+/]{86}==) -->$/;
+const DEPENDABOT = 'dependabot[bot]';
+
+export const signedPayload = ({ repo, pr, verdict, sha }) => `review-verdict:v1:${repo}:${pr}:${verdict}:${sha}`;
+
+// Null when no key file exists (signing not activated); any other problem throws so the check fails closed.
+export function loadPublicKey(file = PUBLIC_KEY_FILE) {
+  let pem;
+  try { pem = readFileSync(resolve(file), 'utf8'); } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+  const key = createPublicKey(pem);
+  if (key.asymmetricKeyType !== 'ed25519') throw new Error(`${file}: not an Ed25519 public key`);
+  return key;
+}
 
 const MARKER = /^<!-- review-verdict: (PASS|FAIL) sha=([0-9a-f]{40}) -->$/;
 
@@ -16,26 +36,35 @@ export function parseVerdict(body) {
   const [, verdict, sha] = marker;
   if (lines[1]?.trimEnd() !== `Review verdict: ${verdict}`) return null;
   if (lines[2]?.trimEnd() !== `Reviewed head: ${sha}`) return null;
-  return { verdict, sha };
+  const signature = SIGNATURE.exec(lines[3] ?? '')?.[1] ?? null;
+  return { verdict, sha, signature };
 }
 
 const limit = text => (text.length > 140 ? `${text.slice(0, 139)}…` : text);
 
-export function evaluate({ headSha, comments }) {
+function verifies(publicKey, payload, signature) {
+  if (!signature) return false;
+  try { return verify(null, Buffer.from(payload, 'utf8'), publicKey, Buffer.from(signature, 'base64')); } catch { return false; }
+}
+
+/** @param {{ headSha: string, comments: any[], publicKey?: import('node:crypto').KeyObject | null, repo?: string, pr?: string | number, prAuthor?: string }} input */
+export function evaluate({ headSha, comments, publicKey = null, repo, pr, prAuthor }) {
   const sha7 = headSha.slice(0, 7);
+  const signed = Boolean(publicKey) && prAuthor !== DEPENDABOT;
   const matching = comments
     .filter(comment => TRUSTED_ASSOCIATIONS.includes(comment.author_association))
     .map(comment => ({ comment, parsed: parseVerdict(comment.body) }))
     .filter(({ parsed }) => parsed && parsed.sha === headSha)
+    .filter(({ parsed }) => !signed || verifies(publicKey, signedPayload({ repo, pr, verdict: parsed.verdict, sha: parsed.sha }), parsed.signature))
     .sort((a, b) => {
       const byTime = Date.parse(a.comment.created_at) - Date.parse(b.comment.created_at);
       return byTime || a.comment.id - b.comment.id;
     });
   const latest = matching.at(-1);
-  if (!latest) return { state: 'failure', description: limit(`No PASS verdict for head ${sha7}`), targetUrl: null };
+  if (!latest) return { state: 'failure', description: limit(`No ${signed ? 'signed ' : ''}PASS verdict for head ${sha7}`), targetUrl: null };
   const { comment, parsed } = latest;
   if (parsed.verdict === 'PASS') {
-    return { state: 'success', description: limit(`PASS for ${sha7} by ${comment.user?.login}`), targetUrl: comment.html_url };
+    return { state: 'success', description: limit(`${signed ? 'Signed PASS' : 'PASS'} for ${sha7} by ${comment.user?.login}`), targetUrl: comment.html_url };
   }
   return { state: 'failure', description: limit(`Latest verdict for ${sha7} is FAIL`), targetUrl: comment.html_url };
 }
@@ -69,7 +98,8 @@ async function main() {
       comments.push(...batch);
       if (batch.length < 100) break;
     }
-    const { state, description, targetUrl } = evaluate({ headSha, comments });
+    const publicKey = loadPublicKey();
+    const { state, description, targetUrl } = evaluate({ headSha, comments, publicKey, repo, pr, prAuthor: pull.user?.login });
     await call(`${api}/repos/${repo}/statuses/${headSha}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
