@@ -108,3 +108,20 @@ describe('all built pages', () => {
     }
   });
 });
+
+// The expected origin comes from the built sitemap index, which @astrojs/sitemap derives from `site`.
+describe('robots.txt', () => {
+  const sitemapLines = () => readFileSync(resolve(dist, 'robots.txt'), 'utf8').split(/\r?\n/).filter(line => /^Sitemap:/i.test(line));
+  it('has exactly one Sitemap line', () => expect(sitemapLines()).toHaveLength(1));
+  it('advertises the built sitemap index on the configured site origin', () => {
+    const sitemap = new URL(sitemapLines()[0].replace(/^Sitemap:/i, '').trim());
+    const file = resolve(dist, sitemap.pathname.slice(1));
+    expect(existsSync(file), `${sitemap.pathname} is not in dist/`).toBe(true);
+    const index = readFileSync(file, 'utf8');
+    expect(index).toMatch(/<sitemapindex[\s>]/);
+    const origins = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => new URL(match[1]).origin);
+    expect(origins.length).toBeGreaterThan(0);
+    expect(new Set(origins)).toEqual(new Set([sitemap.origin]));
+    expect(sitemap.href).toBe(`${origins[0]}/sitemap-index.xml`);
+  });
+});
