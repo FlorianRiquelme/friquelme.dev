@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
@@ -62,6 +61,8 @@ jobs:
         id: good
         if: ${{ !cancelled() && steps.smoke.outcome == 'failure' }}
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sha=$(gh run list --workflow deploy.yml --branch main --limit 50 \
             --json databaseId,headSha,conclusion,status,headBranch,createdAt \
@@ -88,6 +89,7 @@ jobs:
         id: incident
         if: always() && steps.smoke.outcome == 'failure'
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOD_SHA: ${{ steps.good.outputs.sha }}
           ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
           RECHECK_OUTCOME: ${{ steps.recheck.outcome }}
@@ -131,6 +133,7 @@ jobs:
             echo "$fence"
             echo "$range"
             echo "$fence"
+            echo "Only the commit of this run is reverted. If the range above lists more than one commit, check whether an earlier one caused the failure."
             echo
             echo "A revert PR is opened by this run with GITHUB_TOKEN, so CI does not start on it. Close and reopen it, or push to it, with a user token to start the \`site\` and \`infra\` checks."
           } > "$RUNNER_TEMP/incident.md"
@@ -144,6 +147,7 @@ jobs:
         if: always() && steps.smoke.outcome == 'failure'
         continue-on-error: true
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_URL: ${{ steps.incident.outputs.url }}
         run: |
           subject=$(git log -1 --format=%s "$GITHUB_SHA")

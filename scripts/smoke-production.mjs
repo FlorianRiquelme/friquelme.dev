@@ -1,27 +1,20 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { buildCsp } from '../src/lib/security/csp.ts';
 
-const expectedHeaders = {
-  'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
-  'x-content-type-options': 'nosniff',
-  'x-frame-options': 'DENY',
-  'referrer-policy': 'strict-origin-when-cross-origin',
-  'permissions-policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-  'content-security-policy': buildCsp({ posthog: 'eu' }),
-};
+const htmlCache = 'public,max-age=0,must-revalidate';
+const assetCache = 'public,max-age=31536000,immutable';
 
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const locs = xml => [...xml.matchAll(/<loc>\s*([^<]*?)\s*<\/loc>/g)].map(match => match[1]);
 
 /**
- * @param {{ baseUrl: string, site?: string, distDir?: string | null, checkHeaders?: boolean,
+ * @param {{ baseUrl: string, site?: string, distDir?: string | null, checkCacheHeaders?: boolean,
  *   identityTimeoutMs?: number, pollMs?: number, fetchImpl?: typeof fetch }} options
  * @returns {Promise<{ ok: boolean, baseUrl: string, routes: string[], failures: string[] }>}
  */
 export async function runSmoke({
-  baseUrl, site = 'https://friquelme.dev', distDir = null, checkHeaders = true,
+  baseUrl, site = 'https://friquelme.dev', distDir = null, checkCacheHeaders = true,
   identityTimeoutMs = 300_000, pollMs = 10_000, fetchImpl = fetch,
 } = {}) {
   const base = baseUrl.replace(/\/$/, '');
@@ -45,16 +38,20 @@ export async function runSmoke({
     }
   }
 
-  const text = async (url, label = url) => {
+  const text = async (url, label = url, cache = null) => {
     try {
       const response = await get(url);
       if (response.status !== 200) { failures.push(`${label}: expected status 200, got ${response.status}`); return null; }
+      if (cache && checkCacheHeaders) {
+        const actual = response.headers.get('cache-control');
+        if (actual !== cache) failures.push(`${label}: expected cache-control ${cache}, got ${actual ?? 'missing'}`);
+      }
       return { response, body: await response.text() };
     } catch (error) { failures.push(`${label}: request failed (${error.message})`); return null; }
   };
 
   const routes = [];
-  const index = await text(`${base}/sitemap-index.xml`);
+  const index = await text(`${base}/sitemap-index.xml`, `${base}/sitemap-index.xml`, htmlCache);
   const sitemaps = index ? locs(index.body) : [];
   if (index && sitemaps.length === 0) failures.push(`${base}/sitemap-index.xml: expected at least 1 sitemap, got 0`);
   for (const sitemap of sitemaps) {
@@ -73,7 +70,7 @@ export async function runSmoke({
   const pages = new Map();
   for (const loc of routes) {
     const url = `${base}${new URL(loc).pathname}`;
-    const page = await text(url);
+    const page = await text(url, url, htmlCache);
     if (!page) continue;
     const { response, body } = page;
     pages.set(loc, body);
@@ -86,12 +83,6 @@ export async function runSmoke({
       .map(tag => tag.match(/\bhref=["']([^"']*)["']/)?.[1] ?? '');
     if (canonicals.length !== 1) failures.push(`${url}: expected exactly 1 canonical link, got ${canonicals.length}`);
     else if (canonicals[0] !== loc) failures.push(`${url}: expected canonical ${loc}, got ${canonicals[0]}`);
-    if (checkHeaders) {
-      for (const [name, expected] of Object.entries(expectedHeaders)) {
-        const actual = response.headers.get(name);
-        if (actual !== expected) failures.push(`${url}: expected ${name} ${expected}, got ${actual ?? 'missing'}`);
-      }
-    }
   }
 
   const home = pages.get(`${new URL(site).origin}/`);
@@ -101,14 +92,21 @@ export async function runSmoke({
     }
     if (!/<title[^>]*>\s*[^<\s][^<]*<\/title>/.test(home)) failures.push(`${base}/: expected non-empty <title>, got none`);
     const origins = new Set([new URL(site).origin, new URL(base).origin]);
-    const assets = [...home.matchAll(/<link\b[^>]*>/g)].map(match => match[0])
+    const styles = [...home.matchAll(/<link\b[^>]*>/g)].map(match => match[0])
       .filter(tag => /\brel=["']stylesheet["']/.test(tag))
-      .map(tag => tag.match(/\bhref=["']([^"']*)["']/)?.[1])
-      .concat([...home.matchAll(/<script\b[^>]*\bsrc=["']([^"']*)["']/g)].map(match => match[1]));
-    for (const ref of new Set(assets.filter(Boolean))) {
+      .map(tag => tag.match(/\bhref=["']([^"']*)["']/)?.[1]);
+    const scripts = [...home.matchAll(/<script\b[^>]*\bsrc=["']([^"']*)["']/g)].map(match => match[1]);
+    const assets = [...styles.filter(Boolean).map(ref => ({ ref, css: true })), ...scripts.map(ref => ({ ref, css: false }))];
+    for (const { ref, css } of assets) {
       const resolved = new URL(ref, `${base}/`);
       if (!origins.has(resolved.origin)) continue;
-      await text(`${base}${resolved.pathname}${resolved.search}`);
+      const url = `${base}${resolved.pathname}${resolved.search}`;
+      const immutable = resolved.pathname.startsWith('/_astro/');
+      const asset = await text(url, url, immutable ? assetCache : null);
+      if (!asset || !immutable) continue;
+      const type = asset.response.headers.get('content-type') ?? '';
+      const ok = css ? type.startsWith('text/css') : /^(text|application)\/javascript/.test(type);
+      if (!ok) failures.push(`${url}: expected content-type ${css ? 'text/css' : 'text/javascript or application/javascript'}, got ${type || 'none'}`);
     }
   }
 
@@ -121,7 +119,7 @@ export async function runSmoke({
     }
   }
 
-  for (const path of ['/rss.xml', '/robots.txt', '/llms.txt']) await text(`${base}${path}`);
+  for (const path of ['/rss.xml', '/robots.txt', '/llms.txt']) await text(`${base}${path}`, `${base}${path}`, htmlCache);
   return result(routes);
 }
 

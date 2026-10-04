@@ -26,7 +26,7 @@ describe('production smoke contracts against the built site', () => {
 
   it('passes with the sitemap routes and an identical homepage', async () => {
     const result = await runSmoke({
-      baseUrl: `http://${previewHost}:${PORT}`, site: 'https://friquelme.dev', distDir: 'dist', checkHeaders: false, identityTimeoutMs: 10_000,
+      baseUrl: `http://${previewHost}:${PORT}`, site: 'https://friquelme.dev', distDir: 'dist', checkCacheHeaders: false, identityTimeoutMs: 10_000,
     });
     expect(result).toMatchObject({ ok: true, failures: [] });
     expect(result.routes).toEqual(routes.map(route => `${siteOrigin}${route}`));

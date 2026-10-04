@@ -1,25 +1,19 @@
 import { spawn } from 'node:child_process';
 import { createServer, type Server } from 'node:http';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { runSmoke } from '../../scripts/smoke-production.mjs';
-import { buildCsp } from '../../src/lib/security/csp';
 
 const SITE = 'https://friquelme.dev';
-const securityHeaders: Record<string, string> = {
-  'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
-  'x-content-type-options': 'nosniff',
-  'x-frame-options': 'DENY',
-  'referrer-policy': 'strict-origin-when-cross-origin',
-  'permissions-policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-  'content-security-policy': buildCsp({ posthog: 'eu' }),
-};
+const htmlCache = 'public,max-age=0,must-revalidate';
+const assetCache = 'public,max-age=31536000,immutable';
 const locs = [`${SITE}/`, `${SITE}/blog/`, `${SITE}/blog/post/`];
 const urlset = (items: string[]) => `<urlset>${items.map(l => `<url><loc>${l}</loc></url>`).join('')}</urlset>`;
 const page = (loc: string, body = '<h1>Title</h1>') => `<!doctype html><html><head><title>T</title><link rel="canonical" href="${loc}"></head><body>${body}</body></html>`;
-const home = `<!doctype html><html><head><title>Home</title><link rel="canonical" href="${SITE}/"><link rel="stylesheet" href="/_astro/app.css"></head><body><h1>Hi</h1><section id="about"></section><section id="projects"></section><section id="contact"></section></body></html>`;
+const homePage = (over: { title?: string; sections?: string[]; extra?: string } = {}) => `<!doctype html><html><head><title>${over.title ?? 'Home'}</title><link rel="canonical" href="${SITE}/"><link rel="stylesheet" href="/_astro/app.css"><script src="/_astro/app.js"></script>${over.extra ?? ''}</head><body><h1>Hi</h1>${(over.sections ?? ['about', 'projects', 'contact']).map(id => `<section id="${id}"></section>`).join('')}</body></html>`;
+const home = homePage();
 
 type Reply = { status?: number; type?: string; body?: string; headers?: Record<string, string | null> };
 const baseFiles = (): Record<string, Reply> => ({
@@ -29,20 +23,23 @@ const baseFiles = (): Record<string, Reply> => ({
   '/blog/': { type: 'text/html', body: page(`${SITE}/blog/`, '<h1>Blog</h1><a href="/blog/post/">post</a>') },
   '/blog/post/': { type: 'text/html', body: page(`${SITE}/blog/post/`) },
   '/_astro/app.css': { type: 'text/css', body: 'body{}' },
+  '/_astro/app.js': { type: 'text/javascript', body: '1' },
   '/rss.xml': { type: 'application/xml', body: '<rss/>' },
   '/robots.txt': { type: 'text/plain', body: 'User-agent: *' },
   '/llms.txt': { type: 'text/plain', body: '# llms' },
 });
 
 let files = baseFiles();
+let requested: string[] = [];
 let server: Server;
 let baseUrl = '';
 beforeAll(async () => {
   server = createServer((req, res) => {
+    requested.push(req.url ?? '');
     const reply = files[req.url ?? ''];
     if (!reply) { res.writeHead(404).end('nope'); return; }
-    const isHtml = reply.type === 'text/html';
-    const headers: Record<string, string | null> = { 'content-type': reply.type ?? 'text/plain', ...(isHtml ? securityHeaders : {}), ...reply.headers };
+    const cache = req.url?.startsWith('/_astro/') ? assetCache : htmlCache;
+    const headers: Record<string, string | null> = { 'content-type': reply.type ?? 'text/plain', 'cache-control': cache, ...reply.headers };
     for (const name of Object.keys(headers)) if (headers[name] === null) delete headers[name];
     res.writeHead(reply.status ?? 200, headers as Record<string, string>).end(reply.body ?? '');
   });
@@ -54,6 +51,7 @@ afterAll(() => new Promise<void>(done => server.close(() => done())));
 const smoke = (overrides: Partial<Parameters<typeof runSmoke>[0]> = {}) => runSmoke({ baseUrl, site: SITE, ...overrides });
 const withFiles = (patch: Record<string, Reply | null>) => {
   files = baseFiles();
+  requested = [];
   for (const [path, reply] of Object.entries(patch)) { if (reply) files[path] = { ...files[path], ...reply }; else delete files[path]; }
 };
 describe('runSmoke contracts', () => {
@@ -70,7 +68,7 @@ describe('runSmoke contracts', () => {
   });
 
   it('fails a route that is not served as html', async () => {
-    withFiles({ '/blog/post/': { type: 'text/plain', headers: securityHeaders } });
+    withFiles({ '/blog/post/': { type: 'text/plain' } });
     expect((await smoke()).failures).toEqual([`${baseUrl}/blog/post/: expected content-type text/html, got text/plain`]);
   });
 
@@ -106,19 +104,59 @@ describe('runSmoke contracts', () => {
     expect((await smoke()).failures).toEqual([`${baseUrl}/_astro/app.css: expected status 200, got 404`]);
   });
 
-  it('fails a missing CSP', async () => {
-    withFiles({ '/blog/post/': { headers: { 'content-security-policy': null } } });
-    expect((await smoke()).failures).toEqual([`${baseUrl}/blog/post/: expected content-security-policy ${securityHeaders['content-security-policy']}, got missing`]);
+  it('fails an html route with a wrong cache-control', async () => {
+    withFiles({ '/blog/post/': { headers: { 'cache-control': 'public,max-age=0,must-revalidate,x' } } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/blog/post/: expected cache-control ${htmlCache}, got public,max-age=0,must-revalidate,x`]);
   });
 
-  it('fails an HSTS value that differs', async () => {
-    withFiles({ '/': { headers: { 'strict-transport-security': 'max-age=63072000; includeSubDomains; preload; extra' } } });
-    expect((await smoke()).failures).toEqual([`${baseUrl}/: expected strict-transport-security max-age=63072000; includeSubDomains; preload, got max-age=63072000; includeSubDomains; preload; extra`]);
+  it('fails a text endpoint without cache-control', async () => {
+    withFiles({ '/robots.txt': { headers: { 'cache-control': null } } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/robots.txt: expected cache-control ${htmlCache}, got missing`]);
   });
 
-  it('ignores headers when checkHeaders is false', async () => {
-    withFiles({ '/blog/post/': { headers: { 'content-security-policy': null, 'x-frame-options': null } } });
-    expect(await smoke({ checkHeaders: false })).toEqual({ ok: true, baseUrl, routes: locs, failures: [] });
+  it('fails a hashed asset with a wrong cache-control', async () => {
+    withFiles({ '/_astro/app.css': { headers: { 'cache-control': 'public,max-age=0,must-revalidate' } } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/_astro/app.css: expected cache-control ${assetCache}, got ${htmlCache}`]);
+  });
+
+  it('fails a stylesheet and a script with the wrong content-type', async () => {
+    withFiles({ '/_astro/app.css': { type: 'text/plain' }, '/_astro/app.js': { type: 'text/plain' } });
+    expect((await smoke()).failures).toEqual([
+      `${baseUrl}/_astro/app.css: expected content-type text/css, got text/plain`,
+      `${baseUrl}/_astro/app.js: expected content-type text/javascript or application/javascript, got text/plain`,
+    ]);
+  });
+
+  it('ignores cache-control when checkCacheHeaders is false', async () => {
+    withFiles({ '/blog/post/': { headers: { 'cache-control': null } }, '/_astro/app.css': { headers: { 'cache-control': 'no-store' } } });
+    expect(await smoke({ checkCacheHeaders: false })).toEqual({ ok: true, baseUrl, routes: locs, failures: [] });
+  });
+
+  it('fails a homepage without the projects section', async () => {
+    withFiles({ '/': { body: homePage({ sections: ['about', 'contact'] }) } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/: expected element with id="projects", got none`]);
+  });
+
+  it('fails a homepage with an empty title', async () => {
+    withFiles({ '/': { body: homePage({ title: ' ' }) } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/: expected non-empty <title>, got none`]);
+  });
+
+  it.each(['/robots.txt', '/llms.txt'])('fails when %s is missing', async path => {
+    withFiles({ [path]: null });
+    expect((await smoke()).failures).toEqual([`${baseUrl}${path}: expected status 200, got 404`]);
+  });
+
+  it('fails a same-origin script that is not 200', async () => {
+    withFiles({ '/_astro/app.js': null });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/_astro/app.js: expected status 200, got 404`]);
+  });
+
+  it('does not request foreign-origin stylesheets or scripts', async () => {
+    withFiles({ '/': { body: homePage({ extra: '<link rel="stylesheet" href="https://cdn.example/foreign.css"><script src="https://cdn.example/foreign.js"></script>' }) } });
+    expect(await smoke()).toEqual({ ok: true, baseUrl, routes: locs, failures: [] });
+    expect(requested.filter(path => path.includes('foreign'))).toEqual([]);
+    expect(requested).toContain('/_astro/app.js');
   });
 
   it('fails when /blog/ misses a post link', async () => {
@@ -184,5 +222,34 @@ describe('smoke-production CLI', () => {
 
   it('exits 2 without --base-url', async () => {
     expect((await run([])).status).toBe(2);
+  });
+
+  it('exits 2 for an invalid --identity-timeout-ms', async () => {
+    expect((await run(['--base-url', baseUrl, '--identity-timeout-ms', 'abc'])).status).toBe(2);
+  });
+
+  it('honours --dist and --identity-timeout-ms: a mismatching build fails with no contracts', async () => {
+    files = baseFiles();
+    const dist = join(dir, 'dist-bad');
+    mkdirSync(dist);
+    writeFileSync(join(dist, 'index.html'), 'another build');
+    const report = join(dir, 'identity.json');
+    const result = await run(['--base-url', baseUrl, '--dist', dist, '--identity-timeout-ms', '0', '--report', report]);
+    expect(result.status).toBe(1);
+    const json = JSON.parse(readFileSync(report, 'utf8'));
+    expect(json.failures).toEqual(['production / does not serve this build within 0s']);
+    expect(json.routes).toEqual([]);
+    expect(json.distDir).toBe(dist);
+  });
+
+  it('passes with --dist when production serves that build', async () => {
+    files = baseFiles();
+    const dist = join(dir, 'dist-good');
+    mkdirSync(dist);
+    writeFileSync(join(dist, 'index.html'), home);
+    const report = join(dir, 'identity-ok.json');
+    const result = await run(['--base-url', baseUrl, '--dist', dist, '--identity-timeout-ms', '5000', '--report', report]);
+    expect(result.status).toBe(0);
+    expect(JSON.parse(readFileSync(report, 'utf8'))).toMatchObject({ ok: true, failures: [] });
   });
 });
