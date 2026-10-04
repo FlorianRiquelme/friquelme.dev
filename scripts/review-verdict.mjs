@@ -4,6 +4,8 @@ import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 
 export const STATUS_CONTEXT = 'review-verdict';
+// Posted instead of STATUS_CONTEXT once a key is loaded; code from before signing existed never posts it.
+export const SIGNED_STATUS_CONTEXT = 'review-verdict-signed';
 export const TRUSTED_ASSOCIATIONS = ['OWNER', 'MEMBER', 'COLLABORATOR'];
 
 export const PUBLIC_KEY_FILE = '.github/review-verdict-key.pub';
@@ -12,6 +14,12 @@ const DEPENDABOT = 'dependabot[bot]';
 
 export const signedPayload = ({ repo, pr, verdict, sha }) => `review-verdict:v1:${repo}:${pr}:${verdict}:${sha}`;
 
+export function publicKeyFromPem(pem, source = 'review verdict key') {
+  const key = createPublicKey(pem);
+  if (key.asymmetricKeyType !== 'ed25519') throw new Error(`${source}: not an Ed25519 public key`);
+  return key;
+}
+
 // Null when no key file exists (signing not activated); any other problem throws so the check fails closed.
 export function loadPublicKey(file = PUBLIC_KEY_FILE) {
   let pem;
@@ -19,9 +27,7 @@ export function loadPublicKey(file = PUBLIC_KEY_FILE) {
     if (error.code === 'ENOENT') return null;
     throw error;
   }
-  const key = createPublicKey(pem);
-  if (key.asymmetricKeyType !== 'ed25519') throw new Error(`${file}: not an Ed25519 public key`);
-  return key;
+  return publicKeyFromPem(pem, file);
 }
 
 const MARKER = /^<!-- review-verdict: (PASS|FAIL) sha=([0-9a-f]{40}) -->$/;
@@ -98,13 +104,18 @@ async function main() {
       comments.push(...batch);
       if (batch.length < 100) break;
     }
-    const publicKey = loadPublicKey();
-    const { state, description, targetUrl } = evaluate({ headSha, comments, publicKey, repo, pr, prAuthor: pull.user?.login });
-    await call(`${api}/repos/${repo}/statuses/${headSha}`, {
+    const post = (context, state, description, targetUrl) => call(`${api}/repos/${repo}/statuses/${headSha}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state, context: STATUS_CONTEXT, description, target_url: targetUrl ?? pull.html_url }),
+      body: JSON.stringify({ state, context, description, target_url: targetUrl ?? pull.html_url }),
     });
+    let publicKey;
+    try { publicKey = loadPublicKey(); } catch (error) {
+      await post(SIGNED_STATUS_CONTEXT, 'failure', 'Review verdict key does not load', null);
+      throw error;
+    }
+    const { state, description, targetUrl } = evaluate({ headSha, comments, publicKey, repo, pr, prAuthor: pull.user?.login });
+    await post(publicKey ? SIGNED_STATUS_CONTEXT : STATUS_CONTEXT, state, description, targetUrl);
     console.log(`review-verdict: ${state} on ${headSha} (${description})`);
     return 0;
   } catch (error) {

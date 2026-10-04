@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { generateKeyPairSync, sign } from 'node:crypto';
+import { generateKeyPairSync, sign, verify } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -7,7 +7,7 @@ import { createServer, type IncomingMessage, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { evaluate, loadPublicKey, parseVerdict, signedPayload, STATUS_CONTEXT } from '../../scripts/review-verdict.mjs';
+import { evaluate, loadPublicKey, parseVerdict, signedPayload, SIGNED_STATUS_CONTEXT, STATUS_CONTEXT } from '../../scripts/review-verdict.mjs';
 
 const HEAD = 'a'.repeat(20) + 'b'.repeat(20);
 const OLD = 'c'.repeat(40);
@@ -240,8 +240,10 @@ describe('evaluate with a public key', () => {
   });
 
   it('a key that makes verify throw does not count', () => {
-    const rsa = generateKeyPairSync('rsa', { modulusLength: 2048 }).publicKey;
-    expect(ok([comment({ body: signedBody('PASS', HEAD) })], { publicKey: rsa }).state).toBe('failure');
+    // crypto.verify throws (not just returns false) for a key type that cannot verify Ed25519 signatures.
+    const x25519 = generateKeyPairSync('x25519').publicKey;
+    expect(() => verify(null, Buffer.from('x'), x25519, Buffer.alloc(64))).toThrow();
+    expect(ok([comment({ body: signedBody('PASS', HEAD) })], { publicKey: x25519 }).state).toBe('failure');
   });
 
   it('a newer signed FAIL beats an older signed PASS', () => {
@@ -329,7 +331,9 @@ describe('CLI', () => {
     return { requests, api: `http://127.0.0.1:${(server.address() as AddressInfo).port}` };
   }
 
-  function run(env: Record<string, string>, cwd = root) {
+  // Every run gets a cwd whose key situation the test chooses; the default is no key file, so the
+  // suite does not depend on whether the repository has activated signing.
+  function run(env: Record<string, string>, cwd = mkdtempSync(join(tmpdir(), 'rv-nokey-'))) {
     return new Promise<{ code: number | null; stdout: string; stderr: string }>(done => {
       const child = spawn(process.execPath, [script], {
         cwd,
@@ -339,7 +343,10 @@ describe('CLI', () => {
       let stderr = '';
       child.stdout.on('data', d => (stdout += d));
       child.stderr.on('data', d => (stderr += d));
-      child.on('close', code => done({ code, stdout, stderr }));
+      child.on('close', code => {
+        rmSync(cwd, { recursive: true, force: true });
+        done({ code, stdout, stderr });
+      });
     });
   }
 
@@ -436,10 +443,16 @@ describe('CLI', () => {
       expect(status).toMatchObject({ state: 'success' });
     });
 
-    it('exits 1 without posting when the key file is garbage', async () => {
+    it('posts the signed context, not review-verdict', async () => {
+      const { status } = await runSigned(signedBody('PASS', HEAD));
+      expect(status.context).toBe(SIGNED_STATUS_CONTEXT);
+      expect(SIGNED_STATUS_CONTEXT).toBe('review-verdict-signed');
+    });
+
+    it('posts a failure under the signed context and exits 1 when the key file is garbage', async () => {
       const { result, status } = await runSigned(signedBody('PASS', HEAD), 'FlorianRiquelme', 'garbage');
       expect(result.code).toBe(1);
-      expect(status).toBeNull();
+      expect(status).toEqual({ state: 'failure', context: SIGNED_STATUS_CONTEXT, description: 'Review verdict key does not load', target_url: pull.html_url });
     });
   });
 

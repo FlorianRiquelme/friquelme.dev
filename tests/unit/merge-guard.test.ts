@@ -23,7 +23,12 @@ const args = process.argv.slice(2);
 appendFileSync(dir + '/gh.log', JSON.stringify(args) + '\\n');
 const state = JSON.parse(readFileSync(dir + '/state.json', 'utf8'));
 if (args[0] === 'pr' && args[1] === 'view') process.stdout.write(JSON.stringify({ headRefOid: state.head, state: state.prState }));
-else if (args[0] === 'api' && args[1].includes('/pulls/')) process.stdout.write(JSON.stringify({ user: { login: state.author }, base: { repo: { full_name: 'o/r' } } }));
+else if (args[0] === 'api' && args[1] === '-H') {
+  if (state.baseKey === undefined) { process.stderr.write('gh: Not Found (HTTP 404)'); process.exit(1); }
+  if (state.keyError) { process.stderr.write('gh: Server Error (HTTP 500)'); process.exit(1); }
+  process.stdout.write(state.baseKey);
+}
+else if (args[0] === 'api' && args[1].includes('/pulls/')) process.stdout.write(JSON.stringify({ user: { login: state.author }, base: { ref: 'main', repo: { full_name: 'o/r' } } }));
 else if (args[0] === 'api') process.stdout.write(JSON.stringify(state.pages));
 else if (args[0] === 'pr' && args[1] === 'merge') process.exit(state.mergeExit);
 else process.exit(99);
@@ -64,6 +69,8 @@ function run(args: string[], options: {
   infra?: unknown;
   mergeExit?: number;
   key?: string;
+  headKey?: string;
+  keyError?: boolean;
   author?: string;
 } = {}) {
   dir = mkdtempSync(join(tmpdir(), 'merge-guard-'));
@@ -76,10 +83,12 @@ function run(args: string[], options: {
     pages: options.pages ?? [[marker('FAIL', HEAD, 1)], [marker('PASS', HEAD, 2)]],
     mergeExit: options.mergeExit ?? 0,
     author: options.author ?? 'FlorianRiquelme',
+    baseKey: options.key,
+    keyError: options.keyError,
   }));
-  if (options.key !== undefined) {
+  if (options.headKey !== undefined) {
     mkdirSync(join(dir, '.github'));
-    writeFileSync(join(dir, '.github/review-verdict-key.pub'), options.key);
+    writeFileSync(join(dir, '.github/review-verdict-key.pub'), options.headKey);
   }
   for (const [file, content] of [[SITE, 'site' in options ? options.site : summary()], [INFRA, 'infra' in options ? options.infra : summary()]] as const) {
     if (content === undefined) continue;
@@ -103,6 +112,7 @@ describe('merge-guard.mjs', () => {
       ['pr', 'view', '42', '--json', 'headRefOid,state'],
       ['api', '--paginate', '--slurp', 'repos/{owner}/{repo}/issues/42/comments'],
       ['api', 'repos/{owner}/{repo}/pulls/42'],
+      ['api', '-H', 'Accept: application/vnd.github.raw', 'repos/{owner}/{repo}/contents/.github/review-verdict-key.pub?ref=main'],
       ['pr', 'merge', '42', '--squash', '--match-head-commit', HEAD],
     ]);
   });
@@ -145,7 +155,7 @@ describe('merge-guard.mjs', () => {
     expect(result.merges).toEqual([]);
   });
 
-  describe('with .github/review-verdict-key.pub in the working directory', () => {
+  describe('with .github/review-verdict-key.pub on the base branch', () => {
     it('merges on a signed PASS', () => {
       const result = run(['42'], { key: publicPem, pages: [[signedMarker('PASS', HEAD, 1)]] });
       expect(result.status, result.stderr).toBe(0);
@@ -171,10 +181,39 @@ describe('merge-guard.mjs', () => {
       expect(result.merges).toHaveLength(1);
     });
 
-    it('refuses when the key file does not load', () => {
+    it('refuses when the base key does not load', () => {
       const result = run(['42'], { key: 'not a key', author: 'dependabot[bot]' });
       expect(result.status).toBe(1);
       expect(result.merges).toEqual([]);
+    });
+
+    it('refuses when the key cannot be fetched for a reason other than 404', () => {
+      const result = run(['42'], { key: publicPem, keyError: true, author: 'dependabot[bot]' });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+      expect(result.stderr).toMatch(/HTTP 500/);
+    });
+
+    it('still refuses an unsigned PASS when the head worktree has no key file', () => {
+      const result = run(['42'], { key: publicPem });
+      expect(result.status).toBe(1);
+      expect(result.stderr).toMatch(/No signed PASS verdict/);
+    });
+
+    it('refuses a verdict signed with a key the head worktree swapped in', () => {
+      const other = generateKeyPairSync('ed25519');
+      const headPem = other.publicKey.export({ type: 'spki', format: 'pem' }) as string;
+      const body = signedMarker('PASS', HEAD, 1);
+      const sig = sign(null, Buffer.from(signedPayload({ repo: 'o/r', pr: '42', verdict: 'PASS', sha: HEAD }), 'utf8'), other.privateKey).toString('base64');
+      const forged = { ...body, body: body.body.replace(/signature: \S+ -->/, `signature: ${sig} -->`) };
+      const result = run(['42'], { key: publicPem, headKey: headPem, pages: [[forged]] });
+      expect(result.status).toBe(1);
+      expect(result.merges).toEqual([]);
+    });
+
+    it('ignores a head worktree key when the base has none', () => {
+      const result = run(['42'], { headKey: publicPem });
+      expect(result.status, result.stderr).toBe(0);
     });
   });
 
@@ -189,7 +228,7 @@ describe('merge-guard.mjs', () => {
 
   it('imports evaluate from review-verdict.mjs instead of parsing markers itself', () => {
     const source = readFileSync(guard, 'utf8');
-    expect(source).toContain("import { evaluate, loadPublicKey } from './review-verdict.mjs';");
+    expect(source).toContain("import { evaluate, publicKeyFromPem } from './review-verdict.mjs';");
     expect(source).not.toContain('review-verdict:');
   });
 });
