@@ -1,0 +1,67 @@
+name: Deploy infrastructure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      # infra/lib imports the CSP and header definitions from here
+      - 'src/lib/security/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-infrastructure
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: infrastructure
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            infra/pnpm-lock.yaml
+
+      # The CDK app imports the site's CSP builder, so the root workspace is needed too.
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C infra install --frozen-lockfile
+
+      - run: pnpm verify:infra
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # PortfolioOidcStack defines the CI roles and is never deployed from CI.
+      - name: Deploy stacks
+        run: pnpm -C infra cdk deploy PortfolioSiteStack PortfolioPreviewStack --exclusively --require-approval never
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify production
+        env:
+          DEPLOYED_BASE_URL: https://friquelme.dev
+        run: pnpm verify:deployed
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: infrastructure-deploy-verification
+          path: |
+            reports/verification-infra/
+            reports/verification-deployed/
+          retention-days: 7
+          if-no-files-found: warn

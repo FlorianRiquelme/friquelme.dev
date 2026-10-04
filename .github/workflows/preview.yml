@@ -1,0 +1,103 @@
+name: Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Fork and Dependabot runs get no OIDC token or secrets; skip them.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    env:
+      PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}.preview.friquelme.dev
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run build
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_PREVIEW_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Publish preview
+        run: |
+          aws s3 sync dist/ "s3://${{ vars.PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/" --delete
+
+      - name: Wait for preview
+        run: |
+          for attempt in $(seq 1 30); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "$PREVIEW_URL/" || true)
+            echo "attempt $attempt: HTTP $status"
+            if [ "$status" = "200" ]; then exit 0; fi
+            sleep 10
+          done
+          echo "$PREVIEW_URL did not return 200 within 5 minutes" >&2
+          exit 1
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - name: Deployed-environment suite
+        id: suite
+        continue-on-error: true
+        env:
+          DEPLOYED_BASE_URL: ${{ env.PREVIEW_URL }}
+        run: pnpm verify:deployed
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: preview-verification
+          path: reports/verification-deployed/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Update preview comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUITE_OUTCOME: ${{ steps.suite.outcome }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$SUITE_OUTCOME" in
+            success) result="passed" ;;
+            failure) result="FAILED" ;;
+            *) result="did not run (publishing or readiness failed)" ;;
+          esac
+          marker='<!-- preview-environment -->'
+          body="$marker
+          **Preview:** $PREVIEW_URL
+          Commit: \`${HEAD_SHA:0:7}\`
+          Deployed-environment suite (headers and real-CSP browser check): **$result** ([run]($RUN_URL))"
+          existing=$(gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
+            --jq ".[] | select(.body | contains(\"$marker\")) | .id" | head -n 1)
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing" -f body="$body"
+          else
+            gh api -X POST "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" -f body="$body"
+          fi
+
+      - name: Fail when the suite failed
+        if: steps.suite.outcome != 'success'
+        run: exit 1

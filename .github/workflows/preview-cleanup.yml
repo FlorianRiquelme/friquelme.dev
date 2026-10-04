@@ -1,0 +1,28 @@
+name: Preview cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  id-token: write
+  contents: read
+
+# Shares the group with preview.yml so a closing PR cancels an in-flight publish.
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_PREVIEW_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Remove preview
+        run: |
+          aws s3 rm --recursive "s3://${{ vars.PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/"
