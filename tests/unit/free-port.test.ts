@@ -37,9 +37,13 @@ describe('freePort host', () => {
 });
 
 describe('preview CLI', () => {
+  // spawnSync blocks the event loop, so only its own timeout can stop a CLI that starts a server instead of failing.
   it('fails with a usage error instead of defaulting a port when none is given', () => {
-    const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../scripts/preview.mjs', import.meta.url))], { encoding: 'utf8' });
+    const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../scripts/preview.mjs', import.meta.url))], {
+      encoding: 'utf8', timeout: 10_000, killSignal: 'SIGKILL',
+    });
+    expect(result.error).toBeUndefined();
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Usage: node scripts/preview.mjs <port>');
-  });
+  }, 15_000);
 });
