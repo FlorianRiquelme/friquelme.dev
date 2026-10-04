@@ -1,22 +1,58 @@
 name: Agent task
-description: A task an agent can work to completion, with checkable acceptance examples.
+description: A request for the agent queue. The refiner turns it into ready tickets; only What is required.
 title: ""
-labels: []
+labels: [needs-refinement]
 body:
   - type: textarea
     id: what
     attributes:
       label: What
-      description: What to change and why.
+      description: What to change and why, in your own words.
     validations:
       required: true
   - type: textarea
     id: done-when
     attributes:
       label: Done when
-      description: Concrete, checkable acceptance examples. The worker turns each one into a test or an observable check.
+      description: Checkable acceptance examples, one per line starting with "- ". The refiner completes them if you leave this empty.
     validations:
-      required: true
+      required: false
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: '"None", or one line per blocker: "- blocked by #N".'
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [frontend, backend, infra, content, deps]
+    validations:
+      required: false
+  - type: dropdown
+    id: risk-tier
+    attributes:
+      label: Risk tier
+      description: mechanical (queued directly), clear (written spec), spike (time-boxed research ending in a recommendation).
+      options: [mechanical, clear, spike]
+    validations:
+      required: false
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: How the worker proves it works (tests, browser suites, preview, production check).
+    validations:
+      required: false
+  - type: input
+    id: time-box
+    attributes:
+      label: Time box
+      description: Spikes only, for example "2h".
+    validations:
+      required: false
   - type: textarea
     id: context
     attributes:
