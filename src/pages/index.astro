@@ -17,6 +17,11 @@ import Footer from '../components/nav/Footer.astro';
 import SectionHeader from '../components/content/SectionHeader.astro';
 import TerminalWindow from '../components/content/TerminalWindow.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
+
+// NEGATIVE CONTROL (phase 1): drops the contact section id only in the production deploy
+// workflow, so CI stays green and the post-deploy smoke test must catch it and roll back.
+// The rollback opens a revert PR for this commit; merging that revert removes it.
+const contactId = process.env.GITHUB_WORKFLOW === 'Deploy to AWS' ? undefined : 'contact';
 ---
 
 <Layout
@@ -126,7 +131,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
   <Divider />
 
   <!-- Contact Section -->
-  <section id="contact" class="flex flex-col items-center gap-8 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-20">
+  <section id={contactId} class="flex flex-col items-center gap-8 bg-bg-page px-5 py-12 md:gap-12 md:px-16 md:py-20">
     <div class="flex flex-col items-center gap-2">
       <h2 class="text-xl font-semibold text-green-primary md:text-[28px]">$ ping friquelme.dev</h2>
       <p class="text-[13px] text-text-tertiary text-center">
