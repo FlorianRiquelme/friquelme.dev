@@ -2,6 +2,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Window, type IFetchInterceptor } from 'happy-dom';
 import sharp from 'sharp';
+import { parse as parseYaml } from 'yaml';
 import { describe, expect, it } from 'vitest';
 import { routes, siteOrigin, articles } from '../support/site';
 import { bgPageColor } from '../support/theme';
@@ -100,6 +101,24 @@ describe('all built pages', () => {
     const links = items.map(item => new URL(item[1].match(/<link>([^<]+)<\/link>/)![1]));
     expect(links.map(url => url.pathname).sort()).toEqual([...articles].sort());
     expect(links.every(url => url.origin === siteOrigin)).toBe(true);
+  });
+  it('RSS items carry exactly their post\'s frontmatter tags as categories, in order', () => {
+    const rss = readFileSync(resolve(dist, 'rss.xml'), 'utf8');
+    const items = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(item => item[1]);
+    expect(items).toHaveLength(articles.length);
+    let total = 0;
+    for (const item of items) {
+      const slug = new URL(item.match(/<link>([^<]+)<\/link>/)![1]).pathname.match(/^\/blog\/([^/]+)\/$/)![1];
+      const file = ['mdx', 'md'].map(ext => resolve('src/blog', `${slug}.${ext}`)).find(existsSync);
+      const source = readFileSync(file!, 'utf8');
+      const tags: string[] = parseYaml(source.match(/^---\n([\s\S]*?)\n---/)![1]).tags ?? [];
+      const categories = [...item.matchAll(/<category>([^<]*)<\/category>/g)].map(match => match[1]);
+      expect(categories, slug).toEqual(tags);
+      total += tags.length;
+    }
+    // Guard against a vacuous pass: the published posts do carry tags.
+    expect(total).toBeGreaterThan(0);
+    expect(rss.match(/<category>/g)?.length ?? 0).toBe(total);
   });
   it('LLM discovery links and full-text headings cover every published article', async () => {
     const index = readFileSync(resolve(dist, 'llms.txt'), 'utf8');
