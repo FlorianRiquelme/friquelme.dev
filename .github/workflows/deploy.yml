@@ -7,7 +7,10 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
 
 concurrency:
   group: deploy-production
@@ -17,8 +20,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
 
@@ -36,24 +44,141 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
-      # Sync hashed assets with immutable cache headers
-      - name: Sync _astro/ assets
-        run: |
-          aws s3 sync dist/_astro/ s3://${{ secrets.S3_BUCKET_NAME }}/_astro/ \
-            --cache-control "public,max-age=31536000,immutable" \
-            --delete
+      # Sync dist/, then invalidate only critical non-hashed paths
+      - name: Publish site
+        id: publish
+        run: scripts/publish-site.sh dist "/" "/index.html" "/favicon.ico" "/favicon.svg" "/blog/*"
 
-      # Sync root files with must-revalidate cache headers
-      - name: Sync root files
-        run: |
-          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
-            --exclude "_astro/*" \
-            --cache-control "public,max-age=0,must-revalidate" \
-            --delete
+      # Waits until production serves this build, then checks the production contracts once.
+      # It also runs when the publish failed part-way, because S3 may then hold a mixed build.
+      - name: Smoke test production
+        id: smoke
+        if: ${{ !cancelled() && (steps.publish.outcome == 'success' || steps.publish.outcome == 'failure') }}
+        continue-on-error: true
+        run: node scripts/smoke-production.mjs --base-url https://friquelme.dev --dist dist --report reports/smoke/deploy.json
 
-      # Invalidate only critical non-hashed paths
-      - name: Invalidate CloudFront
+      - name: Find last known-good deploy
+        id: good
+        if: ${{ !cancelled() && steps.smoke.outcome == 'failure' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/" "/index.html" "/favicon.ico" "/favicon.svg" "/blog/*"
+          sha=$(gh run list --workflow deploy.yml --branch main --limit 50 \
+            --json databaseId,headSha,conclusion,status,headBranch,createdAt \
+            | node scripts/last-good-deploy.mjs --exclude-run "$GITHUB_RUN_ID" --exclude-sha "$GITHUB_SHA")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back to last known-good build
+        id: rollback
+        if: ${{ !cancelled() && steps.smoke.outcome == 'failure' && steps.good.outputs.sha != '' }}
+        continue-on-error: true
+        run: |
+          git worktree add "$RUNNER_TEMP/good" "${{ steps.good.outputs.sha }}"
+          pnpm -C "$RUNNER_TEMP/good" install --frozen-lockfile
+          pnpm -C "$RUNNER_TEMP/good" run build
+          scripts/publish-site.sh "$RUNNER_TEMP/good/dist" "/*"
+
+      - name: Smoke test after rollback
+        id: recheck
+        if: ${{ !cancelled() && steps.smoke.outcome == 'failure' && steps.rollback.outcome == 'success' }}
+        continue-on-error: true
+        run: node scripts/smoke-production.mjs --base-url https://friquelme.dev --dist "$RUNNER_TEMP/good/dist" --report reports/smoke/rollback.json
+
+      - name: Open incident issue
+        id: incident
+        if: always() && steps.smoke.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOD_SHA: ${{ steps.good.outputs.sha }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+          RECHECK_OUTCOME: ${{ steps.recheck.outcome }}
+        run: |
+          bad7="${GITHUB_SHA::7}"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ -z "$GOOD_SHA" ]; then
+            title="Production smoke failed for $bad7; no known-good deploy"
+            rollback="no known-good deploy found, nothing was rolled back"
+          elif [ "$ROLLBACK_OUTCOME" != "success" ]; then
+            title="Production smoke failed for $bad7; rollback FAILED"
+            rollback="rollback to ${GOOD_SHA::7} FAILED (see run log); production may still serve the broken build"
+          else
+            title="Production smoke failed for $bad7; rolled back to ${GOOD_SHA::7}"
+            rollback="published the build of ${GOOD_SHA::7}"
+          fi
+          failures() {
+            node -e 'try { const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log(r.failures.join("\n") || "(none)"); } catch { console.log("(no report)"); }' "$1"
+          }
+          if [ -n "$GOOD_SHA" ]; then range=$(git log --oneline "$GOOD_SHA..$GITHUB_SHA"); else range=$(git log --oneline -1 "$GITHUB_SHA"); fi
+          fence='```'
+          {
+            echo "Run: $run_url"
+            echo
+            echo "Bad commit: \`$GITHUB_SHA\` $(git log -1 --format=%s "$GITHUB_SHA")"
+            echo "Last known-good commit: ${GOOD_SHA:-none}"
+            echo "Rollback: $rollback"
+            echo "Smoke after rollback: ${RECHECK_OUTCOME:-skipped}"
+            echo
+            echo "Smoke failures on the deploy:"
+            echo "$fence"
+            failures reports/smoke/deploy.json
+            echo "$fence"
+            echo
+            echo "Smoke failures after rollback:"
+            echo "$fence"
+            failures reports/smoke/rollback.json
+            echo "$fence"
+            echo
+            echo "Commits since the last known-good deploy:"
+            echo "$fence"
+            echo "$range"
+            echo "$fence"
+            echo "Only the commit of this run is reverted. If the range above lists more than one commit, check whether an earlier one caused the failure."
+            echo
+            echo "A revert PR is opened by this run with GITHUB_TOKEN, so CI does not start on it. Close and reopen it, or push to it, with a user token to start the \`site\`, \`infra\` and \`review-verdict\` checks."
+          } > "$RUNNER_TEMP/incident.md"
+          if ! gh label list --search agent-merge --json name --jq '.[].name' | grep -qx agent-merge; then
+            gh label create agent-merge --color B60205 --description "Incident from an agent-merged change"
+          fi
+          url=$(gh issue create --label agent-merge --title "$title" --body-file "$RUNNER_TEMP/incident.md")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Open revert PR
+        id: revert
+        if: always() && steps.smoke.outcome == 'failure'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_URL: ${{ steps.incident.outputs.url }}
+        run: |
+          subject=$(git log -1 --format=%s "$GITHUB_SHA")
+          branch="revert/deploy-${GITHUB_SHA::7}"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git checkout -b "$branch" origin/main \
+            && git revert --no-edit "$GITHUB_SHA" \
+            && git push origin "$branch" \
+            && gh pr create --base main --head "$branch" --title "Revert \"$subject\"" \
+              --body "Reverts $GITHUB_SHA after the production smoke test failed. Incident: ${ISSUE_URL:-none}. Run: $run_url"; then
+            exit 0
+          fi
+          git revert --abort || true
+          if [ -n "$ISSUE_URL" ]; then
+            gh issue comment "$ISSUE_URL" --body "The automatic revert PR could not be created (conflict, or the commit touches .github/workflows which GITHUB_TOKEN cannot push). Revert $GITHUB_SHA manually. Run: $run_url"
+          fi
+          exit 1
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: smoke-reports
+          path: reports/smoke/
+          if-no-files-found: warn
+
+      # A rolled-back deploy must be a failed run so it never counts as last known-good
+      - name: Fail the deploy
+        if: always() && steps.smoke.outcome == 'failure'
+        run: |
+          echo "Production smoke failed for ${GITHUB_SHA::7}; rollback outcome: ${{ steps.rollback.outcome }}; incident: ${{ steps.incident.outputs.url }}"
+          exit 1
