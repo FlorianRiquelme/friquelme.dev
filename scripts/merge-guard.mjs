@@ -1,0 +1,67 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { evaluate } from './review-verdict.mjs';
+
+// Merges a PR only when both local gates passed on its current head in a clean tree and the head has
+// a PASS review verdict. Run it from the worktree that ran `verify` and `verify:infra`.
+const SUMMARIES = ['reports/verification/summary.json', 'reports/verification-infra/summary.json'];
+
+function checkSummary(file, text, headSha) {
+  let summary;
+  try { summary = JSON.parse(text); } catch { return [`${file}: does not parse as JSON`]; }
+  const git = summary?.git ?? {};
+  const failures = [];
+  if (summary?.status !== 'passed') failures.push(`${file}: status is ${JSON.stringify(summary?.status)}, not "passed"`);
+  for (const key of ['headAtStart', 'headAtEnd']) {
+    if (git[key] !== headSha) failures.push(`${file}: git.${key} is ${JSON.stringify(git[key])}, not the PR head ${headSha}`);
+  }
+  for (const key of ['cleanAtStart', 'cleanAtEnd']) {
+    if (git[key] !== true) failures.push(`${file}: git.${key} is ${JSON.stringify(git[key])}, not true`);
+  }
+  return failures;
+}
+
+function gh(args) {
+  const result = spawnSync('gh', args, { encoding: 'utf8' });
+  if (result.error) throw new Error(`gh ${args.join(' ')}: ${result.error.message}`);
+  if (result.status !== 0) throw new Error(`gh ${args.join(' ')} exited ${result.status}: ${result.stderr.trim()}`);
+  return result.stdout;
+}
+
+function main(argv) {
+  if (argv.length !== 1 || !/^[1-9]\d*$/.test(argv[0])) {
+    console.error('usage: node scripts/merge-guard.mjs <pr-number>');
+    return 2;
+  }
+  const pr = argv[0];
+  const refuse = failures => {
+    for (const failure of failures) console.error(`merge-guard: refusing to merge #${pr}: ${failure}`);
+    return 1;
+  };
+  try {
+    const { headRefOid: headSha, state } = JSON.parse(gh(['pr', 'view', pr, '--json', 'headRefOid,state']));
+    if (state !== 'OPEN') return refuse([`PR state is ${state}, not OPEN`]);
+    const failures = [];
+    for (const file of SUMMARIES) {
+      let text;
+      try { text = readFileSync(resolve(file), 'utf8'); } catch (error) {
+        failures.push(`${file}: cannot be read (${error.code ?? error.message})`);
+        continue;
+      }
+      failures.push(...checkSummary(file, text, headSha));
+    }
+    // --slurp wraps the pages in one outer array, so every page's comments are evaluated together.
+    const pages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/issues/${pr}/comments`]));
+    const verdict = evaluate({ headSha, comments: pages.flat() });
+    if (verdict.state !== 'success') failures.push(`review verdict: ${verdict.description}`);
+    if (failures.length) return refuse(failures);
+    const merge = spawnSync('gh', ['pr', 'merge', pr, '--squash', '--match-head-commit', headSha], { stdio: 'inherit' });
+    if (merge.error) throw merge.error;
+    return merge.status ?? 1;
+  } catch (error) {
+    return refuse([error.message]);
+  }
+}
+
+process.exitCode = main(process.argv.slice(2));
