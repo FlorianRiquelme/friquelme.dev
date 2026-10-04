@@ -31,7 +31,7 @@ Start from `gh pr list --author app/dependabot --state open --json number,title,
 
 You are the independent reviewer for Dependabot PRs. `main` requires the `review-verdict` status, which is green only when a comment carries a PASS marker for the PR's current head.
 
-When all five checks pass, post exactly one comment (`gh pr comment <n> --body-file <file>`) in this format, with the full 40-character lowercase head SHA you recorded in step 2 on the first two lines:
+When all five checks pass, post exactly one comment (`gh pr comment <n> --body-file <file>`) in this format. Replace `<head sha>` on lines 1 and 3 with the full 40-character lowercase head SHA you recorded in step 2. The marker must be the comment's very first line, with nothing before it, and lines 2 and 3 must follow it unchanged:
 
 ```
 <!-- review-verdict: PASS sha=<head sha> -->

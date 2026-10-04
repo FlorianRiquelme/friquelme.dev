@@ -16,6 +16,13 @@ describe('review-verdict workflow', () => {
     });
   });
 
+  it('serialises runs per PR without cancelling, so a later run always posts last', () => {
+    expect(workflow.concurrency).toEqual({
+      group: 'review-verdict-${{ github.event.pull_request.number || github.event.issue.number }}',
+      'cancel-in-progress': false,
+    });
+  });
+
   it('holds only the permissions it needs', () => {
     expect(workflow.permissions).toEqual({ contents: 'read', 'pull-requests': 'read', statuses: 'write' });
   });
