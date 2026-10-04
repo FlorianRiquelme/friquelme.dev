@@ -2,8 +2,8 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const htmlCache = 'public,max-age=0,must-revalidate';
-const assetCache = 'public,max-age=31536000,immutable';
+export const HTML_CACHE_CONTROL = 'public,max-age=0,must-revalidate';
+export const ASSET_CACHE_CONTROL = 'public,max-age=31536000,immutable';
 
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const locs = xml => [...xml.matchAll(/<loc>\s*([^<]*?)\s*<\/loc>/g)].map(match => match[1]);
@@ -51,11 +51,11 @@ export async function runSmoke({
   };
 
   const routes = [];
-  const index = await text(`${base}/sitemap-index.xml`, `${base}/sitemap-index.xml`, htmlCache);
+  const index = await text(`${base}/sitemap-index.xml`, `${base}/sitemap-index.xml`, HTML_CACHE_CONTROL);
   const sitemaps = index ? locs(index.body) : [];
   if (index && sitemaps.length === 0) failures.push(`${base}/sitemap-index.xml: expected at least 1 sitemap, got 0`);
   for (const sitemap of sitemaps) {
-    const page = await text(`${base}${new URL(sitemap, site).pathname}`, sitemap);
+    const page = await text(`${base}${new URL(sitemap, site).pathname}`, sitemap, HTML_CACHE_CONTROL);
     if (!page) continue;
     const found = locs(page.body);
     if (found.length === 0) failures.push(`${sitemap}: expected at least 1 loc, got 0`);
@@ -70,7 +70,7 @@ export async function runSmoke({
   const pages = new Map();
   for (const loc of routes) {
     const url = `${base}${new URL(loc).pathname}`;
-    const page = await text(url, url, htmlCache);
+    const page = await text(url, url, HTML_CACHE_CONTROL);
     if (!page) continue;
     const { response, body } = page;
     pages.set(loc, body);
@@ -102,7 +102,7 @@ export async function runSmoke({
       if (!origins.has(resolved.origin)) continue;
       const url = `${base}${resolved.pathname}${resolved.search}`;
       const immutable = resolved.pathname.startsWith('/_astro/');
-      const asset = await text(url, url, immutable ? assetCache : null);
+      const asset = await text(url, url, immutable ? ASSET_CACHE_CONTROL : null);
       if (!asset || !immutable) continue;
       const type = asset.response.headers.get('content-type') ?? '';
       const ok = css ? type.startsWith('text/css') : /^(text|application)\/javascript/.test(type);
@@ -119,7 +119,7 @@ export async function runSmoke({
     }
   }
 
-  for (const path of ['/rss.xml', '/robots.txt', '/llms.txt']) await text(`${base}${path}`, `${base}${path}`, htmlCache);
+  for (const path of ['/rss.xml', '/robots.txt', '/llms.txt']) await text(`${base}${path}`, `${base}${path}`, HTML_CACHE_CONTROL);
   return result(routes);
 }
 

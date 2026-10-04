@@ -4,11 +4,11 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { runSmoke } from '../../scripts/smoke-production.mjs';
+import { HTML_CACHE_CONTROL, ASSET_CACHE_CONTROL, runSmoke } from '../../scripts/smoke-production.mjs';
 
 const SITE = 'https://friquelme.dev';
-const htmlCache = 'public,max-age=0,must-revalidate';
-const assetCache = 'public,max-age=31536000,immutable';
+const htmlCache = HTML_CACHE_CONTROL;
+const assetCache = ASSET_CACHE_CONTROL;
 const locs = [`${SITE}/`, `${SITE}/blog/`, `${SITE}/blog/post/`];
 const urlset = (items: string[]) => `<urlset>${items.map(l => `<url><loc>${l}</loc></url>`).join('')}</urlset>`;
 const page = (loc: string, body = '<h1>Title</h1>') => `<!doctype html><html><head><title>T</title><link rel="canonical" href="${loc}"></head><body>${body}</body></html>`;
@@ -132,9 +132,24 @@ describe('runSmoke contracts', () => {
     expect(await smoke({ checkCacheHeaders: false })).toEqual({ ok: true, baseUrl, routes: locs, failures: [] });
   });
 
-  it('fails a homepage without the projects section', async () => {
-    withFiles({ '/': { body: homePage({ sections: ['about', 'contact'] }) } });
-    expect((await smoke()).failures).toEqual([`${baseUrl}/: expected element with id="projects", got none`]);
+  it.each(['about', 'projects', 'contact'])('fails a homepage without the %s section', async id => {
+    withFiles({ '/': { body: homePage({ sections: ['about', 'projects', 'contact'].filter(x => x !== id) }) } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/: expected element with id="${id}", got none`]);
+  });
+
+  it.each(['/sitemap-index.xml', '/sitemap-0.xml'])('fails %s with a wrong cache-control', async path => {
+    withFiles({ [path]: { headers: { 'cache-control': 'no-store' } } });
+    expect((await smoke()).failures).toEqual([`${path === '/sitemap-0.xml' ? SITE : baseUrl}${path}: expected cache-control ${htmlCache}, got no-store`]);
+  });
+
+  it.each(['/sitemap-index.xml', '/sitemap-0.xml'])('fails %s without cache-control', async path => {
+    withFiles({ [path]: { headers: { 'cache-control': null } } });
+    expect((await smoke()).failures).toEqual([`${path === '/sitemap-0.xml' ? SITE : baseUrl}${path}: expected cache-control ${htmlCache}, got missing`]);
+  });
+
+  it('fails a sitemap index without sitemaps', async () => {
+    withFiles({ '/sitemap-index.xml': { body: '<sitemapindex></sitemapindex>' } });
+    expect((await smoke()).failures).toEqual([`${baseUrl}/sitemap-index.xml: expected at least 1 sitemap, got 0`, 'no routes in sitemap']);
   });
 
   it('fails a homepage with an empty title', async () => {
