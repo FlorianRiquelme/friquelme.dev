@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
 import { networkInterfaces } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
@@ -8,6 +9,18 @@ const tailnetHost = '100.84.161.116';
 const hasTailnet = Object.values(networkInterfaces()).flat().some(address => address?.address === tailnetHost);
 // agent-server's previews stay on its tailnet interface; other hosts (including CI) use loopback.
 export const previewHost = hasTailnet ? tailnetHost : '127.0.0.1';
+
+// Asks the OS for a free port. The close-to-bind race is left to `strictPort`, which fails loudly.
+export function freePort(host = previewHost) {
+  return new Promise((done, reject) => {
+    const probe = createServer();
+    probe.once('error', reject);
+    probe.listen(0, host, () => {
+      const { port } = probe.address();
+      probe.close(error => (error ? reject(error) : done(port)));
+    });
+  });
+}
 
 export function startPreview(port) {
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid preview port');
@@ -50,7 +63,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   };
   for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, stop);
   try {
-    const port = Number(process.argv[2] ?? 14322);
+    if (process.argv[2] === undefined) throw new Error('Usage: node scripts/preview.mjs <port>');
+    const port = Number(process.argv[2]);
     if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid preview port');
     const { preview } = await import('astro');
     server = await preview({ root, server: { host: previewHost, port }, vite: { preview: { strictPort: true } } });

@@ -7,14 +7,13 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { previewHost } from './preview.mjs';
+import { freePort, previewHost } from './preview.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 process.chdir(root);
 const dist = resolve(root, 'dist');
 const controlsDirectory = 'reports/controls';
 const target = 'desktop-chromium';
-const port = 14322;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -96,8 +95,10 @@ function deleteAsset() {
 
 // TesterArmy only treats the port as occupied when something answers HTTP (200-499) before its own app starts.
 async function occupiedPort() {
+  const port = await freePort();
   const server = createServer((request, response) => response.end('occupied'));
   await new Promise((done, reject) => { server.once('error', reject); server.listen(port, previewHost, done); });
+  process.env.E2E_PREVIEW_PORT = String(port);
   try {
     const result = await e2e('occupied-port', ['--grep', '^/ renders']);
     assert(result.status === 3, `occupied-port: expected e2e exit 3, got ${result.status}`);
@@ -105,7 +106,7 @@ async function occupiedPort() {
     assert(!existsSync(resolve(root, controlsDirectory, 'occupied-port/report.json')), 'occupied-port: a report was written although no test could run');
     await expectValidatorRejects('occupied-port', /ENOENT/);
     return 'exit 3, APP_ALREADY_RUNNING, no report, validator rejects';
-  } finally { await new Promise(done => server.close(done)); }
+  } finally { delete process.env.E2E_PREVIEW_PORT; await new Promise(done => server.close(done)); }
 }
 
 async function filteredRun() {
@@ -149,7 +150,7 @@ try {
   await control('mutated pinned link', pinnedHref, () => expectTestFailure('mutated-href', 'exact pinned essay', /operator-mutated/));
   await control('injected page error', pageError, () => expectTestFailure('page-error', '^/ renders', /negative control page error/));
   await control('deleted local asset', deleteAsset, () => expectTestFailure('deleted-asset', '^/ renders', /404 .*\/_astro\/.+\.css/));
-  await control('occupied port 14322', undefined, occupiedPort);
+  await control('occupied preview port', undefined, occupiedPort);
   await control('passing filtered run', undefined, filteredRun);
   await control('missing report', undefined, missingReport);
 } finally {

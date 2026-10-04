@@ -17,10 +17,19 @@ Before pinning a new dependency, inspect its actual peer requirements. Before co
 1. State the requested behavior as acceptance examples; add or update exact regression assertions for changed behavior.
 2. Implement the change and run verification. Diagnose failures and repair routine reversible problems; rerun affected checks, then the required gate.
 3. Push the branch and open the PR, then run an **independent review**. This is mandatory for every PR, including docs-only, instruction and spike PRs. The reviewer is a separate agent with fresh context, not the implementer reviewing its own diff. Give it the repository-qualified task URL, the exact base and head commit, the acceptance examples and [`REVIEW.md`](REVIEW.md), which is its checklist and output format. It reviews the pushed head; do not edit or mutation-test that tree while it runs. Mutation-test a copy, not the live file.
-4. Fix every blocking finding, push, and re-review the affected code on the new head. A review in another session must be passed explicitly to the implementer; include location, failure and expected behavior. The reviewer returns its verdict in the `REVIEW.md` format; the implementer posts it unedited as a PR comment (one comment per review round), then notes how each finding was resolved. A PR without a PASS verdict on its current head is not done; the `review-verdict` status check turns green only when that comment's marker names the current head.
+4. Fix every blocking finding, push, and re-review the affected code on the new head. A review in another session must be passed explicitly to the implementer; include location, failure and expected behavior. The reviewer returns its verdict in the `REVIEW.md` format; the implementer posts it unedited as a PR comment (one comment per review round), then notes how each finding was resolved. A PR without a PASS verdict on its current head is not done; the `review-verdict` status check turns green only when that comment's marker names the current head. To bring a pushed branch up to date, merge `main` into it; never rebase it, because force-push is blocked.
 5. Return the result, commands, report location and remaining uncertainty. A passing build alone does not establish functioning interactions. When porting tests, map each old assertion to its new form before the first run and flag every downgrade. After `git rm`/`git mv`, commit with explicit paths or check `git diff --cached --stat` so staged deletions do not leak into an unrelated commit. Keep incidental broader findings in a buffer instead of silently expanding scope.
 
 Never weaken assertions, increase retries, skip a failing case or regenerate a visual baseline solely to make verification green. Changes to an acceptance contract require the task's actual intended behavior and an explanation in the review. A successful deterministic gate is evidence of the documented coverage, not by itself permission to merge.
+
+## Work queue
+
+A dispatcher starts one unattended worker per issue labelled `agent-ready`, each in its own git worktree.
+
+- Labels: `agent-ready` means an agent may take the issue; only Florian, or an agent acting on his decision, sets it. `agent-working` means the dispatcher has claimed it; do not take it. `needs-triage` means an agent could not proceed; the issue comment says why and what is needed. `agent-merge` marks an incident after an agent-owned merge.
+- Every queued issue has a `### Done when` section with checkable acceptance examples. Use the "Agent task" issue form, or `gh issue create` with a body that has the `### What` and `### Done when` headings. The dispatcher refuses an `agent-ready` issue without a non-empty Done when and labels it `needs-triage`.
+- A worker works the issue through the implementation, review and merge rules in this file and links its PR with `Closes #<n>`. When blocked it comments on the issue with the exact blocker and relabels it `needs-triage`, removing `agent-working`, instead of waiting.
+- Parallel gate runs are safe: the gate's preview servers use OS-assigned ports, so there are no fixed ports and no lock is needed.
 
 ## Merge and deploy
 

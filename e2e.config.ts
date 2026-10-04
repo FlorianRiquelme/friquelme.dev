@@ -1,8 +1,15 @@
 import type { E2EConfig } from 'e2e';
-import { previewHost } from './scripts/preview.mjs';
+import { freePort, previewHost } from './scripts/preview.mjs';
 import { targets } from './tests/e2e/targets';
 
-const port = 14322;
+// One port per run: use E2E_PREVIEW_PORT when set, else let the OS pick. The choice is written back to the
+// environment so a reload of this config (e.g. in a worker process) agrees with the process that started the app.
+const requested = process.env.E2E_PREVIEW_PORT;
+if (requested !== undefined && !(/^\d+$/.test(requested) && Number(requested) >= 1024 && Number(requested) <= 65535)) {
+  throw new Error(`Invalid E2E_PREVIEW_PORT: ${requested}`);
+}
+const port = requested === undefined ? await freePort() : Number(requested);
+process.env.E2E_PREVIEW_PORT = String(port);
 const app = {
   url: `http://${previewHost}:${port}`,
   environment: 'test' as const,
