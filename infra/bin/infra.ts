@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { StaticSiteStack } from '../lib/static-site-stack';
+import { PreviewStack } from '../lib/preview-stack';
 import { GitHubOidcStack } from '../lib/github-oidc-stack';
 
 const app = new cdk.App();
@@ -14,8 +15,11 @@ const env: cdk.Environment = {
 
 const site = new StaticSiteStack(app, 'PortfolioSiteStack', { env });
 
+const preview = new PreviewStack(app, 'PortfolioPreviewStack', { env });
+
 new GitHubOidcStack(app, 'PortfolioOidcStack', {
   env,
   bucket: site.bucket,
+  previewBucket: preview.bucket,
   distribution: site.distribution,
 });
