@@ -88,6 +88,12 @@ describe('wait-checks', () => {
     expect(Date.now() - start).toBeLessThan(5000);
   });
 
+  it('does not poll again after the deadline, so a late pass is not reported', () => {
+    const r = run([checks(['site', 'pending']), checks(['site', 'pass'], ['infra', 'pass'])], ['7', '--interval-seconds', '30', '--timeout-seconds', '0.2']);
+    expect(r.code).toBe(3);
+    expect(r.log).toHaveLength(1);
+  });
+
   it('exits 2 when gh exits non-zero even with JSON on stdout', () => {
     const r = run([{ status: 8, stdout: checks(['site', 'pending']).stdout, stderr: 'boom\n' }], ['7', ...fast]);
     expect(r.code).toBe(2);

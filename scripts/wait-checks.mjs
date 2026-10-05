@@ -69,8 +69,11 @@ async function main(argv) {
     }
     pending = result.pending;
     if (!pending.length) { console.log(`wait-checks: passed: ${opts.checks.join(', ')}`); return 0; }
-    if (Date.now() >= deadline) break;
-    await sleep(Math.min(opts.interval, (deadline - Date.now()) / 1000));
+    const remaining = (deadline - Date.now()) / 1000;
+    if (remaining <= 0) break;
+    // A poll after the deadline could report a pass that came too late, so the capped sleep ends the wait.
+    if (opts.interval >= remaining) { await sleep(remaining); break; }
+    await sleep(opts.interval);
   }
   console.error(`wait-checks: timeout after ${opts.timeout}s, still pending: ${pending.join(', ')}`);
   return 3;
