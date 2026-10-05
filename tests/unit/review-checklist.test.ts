@@ -26,11 +26,15 @@ describe('REVIEW.md verification checklist', () => {
     expect(honesty).toContain('Both required checks `site` and `infra`');
     expect(honesty).toContain('conclusion `success`');
     expect(honesty).toContain('highest `id`');
+    expect(honesty).toContain('not `gh pr checks`');
+    expect(honesty).toContain('While a check is `queued` or `in_progress`, wait for it (poll) for up to 30 minutes.');
+    expect(honesty).toContain('List the query and its result under `Commands run`, so the verdict shows which SHA CI proved.');
   });
 
   it('names the fallback triggers and the full-gate commands', () => {
     expect(honesty).toContain('Fall back to the full gate, `node scripts/pnpm.mjs verify`');
-    expect(honesty).toContain('`node scripts/pnpm.mjs verify:infra`');
+    expect(honesty).toContain('`node scripts/pnpm.mjs verify:infra` when `infra` is the affected check');
+    expect(honesty).toContain('Report exit codes; a run whose failure is hidden behind `| tail` or `echo $?` does not count.');
     for (const trigger of ['missing, red or cancelled', 'different `head_sha`', 'not complete after 30 minutes']) {
       expect(honesty, trigger).toContain(trigger);
     }
@@ -47,6 +51,7 @@ describe('REVIEW.md verification checklist', () => {
   });
 
   it('wraps mutation runs in timeout and records exit 124 as timeout', () => {
+    expect(testing).toContain('A timed-out mutation proves nothing: rerun it or name the test as unproven.');
     expect(testing).toContain('`timeout 300 node scripts/pnpm.mjs exec vitest run <file>`');
     expect(testing).toContain('Exit 124 is recorded as `timeout` in the table, not as red.');
   });
