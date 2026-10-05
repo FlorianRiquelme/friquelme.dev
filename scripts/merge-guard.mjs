@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { evaluate, TRUSTED_ASSOCIATIONS } from './review-verdict.mjs';
+import { evaluate, publicKeyFromPem, TRUSTED_ASSOCIATIONS } from './review-verdict.mjs';
 
 // Merges a PR only when both local gates passed on its current head in a clean tree and the head has
 // a PASS review verdict. Run it from the worktree that ran `verify` and `verify:infra`.
@@ -42,6 +42,18 @@ function gh(args) {
   return result.stdout;
 }
 
+// The key comes from the PR's base branch on GitHub, never from the worktree, so a PR cannot drop or swap it.
+// A 404 means signing is not activated; any other failure is a refusal.
+function baseKey(ref) {
+  const path = `repos/{owner}/{repo}/contents/.github/review-verdict-key.pub?ref=${encodeURIComponent(ref)}`;
+  const result = spawnSync('gh', ['api', '-H', 'Accept: application/vnd.github.raw', path], { encoding: 'utf8' });
+  if (result.error) throw new Error(`gh api ${path}: ${result.error.message}`);
+  if (result.status === 0) return publicKeyFromPem(result.stdout, `${ref}:.github/review-verdict-key.pub`);
+  // A missing ref also answers 404 but with "No commit found for the ref", which stays a refusal.
+  if (/Not Found \(HTTP 404\)/.test(result.stderr)) return null;
+  throw new Error(`gh api ${path} exited ${result.status}: ${result.stderr.trim()}`);
+}
+
 function main(argv) {
   if (argv.length !== 1 || !/^[1-9]\d*$/.test(argv[0])) {
     console.error('usage: node scripts/merge-guard.mjs <pr-number>');
@@ -66,7 +78,8 @@ function main(argv) {
     }
     // --slurp wraps the pages in one outer array, so every page's comments are evaluated together.
     const pages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/issues/${pr}/comments`]));
-    const verdict = evaluate({ headSha, comments: pages.flat() });
+    const { user, base } = JSON.parse(gh(['api', `repos/{owner}/{repo}/pulls/${pr}`]));
+    const verdict = evaluate({ headSha, comments: pages.flat(), publicKey: baseKey(base.ref), repo: base.repo.full_name, pr, prAuthor: user?.login });
     if (verdict.state !== 'success') failures.push(`review verdict: ${verdict.description}`);
     const reviewPages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/pulls/${pr}/comments`]));
     failures.push(...unansweredBotThreads(reviewPages.flat()));

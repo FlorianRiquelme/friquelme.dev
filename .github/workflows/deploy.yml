@@ -135,7 +135,7 @@ jobs:
             echo "$fence"
             echo "Only the commit of this run is reverted. If the range above lists more than one commit, check whether an earlier one caused the failure."
             echo
-            echo "A revert PR is opened by this run with GITHUB_TOKEN, so CI does not start on it. Close and reopen it, or push to it, with a user token to start the \`site\`, \`infra\` and \`review-verdict\` checks."
+            echo "A revert PR is opened by this run with GITHUB_TOKEN, so CI does not start on it. Close and reopen it, or push to it, with a user token to start the \`site\`, \`infra\` and \`review-verdict\` (or \`review-verdict-signed\` once signing is activated) checks."
           } > "$RUNNER_TEMP/incident.md"
           if ! gh label list --search agent-merge --json name --jq '.[].name' | grep -qx agent-merge; then
             gh label create agent-merge --color B60205 --description "Incident from an agent-merged change"

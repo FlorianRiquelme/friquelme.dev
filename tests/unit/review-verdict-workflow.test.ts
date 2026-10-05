@@ -30,7 +30,7 @@ describe('review-verdict workflow', () => {
   it('runs only for PRs, checks out the base without credentials and passes the PR number through env', () => {
     expect(Object.keys(workflow.jobs)).toEqual(['verdict']);
     const job = workflow.jobs.verdict;
-    expect(job.if).toBe("github.event_name == 'pull_request_target' || github.event.issue.pull_request");
+    expect(job.if).toBe("(github.event_name == 'pull_request_target' && github.event.pull_request.base.ref == github.event.repository.default_branch) || github.event.issue.pull_request");
     expect(job.permissions).toBeUndefined();
     expect(job.steps).toEqual([
       { uses: 'actions/checkout@v7', with: { 'persist-credentials': false } },
