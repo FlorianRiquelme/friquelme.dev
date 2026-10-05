@@ -19,7 +19,9 @@ describe('REVIEW.md verification checklist', () => {
 
   it('requires green site and infra check runs for the exact head SHA', () => {
     expect(honesty).toContain('gh api repos/FlorianRiquelme/friquelme.dev/commits/<sha>/check-runs');
-    expect(honesty).toContain('select(.name == "site" or .name == "infra")');
+    expect(honesty).toContain(
+      `--jq '.check_runs[] | select(.name == "site" or .name == "infra") | [.id, .name, .status, .conclusion, .head_sha] | @tsv'`,
+    );
     expect(honesty).toContain('`head_sha` equal to the 40-character head SHA');
     expect(honesty).toContain('Both required checks `site` and `infra`');
     expect(honesty).toContain('conclusion `success`');
