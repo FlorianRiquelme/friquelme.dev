@@ -66,7 +66,7 @@ Tailwind CSS 4 with a custom dark theme. Tokens are declared in `@theme` blocks 
 
 ## Dependencies
 
-Dependabot opens grouped PRs weekly. Nothing merges automatically: a daily Orca automation running the `omp` agent reviews each PR against `.github/automation/dependabot-review.md`, verifies it locally, and merges only what passes. A ruleset on `main` requires the `site`, `infra` and `review-verdict` checks and blocks force pushes, so a red or unreviewed PR cannot be merged by anyone. The automation is the reviewer for Dependabot PRs: it posts a verdict marker for the head it verified before merging.
+Dependabot opens grouped PRs weekly. Nothing merges automatically: a daily Orca automation running the `omp` agent reviews each PR against `.github/automation/dependabot-review.md`, verifies it locally, and merges only what passes. A ruleset on `main` requires the `site`, `infra` and `review-verdict` checks (`review-verdict-signed` instead of `review-verdict` once signing is activated) and blocks force pushes, so a red or unreviewed PR cannot be merged by anyone. The automation is the reviewer for Dependabot PRs: it posts a verdict marker for the head it verified before merging.
 
 Do not merge Dependabot PRs by hand and do not add GitHub-native auto-merge. Merges to `main` deploy to production, so every merge is a release. When you change the review prompt, push the file and also update the automation's stored copy with `orca automations edit <id> --prompt "$(cat .github/automation/dependabot-review.md)"`.
 
