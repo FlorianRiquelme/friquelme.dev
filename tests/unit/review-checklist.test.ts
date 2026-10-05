@@ -40,6 +40,7 @@ describe('REVIEW.md verification checklist', () => {
   it('requires targeted tests and mutations for every Done-when item plus the reviewer\'s own cases', () => {
     expect(testing).toContain('for every "Done when" item');
     expect(testing).toContain('cases you think are missing and the worker did not list');
+    expect(honesty).toContain('Run the test files that cover the "Done when" items (`node scripts/pnpm.mjs exec vitest run <files>`');
   });
 
   it('wraps mutation runs in timeout and records exit 124 as timeout', () => {
