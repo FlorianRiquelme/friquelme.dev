@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { evaluate } from './review-verdict.mjs';
+import { evaluate, TRUSTED_ASSOCIATIONS } from './review-verdict.mjs';
 
 // Merges a PR only when both local gates passed on its current head in a clean tree and the head has
 // a PASS review verdict. Run it from the worktree that ran `verify` and `verify:infra`.
@@ -20,6 +20,19 @@ function checkSummary(file, text, headSha) {
     if (git[key] !== true) failures.push(`${file}: git.${key} is ${JSON.stringify(git[key])}, not true`);
   }
   return failures;
+}
+
+const isBot = user => user?.type === 'Bot' || String(user?.login ?? '').endsWith('[bot]');
+
+// Every inline review thread a bot started needs a written reply from a trusted human. The reply's
+// content is not judged; GitHub points every reply's in_reply_to_id at the thread's root.
+function unansweredBotThreads(comments) {
+  const answered = new Set(comments
+    .filter(c => c.in_reply_to_id != null && !isBot(c.user) && TRUSTED_ASSOCIATIONS.includes(c.author_association))
+    .map(c => c.in_reply_to_id));
+  return comments
+    .filter(c => c.in_reply_to_id == null && isBot(c.user) && !answered.has(c.id))
+    .map(c => `unanswered bot review comment from ${c.user.login} on ${c.path}: ${c.html_url}`);
 }
 
 function gh(args) {
@@ -55,6 +68,8 @@ function main(argv) {
     const pages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/issues/${pr}/comments`]));
     const verdict = evaluate({ headSha, comments: pages.flat() });
     if (verdict.state !== 'success') failures.push(`review verdict: ${verdict.description}`);
+    const reviewPages = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/{owner}/{repo}/pulls/${pr}/comments`]));
+    failures.push(...unansweredBotThreads(reviewPages.flat()));
     if (failures.length) return refuse(failures);
     const merge = spawnSync('gh', ['pr', 'merge', pr, '--squash', '--match-head-commit', headSha], { stdio: 'inherit' });
     if (merge.error) throw merge.error;
