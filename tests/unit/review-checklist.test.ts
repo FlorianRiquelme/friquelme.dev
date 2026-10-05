@@ -21,6 +21,7 @@ describe('REVIEW.md verification checklist', () => {
     expect(honesty).toContain('gh api repos/FlorianRiquelme/friquelme.dev/commits/<sha>/check-runs');
     expect(honesty).toContain('select(.name == "site" or .name == "infra")');
     expect(honesty).toContain('`head_sha` equal to the 40-character head SHA');
+    expect(honesty).toContain('Both required checks `site` and `infra`');
     expect(honesty).toContain('conclusion `success`');
     expect(honesty).toContain('highest `id`');
   });
