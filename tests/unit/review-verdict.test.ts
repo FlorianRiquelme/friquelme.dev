@@ -7,7 +7,7 @@ import { createServer, type IncomingMessage, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { evaluate, loadPublicKey, parseVerdict, signedPayload, SIGNED_STATUS_CONTEXT, STATUS_CONTEXT } from '../../scripts/review-verdict.mjs';
+import { evaluate, loadPublicKey, summaryLine, warningCommand, parseVerdict, signedPayload, SIGNED_STATUS_CONTEXT, STATUS_CONTEXT } from '../../scripts/review-verdict.mjs';
 
 const HEAD = 'a'.repeat(20) + 'b'.repeat(20);
 const OLD = 'c'.repeat(40);
@@ -181,6 +181,27 @@ function signedBody(verdict: string, sha: string, signature = sign64({ verdict, 
   return [a, b, c, `<!-- review-verdict-signature: ${signature} -->`, ...rest].join('\n');
 }
 const ctx = { publicKey: keys.publicKey, repo: REPO, pr: 1, prAuthor: 'FlorianRiquelme' };
+
+describe('evaluate bot filter', () => {
+  it('ignores a PASS marker from a Bot-type user even with a trusted association', () => {
+    const result = evaluate({ headSha: HEAD, comments: [comment({ user: { login: 'x[bot]', type: 'Bot' } })] });
+    expect(result.state).toBe('failure');
+    expect(result.description).toBe('No PASS verdict for head ' + HEAD.slice(0, 7));
+  });
+});
+
+describe('warningCommand and summaryLine', () => {
+  const failure = { state: 'failure', description: 'No PASS verdict for head abc1234' };
+  it('warns when the state is not success', () => {
+    expect(warningCommand(failure)).toBe('::warning title=review-verdict::No PASS verdict for head abc1234');
+  });
+  it('returns nothing on success', () => {
+    expect(warningCommand({ state: 'success', description: 'PASS for abc1234 by x' })).toBeNull();
+  });
+  it('names state, short sha and description in the summary', () => {
+    expect(summaryLine(failure, HEAD)).toBe(`review-verdict: failure for ${HEAD.slice(0, 7)} (No PASS verdict for head abc1234)\n`);
+  });
+});
 
 describe('signedPayload', () => {
   it('has the contract format', () => {
