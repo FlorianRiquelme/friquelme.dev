@@ -23,7 +23,9 @@ describe('REVIEW.md verification checklist', () => {
       `--jq '.check_runs[] | select(.name == "site" or .name == "infra") | [.id, .name, .status, .conclusion, .head_sha] | @tsv'`,
     );
     expect(honesty).toContain('`head_sha` equal to the 40-character head SHA');
-    expect(honesty).toContain('Both required checks `site` and `infra`');
+    expect(honesty).toContain(
+      'Both required checks `site` and `infra` (jobs in `.github/workflows/ci.yml`) must have completed with conclusion `success` and a `head_sha` equal to the 40-character head SHA you were given.',
+    );
     expect(honesty).toContain('conclusion `success`');
     expect(honesty).toContain('highest `id`');
     expect(honesty).toContain('not `gh pr checks`');
