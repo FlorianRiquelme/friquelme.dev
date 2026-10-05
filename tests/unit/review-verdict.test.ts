@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { generateKeyPairSync, sign, verify } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createServer, type IncomingMessage, type Server } from 'node:http';
@@ -419,6 +419,48 @@ describe('CLI', () => {
       context: STATUS_CONTEXT,
       description: `No PASS verdict for head ${HEAD.slice(0, 7)}`,
       target_url: pull.html_url,
+    });
+  });
+
+  describe('non-success warning and step summary', () => {
+    const sha7 = HEAD.slice(0, 7);
+    const env = (api: string, extra: Record<string, string> = {}) => ({ GITHUB_TOKEN: 'tok', GITHUB_REPOSITORY: 'o/r', PR_NUMBER: '1', GITHUB_API_URL: api, ...extra });
+    const stubComments = (comments: unknown[]) => stub((_req, url) => {
+      if (url === '/repos/o/r/pulls/1') return { status: 200, json: pull };
+      if (url.startsWith('/repos/o/r/issues/1/comments')) return { status: 200, json: comments };
+      return { status: 201, json: {} };
+    });
+    const summaryDir = () => mkdtempSync(join(tmpdir(), 'rv-summary-'));
+
+    it('prints the warning and appends the summary on failure, exiting 0', async () => {
+      const { api } = await stubComments([]);
+      const dir = summaryDir();
+      const file = join(dir, 'summary.md');
+      const result = await run(env(api, { GITHUB_STEP_SUMMARY: file }));
+      expect(result.code).toBe(0);
+      expect(result.stdout).toBe(
+        `review-verdict: failure on ${HEAD} (No PASS verdict for head ${sha7})\n::warning title=review-verdict::No PASS verdict for head ${sha7}\n`,
+      );
+      expect(readFileSync(file, 'utf8')).toBe(`review-verdict: failure for ${sha7} (No PASS verdict for head ${sha7})\n`);
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('writes no summary on success', async () => {
+      const { api } = await stubComments([comment()]);
+      const dir = summaryDir();
+      const file = join(dir, 'summary.md');
+      const result = await run(env(api, { GITHUB_STEP_SUMMARY: file }));
+      expect(result.code).toBe(0);
+      expect(result.stdout).not.toContain('::warning');
+      expect(existsSync(file)).toBe(false);
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('still warns and exits 0 on failure when GITHUB_STEP_SUMMARY is unset', async () => {
+      const { api } = await stubComments([]);
+      const result = await run(env(api));
+      expect(result.code).toBe(0);
+      expect(result.stdout).toContain(`::warning title=review-verdict::No PASS verdict for head ${sha7}\n`);
     });
   });
 
