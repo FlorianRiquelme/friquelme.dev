@@ -5,6 +5,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { parseArgs } from '../../scripts/wait-checks.mjs';
+
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const script = join(root, 'scripts/wait-checks.mjs');
 
@@ -63,7 +65,7 @@ describe('wait-checks', () => {
   it('treats a cancelled required check as failure', () => {
     const r = run([checks(['site', 'cancel'], ['infra', 'pass'])], ['7', ...fast]);
     expect(r.code).toBe(1);
-    expect(r.out).toContain('site');
+    expect(r.out).toContain('site (CANCEL)');
   });
 
   it('exits 3 naming infra when it never appears before the timeout', () => {
@@ -71,6 +73,24 @@ describe('wait-checks', () => {
     expect(r.code).toBe(3);
     expect(r.out).toContain('still pending: infra');
     expect(r.out).not.toContain('site');
+  });
+
+  it('honours --interval-seconds: polls repeatedly within the timeout', () => {
+    const r = run([checks(['site', 'pending'])], ['7', '--interval-seconds', '0.01', '--timeout-seconds', '0.8']);
+    expect(r.code).toBe(3);
+    expect(r.log.length).toBeGreaterThan(3);
+  });
+
+  it('never sleeps past the deadline when the interval exceeds the timeout', () => {
+    const start = Date.now();
+    const r = run([checks(['site', 'pending'])], ['7', '--interval-seconds', '30', '--timeout-seconds', '0.2']);
+    expect(r.code).toBe(3);
+    expect(Date.now() - start).toBeLessThan(5000);
+  });
+
+  it('exits 2 when gh exits non-zero even with JSON on stdout', () => {
+    const r = run([{ status: 8, stdout: checks(['site', 'pending']).stdout, stderr: 'boom\n' }], ['7', ...fast]);
+    expect(r.code).toBe(2);
   });
 
   it('exits 3 on a timeout while only the empty state is reported', () => {
@@ -108,11 +128,17 @@ describe('wait-checks', () => {
     expect(r.code).toBe(2);
   });
 
-  it.each([[[]], [['abc']], [['7', '--checks']], [['7', '--timeout-seconds', 'x']], [['7', '--bogus']]])('exits 2 on usage error %j', args => {
+  it.each([[[]], [['abc']], [['7', '--checks']], [['7', '--timeout-seconds', 'x']], [['7', '--bogus']], [['7', '--checks', ',']], [['7', '--checks', '']], [['7', '--timeout-seconds', '-1']], [['7', '--interval-seconds', '-1']]])('exits 2 on usage error %j', args => {
     dir = mkdtempSync(join(tmpdir(), 'wait-checks-'));
     const result = spawnSync('node', [script, ...(args as string[])], { encoding: 'utf8' });
     expect(result.status).toBe(2);
     expect(result.stderr).toContain('usage:');
+  });
+});
+
+describe('parseArgs', () => {
+  it('defaults to site and infra, 1800 s timeout and 15 s interval', () => {
+    expect(parseArgs(['7'])).toEqual({ pr: '7', checks: ['site', 'infra'], timeout: 1800, interval: 15 });
   });
 });
 

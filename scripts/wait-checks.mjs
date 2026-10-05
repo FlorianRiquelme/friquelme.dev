@@ -53,15 +53,10 @@ async function main(argv) {
     const run = spawnSync('gh', ['pr', 'checks', opts.pr, '--json', 'name,state,bucket'], { encoding: 'utf8' });
     let checks = [];
     if (run.error || (run.status !== 0 && !/no checks reported/i.test(run.stderr))) {
-      // gh exits non-zero while checks are still pending; real output then still parses as JSON.
-      let parsed = null;
-      try { parsed = JSON.parse(run.stdout); } catch { /* not JSON */ }
-      if (!Array.isArray(parsed)) {
-        console.error(`wait-checks: gh failed: ${run.error?.message ?? run.stderr.trim()}`);
-        return 2;
-      }
-      checks = parsed;
-    } else if (run.status === 0) {
+      console.error(`wait-checks: gh failed: ${run.error?.message ?? run.stderr.trim()}`);
+      return 2;
+    }
+    if (run.status === 0) {
       try { checks = JSON.parse(run.stdout); } catch {
         console.error(`wait-checks: gh returned invalid JSON: ${run.stdout.slice(0, 200)}`);
         return 2;
@@ -75,7 +70,7 @@ async function main(argv) {
     pending = result.pending;
     if (!pending.length) { console.log(`wait-checks: passed: ${opts.checks.join(', ')}`); return 0; }
     if (Date.now() >= deadline) break;
-    await sleep(opts.interval);
+    await sleep(Math.min(opts.interval, (deadline - Date.now()) / 1000));
   }
   console.error(`wait-checks: timeout after ${opts.timeout}s, still pending: ${pending.join(', ')}`);
   return 3;
