@@ -12,7 +12,7 @@ const GH_TOKEN = "${{ secrets.GITHUB_TOKEN }}";
 
 describe("deploy workflow", () => {
   it("triggers on main pushes and manual dispatch with the permissions rollback needs", () => {
-    expect(workflow.on).toEqual({"push":{"branches":["main"]},"workflow_dispatch":null});
+    expect(workflow.on).toEqual({"push":{"branches":["main"],"paths-ignore":["tests/**","*.md","trials/**",".github/automation/**",".github/ISSUE_TEMPLATE/**"]},"workflow_dispatch":null});
     expect(workflow.permissions).toEqual({"id-token":"write","contents":"write","pull-requests":"write","issues":"write","actions":"read"});
     expect(workflow.concurrency).toEqual({"group":"deploy-production","cancel-in-progress":false});
   });

@@ -3,6 +3,12 @@ name: Deploy to AWS
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'tests/**'
+      - '*.md'
+      - 'trials/**'
+      - '.github/automation/**'
+      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
 
 permissions:
