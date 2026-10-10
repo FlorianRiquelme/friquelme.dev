@@ -61,6 +61,16 @@ describe('all built pages', () => {
         expect(themeColors[0].getAttribute('content')?.toLowerCase()).toBe(bgPageColor);
         for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
           expect(() => JSON.parse(script.textContent ?? '')).not.toThrow();
+          // One entity, one name: every node with the shared Person @id names it identically.
+          JSON.parse(script.textContent!, (_key, value) => {
+            if (value?.['@id'] === `${siteOrigin}/#person` && 'name' in value) expect(value.name, `${route} #person name`).toBe('Florian Riquelme');
+            return value;
+          });
+        }
+        // WCAG 2.5.3 label in name: a link or button's aria-label must contain its visible text.
+        for (const element of document.querySelectorAll('a[aria-label], button[aria-label], [role="link"][aria-label], [role="button"][aria-label]')) {
+          const visible = (element.textContent ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
+          if (visible) expect(element.getAttribute('aria-label')!.toLowerCase(), `${route} label in name`).toContain(visible);
         }
         const targets = document.querySelectorAll('a[href], img[src], script[src], link[rel="stylesheet"], link[rel="icon"], link[rel="preload"]');
         expect(targets.length).toBeGreaterThan(0);

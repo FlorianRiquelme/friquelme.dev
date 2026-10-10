@@ -10,7 +10,7 @@ describe('getSeoMeta', () => {
     description: 'A first post.',
     slug: 'hello-world',
     datePublished: new Date('2026-01-15T00:00:00Z'),
-    author: 'Florian Riquelme',
+    author: 'florian riquelme',
     tags: ['astro', 'typescript'],
   };
 
