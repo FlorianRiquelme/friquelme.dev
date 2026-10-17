@@ -1,67 +1,112 @@
 ---
-title: "screengrab 1.0"
-description: "a macos menu bar app that gets a screenshot to a coding agent in three keystrokes. why it copies a path, why it saves at 1x, and what else is in it."
+title: "screengrab: screenshot to agent in three keystrokes"
+description: "screengrab is a macos menu bar app that puts a screenshot's file path on your clipboard, so claude code, codex or any other agent can read it. why it exists, how it works, and the choices behind it."
 pubDate: 2026-10-17
 author: "florian riquelme"
-tags: ["macos", "swift", "tooling", "screengrab"]
+tags: ["tooling", "macos", "swift", "claude-code", "screengrab"]
 ---
 
-import { Picture } from 'astro:assets';
 import Callout from '../components/blog/Callout.astro';
-import preview from '../assets/images/blog/screengrab-preview.png';
+import demo from '../assets/videos/screengrab-demo.mp4';
 
 <Callout>
-**tldr:** [screengrab](https://github.com/FlorianRiquelme/screengrab) is a macos menu bar app for showing a coding agent what you see. Cmd+Shift+2, drag, Cmd+C, paste. The agent gets a file path, not an image blob. Version 1.0 is out today: `brew install --cask FlorianRiquelme/tap/screengrab`.
+**tldr:** [screengrab](https://github.com/FlorianRiquelme/screengrab) is a macOS menu bar app for one loop: Cmd+Shift+2, drag, Cmd+C, and the screenshot's file path is on your clipboard. Cmd+V in the terminal and your agent reads the image. v1.0.0 is out today: `brew install --cask FlorianRiquelme/tap/screengrab`.
 </Callout>
 
-## the loop i kept repeating
+<video src={demo} width="1200" height="675" autoplay muted loop playsinline controls preload="metadata" aria-label="Press Cmd+Shift+2, drag, press Cmd+C, paste the path into an agent" class="my-4 h-auto w-full rounded border border-border-primary"></video>
 
-Work with Claude Code or Codex often has a visual step in it. A layout is off by a few pixels, an error dialog shows up, a page renders differently than the test says it should. The fastest way to explain that to an agent is to show it.
+## the clunky part
 
-The built-in macOS flow for that has too many steps. Take a screenshot, find it on the desktop, drag it into the terminal, clean up the desktop later. Screengrab cuts it down to three keystrokes.
+Most of my work happens in a terminal, talking to coding agents. And a lot of what I need to tell them is visual: this button is misaligned, this error dialog says something odd, this is what the page looks like after your change.
 
-## three keystrokes
+The agents can read images. Getting the image to them is the clunky part. The macOS screenshot lands on the desktop with a long name. You find it, drag it into the terminal or copy its path by hand, and then remember to clean up the desktop later. Do that twenty times while iterating on a UI and it adds up to real friction, for something that should take a second.
 
-1. **Cmd+Shift+2**, then drag over what you want to show. Press Space to pick a window instead.
-2. **Cmd+C** in the preview. The screenshot is saved to `~/Library/Caches/Screengrab/`, its path is on the clipboard, and the preview closes.
-3. **Cmd+V** in the terminal. The agent reads the image from that path.
+What an agent like Claude Code or Codex actually needs is a path. Give it a file path to a PNG and it reads the image. So the shortest version of the loop is: select an area, get a path on the clipboard, paste.
 
-That loop is the whole app most days. **Cmd+Shift+1** repeats the last capture without selecting again, which is what I use when I iterate on a UI and show the agent each attempt.
+That is screengrab.
 
-## why a path, and why 1x
+## the core loop
 
-Agents in a terminal read files. A path pastes into any prompt, survives a copy into another session, and does not depend on how a given terminal handles pasted images. So the default copy is the path, and **Shift+Cmd+C** copies the image itself for the places that want one.
+1. Press **Cmd+Shift+2** and drag over what you want to show.
+2. Press **Cmd+C**. The preview closes and the screenshot's file path is on your clipboard.
+3. Press **Cmd+V** in your terminal. The agent reads the image from that path.
 
-Copy Path saves at 1x. A Retina capture at 2x costs an agent about four times the image tokens and shows no text it could not read at 1x. Hold **Option** while copying when you do need full resolution.
+Cmd+Shift+2 dims every screen. You drag on any of them, or press **Space** and click a window instead. The screenshot opens in a preview panel, and Cmd+C saves it to `~/Library/Caches/Screengrab/`, copies the path and closes the panel. Esc throws it away.
 
-## the rest is there for the days you need it
+**Cmd+Shift+1** captures the same area or window again without selecting. When you iterate on a UI with an agent, you look at the same region over and over: change, capture, paste, change, capture, paste. Repeating the last capture removes the drag from that loop.
 
-<Picture
-  src={preview}
-  formats={['avif', 'webp']}
-  widths={[600, 900, 1200]}
-  sizes="(max-width: 768px) 100vw, 900px"
-  alt="screengrab preview of a demo deployment dashboard: a red arrow points at a 401 build error, a red box marks a latency spike, and an api key is pixelated. below are the drag, arrow, box and blur tools and the copy path, copy image, copy text and save buttons."
-  loading="lazy"
-  decoding="async"
-  class="my-4 rounded border border-border-primary"
-/>
-
-- **Markup and blur.** Arrow, box and blur draw on the screenshot before you copy it. Blur pixelates into large blocks, so the hidden text is gone from the file, not just covered.
-- **Copy Text.** Cmd+T runs on-device text recognition and copies the text.
-- **Scrolling capture.** Cmd+Shift+8, drag over the content, scroll. Screengrab stitches the page and shows sticky headers once.
-- **Screen recording.** Cmd+Shift+7 records a display or an area, with an optional camera bubble and microphone.
-
-Everything runs on your Mac.
+That is the whole app most days.
 
 ## install
-
-Screengrab needs macOS 26 (Tahoe) or later. The release is a universal binary for Apple silicon and Intel.
 
 ```
 brew install --cask FlorianRiquelme/tap/screengrab
 ```
 
-The app is not notarized, because that needs a paid Apple developer account. The cask removes the quarantine flag after install. The [README](https://github.com/FlorianRiquelme/screengrab) covers the zip install, permissions and building from source.
+Then open it once from `/Applications` (or `open -a Screengrab`). It has no Dock icon and lives in the menu bar. The first Cmd+Shift+2 triggers the macOS Screen Recording permission prompt; grant it in System Settings. If captures still fail after that, quit screengrab from the menu bar and open it again. **Launch at Login** is in the menu.
 
-*screengrab is MIT licensed. Issues and pull requests are welcome on [GitHub](https://github.com/FlorianRiquelme/screengrab).*
+It needs macOS 26 (Tahoe) or later. The release is a universal binary for Apple silicon and Intel.
+
+The app is not notarized, because that needs a paid Apple developer account. The cask removes the quarantine flag after install, so macOS opens it without complaint. If you grab the zip from [Releases](https://github.com/FlorianRiquelme/screengrab/releases) instead, run this once:
+
+```
+xattr -dr com.apple.quarantine /Applications/Screengrab.app
+```
+
+## a few design choices
+
+### a path, not an image
+
+The default copy is the file path, not the image data. A path is plain text. Every terminal can paste it, every agent that can read files can open it, and it doesn't depend on how a particular terminal or CLI handles images on the clipboard. When you do want the pixels, **Shift+Cmd+C** copies the PNG itself.
+
+### 1x by default
+
+Copy Path saves at 1x, even on a Retina display. A 2x capture costs an agent about four times the image tokens and shows no text it couldn't read at 1x. If you need the full resolution, hold **Option** while copying. Option flips the other way for Copy Image: that one keeps full resolution unless you hold Option.
+
+It's a small default, but it runs on every single capture. Defaults that run that often should be tuned for the common case, and the common case here is an agent reading a UI, not a designer inspecting pixels.
+
+### blur that actually removes the text
+
+Screenshots of real work contain things you don't want to paste anywhere: tokens, customer names, internal URLs. The preview has three markup tools: **Arrow** (A), **Box** (R) and **Blur** (B). Blur pixelates the area into large blocks, so the hidden text is gone from the file itself, not just softened on top. Every copy, save and drag gives you the marked-up image.
+
+### the keyboard stays in charge
+
+Everything in the main loop has a key: the capture, the copy, the markup tools, undo and redo, Esc to step back. The shortcuts stay clear of the macOS defaults on 3, 4 and 5. They are defined in one table in `Sources/Screengrab/HotKeys.swift`, and both the menu and the hotkey registration read from it. If you want different keys, that's the one place to change.
+
+### screengrab stays out of its own screenshots
+
+Captures go through ScreenCaptureKit, and screengrab excludes its own windows from area captures, so the dimming overlay and the preview never end up in the image. Window captures keep the window shadow and crop to the visible pixels, so they look like the window you clicked and not like a rectangle cut out of your desktop.
+
+Everything runs on your Mac. There's no account and no upload.
+
+## when you need more
+
+The loop is the point. The rest is there for the days you need it:
+
+- **Copy Text** (Cmd+T) runs on-device text recognition and copies the text. Useful when the agent needs an error message verbatim, not a picture of it.
+- **Scrolling capture** (Cmd+Shift+8): drag over an area, scroll the app underneath from top to bottom, and screengrab stitches one tall image while you scroll. Toolbars and sticky headers that stay in place appear once. Frames that scroll up or don't match confidently are ignored, so a sloppy scroll doesn't corrupt the result.
+- **Screen recording** (Cmd+Shift+7): a whole display or an area, with a camera bubble and a microphone of your choice. The camera bubble and click ripples end up in the video; the control bar and the area outline don't. Recordings go to `~/Movies/Screengrab/`, and **Copy** puts the file on the pasteboard, ready for a chat or an email.
+- **Save** (Cmd+S) and drag-and-drop out of the preview for everything else.
+
+## how it's built
+
+screengrab is a native Swift app, about 3,000 lines of Swift in one package, with a test suite for the parts that are easy to get subtly wrong: the stitcher, cropping, markup and the movie writer. ScreenCaptureKit does the capturing, Vision does the text recognition, and the global shortcuts go through Carbon hotkeys.
+
+Like everything I build these days, I built it AI-first: I steered coding agents through the implementation and spent my own time on the loop, the defaults and reviewing what came out. Even the demo video in the repo is generated: it's an HTML composition rendered with [HyperFrames](https://github.com/heygen-com/hyperframes).
+
+If you want to build it yourself, you need macOS 26 and Swift 6.2. `scripts/setup-signing.sh` once creates a local signing identity so macOS keeps the privacy permissions across rebuilds, then `scripts/build.sh` builds, signs and installs it.
+
+## the trade-offs
+
+Being honest about the edges:
+
+- **macOS 26 only.** No Tahoe, no screengrab.
+- **Not notarized.** The Homebrew cask handles the quarantine flag; the zip needs the `xattr` line above.
+- **Shortcuts are set in code.** There is no preferences window for them. If Cmd+Shift+2 collides with something you use, you change `HotKeys.swift` and build from source.
+- **The cache is yours to manage.** Copied screenshots stay in `~/Library/Caches/Screengrab/`, which is exactly what makes the pasted path keep working later in a session.
+
+screengrab does one thing quickly and gets out of the way. Most days, that's three keystrokes.
+
+---
+
+*repo at [github.com/FlorianRiquelme/screengrab](https://github.com/FlorianRiquelme/screengrab), MIT licensed. shortcuts, permissions and build steps are all in the README. if it saves you a few drags a day, a star helps other people find it.*

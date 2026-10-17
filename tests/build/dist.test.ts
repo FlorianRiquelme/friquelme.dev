@@ -164,6 +164,16 @@ describe('astro build output', () => {
     });
   });
 
+  describe('screengrab post', () => {
+    it('embeds the demo as a self-hosted video', () => {
+      const html = readFileSync(resolve(DIST, 'blog/screengrab-1-0/index.html'), 'utf-8');
+      const src = html.match(/<video src="(\/_astro\/screengrab-demo\.[^"]+\.mp4)"/)?.[1];
+      expect(src).toBeDefined();
+      expect(existsSync(resolve(DIST, src!.slice(1)))).toBe(true);
+      expect(html).not.toContain('raw.githubusercontent.com');
+    });
+  });
+
   describe('MDX rendering', () => {
     it('preserves reading time, heading links, code highlighting, and Astro components', async () => {
       const window = new Window();
