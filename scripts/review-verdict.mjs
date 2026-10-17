@@ -1,5 +1,5 @@
 import { createPublicKey, verify } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { appendFileSync, readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 
@@ -58,6 +58,7 @@ export function evaluate({ headSha, comments, publicKey = null, repo, pr, prAuth
   const sha7 = headSha.slice(0, 7);
   const signed = Boolean(publicKey) && prAuthor !== DEPENDABOT;
   const matching = comments
+    .filter(comment => comment.user?.type !== 'Bot')
     .filter(comment => TRUSTED_ASSOCIATIONS.includes(comment.author_association))
     .map(comment => ({ comment, parsed: parseVerdict(comment.body) }))
     .filter(({ parsed }) => parsed && parsed.sha === headSha)
@@ -74,6 +75,11 @@ export function evaluate({ headSha, comments, publicKey = null, repo, pr, prAuth
   }
   return { state: 'failure', description: limit(`Latest verdict for ${sha7} is FAIL`), targetUrl: comment.html_url };
 }
+
+// A non-success state must not look like a passed review: the job stays green, so it says so.
+export const warningCommand = ({ state, description }) => (state === 'success' ? null : `::warning title=${STATUS_CONTEXT}::${description}`);
+
+export const summaryLine = ({ state, description }, headSha) => `review-verdict: ${state} for ${headSha.slice(0, 7)} (${description})\n`;
 
 async function main() {
   const { GITHUB_TOKEN: token, GITHUB_REPOSITORY: repo, PR_NUMBER: pr } = process.env;
@@ -117,6 +123,12 @@ async function main() {
     const { state, description, targetUrl } = evaluate({ headSha, comments, publicKey, repo, pr, prAuthor: pull.user?.login });
     await post(publicKey ? SIGNED_STATUS_CONTEXT : STATUS_CONTEXT, state, description, targetUrl);
     console.log(`review-verdict: ${state} on ${headSha} (${description})`);
+    const result = { state, description };
+    const warning = warningCommand(result);
+    if (warning) {
+      console.log(warning);
+      if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summaryLine(result, headSha));
+    }
     return 0;
   } catch (error) {
     console.error(`review-verdict: ${error.message}`);

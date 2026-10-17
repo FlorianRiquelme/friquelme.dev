@@ -16,7 +16,14 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verdict:
-    if: (github.event_name == 'pull_request_target' && github.event.pull_request.base.ref == github.event.repository.default_branch) || github.event.issue.pull_request
+    name: Publish review-verdict status
+    if: >-
+      (github.event_name == 'pull_request_target' &&
+      github.event.pull_request.base.ref == github.event.repository.default_branch) ||
+      (github.event.issue.pull_request &&
+      github.event.comment.user.type != 'Bot' &&
+      (contains(github.event.comment.body, '<!-- review-verdict:') ||
+      contains(github.event.changes.body.from, '<!-- review-verdict:')))
     runs-on: ubuntu-latest
     steps:
       # pull_request_target and issue_comment run the base branch's workflow; this checks out
