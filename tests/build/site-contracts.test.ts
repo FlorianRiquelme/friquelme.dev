@@ -39,11 +39,14 @@ describe('all built pages', () => {
     } finally { await window.happyDOM.abort(); }
   });
   it('has no duplicate sitemap URLs', () => expect(new Set(routes).size).toBe(routes.length));
-  it('the sitemap covers every built HTML page', () => {
+  it('the sitemap covers every built HTML page except the known redirect pages', () => {
+    const redirects = ['/blog/brownfield-ai/'];
     const builtPages = (readdirSync(dist, { recursive: true }) as string[])
       .filter(file => file === 'index.html' || file.endsWith('/index.html'))
       .map(file => `/${file.replace(/index\.html$/, '')}`);
-    expect([...routes].sort()).toEqual(builtPages.sort());
+    const refreshPages = builtPages.filter(page => readFileSync(fileFor(page), 'utf8').includes('http-equiv="refresh"'));
+    expect(refreshPages.sort()).toEqual(redirects);
+    expect([...routes].sort()).toEqual(builtPages.filter(page => !redirects.includes(page)).sort());
   });
   for (const route of routes) {
     it(`${route} has exact canonical metadata, valid structured data and reachable internal links`, async () => {

@@ -6,19 +6,19 @@ brand
 
 ## Users
 
-Hiring engineers and engineering managers at AI-enabled companies (not AI-native research labs), plus technical recruiters scanning for signal beyond keyword match. Secondary audience: senior engineers thinking about their own AI repositioning.
+Engineers who work with coding agents and want tools or notes from someone doing the same, plus colleagues and peers who look Florian up.
 
-Context: they arrive cold from a search result, LinkedIn, or a referral, with seconds to judge whether this is a senior engineer doing real in-production AI work — not another bootcamp grad with Copilot, and not a researcher with no production scars.
+Context: they arrive from GitHub, a README link, a shared blog post, or LinkedIn.
 
-Job to be done: in under three seconds, confirm "this person threads LLMs through real codebases for real teams." Then, if interested, follow the breadcrumb trail (homepage → projects → manifesto → contact) without friction.
+Job to be done: see what Florian builds, try a tool, read how it was made, and reach him if they want to talk.
 
 ## Product Purpose
 
-Position Florian Riquelme as a **brownfield AI engineer** — the practitioner who takes a 10-year-old codebase, a non-technical team, and a real P&L, and threads LLMs through them without breaking trust.
+A workshop, not an application. The site shows what Florian builds and how he works with coding agents: the open-source tools, the posts that explain them, and the site itself as a working example. It is not a job search or a recruiter funnel.
 
-The site converts recruiter and EM visits into outreach about hiring or contract work. Success looks like a hiring engineer reading the homepage, opening one of the three OSS tools (ddev-claude, sentry-alert, NachtSchicht), scanning the pinned "Brownfield AI" manifesto, and reaching the contact form with intent. Every section exists to compress that journey.
+Success looks like a visitor installing a tool, reading the post behind it, or writing an email about it.
 
-The site is *not* a CV, not a tutorial blog, not a hype reel. It's a position document.
+The site is *not* a CV, not a tutorial blog, not a hype reel.
 
 ## Brand Personality
 
@@ -44,9 +44,9 @@ If a reader could plausibly say "AI made that" or "another bootcamp portfolio," 
 ## Design Principles
 
 1. **Show, don't tell.** Every claim links to code, numbers, or a shipped artifact. Standalone adjectives ("scalable," "robust," "AI-driven") are negative signal to this audience.
-2. **Practice what you preach.** The site itself is the proof of craft for the brownfield AI thesis. If we can't ship the portfolio with the same discipline we claim about production AI, the position collapses. Performance, accessibility, and copy precision are load-bearing.
+2. **Practice what you preach.** The site itself is the proof of craft. If it can't ship with the same discipline as the tools it shows, the claim collapses. Performance, accessibility, and copy precision are load-bearing.
 3. **Restraint as authority.** This audience reads quiet as senior. Where the category shouts (gradients, neon, hero metrics), this site says less. Whitespace, monospace, full borders, single accent. No decoration that doesn't earn its place.
-4. **Position over decoration.** Every element serves the brownfield AI thesis or gets cut. The terminal aesthetic isn't a stylistic choice; it's autobiographical, and it filters the audience by selecting for readers who recognise the form.
+4. **Substance over decoration.** Every element shows something Florian built or explains how, or it gets cut. The terminal aesthetic isn't a stylistic choice; it's autobiographical, and it selects for readers who recognise the form.
 
 ## Accessibility & Inclusion
 

@@ -17,6 +17,7 @@ const postsBySlug = loadPostsFromDir(new URL('./src/blog/', import.meta.url));
 export default defineConfig({
   site: 'https://friquelme.dev',
   trailingSlash: 'always',
+  redirects: { '/blog/brownfield-ai/': '/blog/' },
   build: { format: 'directory' },
   compressHTML: true,
   prefetch: true,

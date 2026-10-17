@@ -16,7 +16,7 @@ Strategic and visual context lives in two files at the project root. **Read thes
 
 Quick anchors for agents:
 - **Register:** `brand` (personal portfolio + manifesto blog; design IS the product).
-- **Position:** brownfield AI engineer for AI-enabled (not AI-native) companies.
+- **Position:** a workshop, what Florian builds and how he works with coding agents; not a job search.
 - **North Star:** "The Operator's Console" — terminal-native, restraint as authority.
 - **Eight named rules** govern the spec (One Voice, Tonal Ladder, Twin-Gray, Lowercase Default, Comment-as-Caption, Prompt-as-Heading, Flat-by-Default, Glow-Means-Interactive). See DESIGN.md.
 - **Hard bans:** side-stripe borders >1px, gradient text, glassmorphism, hero-metric templates, em dashes in shipped copy, `#000` / `#fff`.

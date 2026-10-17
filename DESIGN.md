@@ -1,6 +1,6 @@
 ---
 name: friquelme.dev
-description: Brownfield AI engineer's portfolio — terminal-native, restrained, evidence-led.
+description: Florian Riquelme's workshop site, terminal-native, restrained, evidence-led.
 colors:
   console-black: "#0C0C0C"
   tier-one-surface: "#171717"
@@ -111,9 +111,9 @@ components:
 
 **Creative North Star: "The Operator's Console"**
 
-A console for the people who already live in a console. The visual language is the practitioner's workspace, not a depiction of one. Every element ought to feel as if it were rendered by `ls`, `cat`, or `ps` — typeface, prompts, status pulses, comment slashes — and not as nostalgic costume but as the reader's actual habitat. The audience (hiring engineers and EMs at AI-enabled companies) recognises the form on sight; that recognition is the filter, and the filter is the point.
+A console for the people who already live in a console. The visual language is the practitioner's workspace, not a depiction of one. Every element ought to feel as if it were rendered by `ls`, `cat`, or `ps` — typeface, prompts, status pulses, comment slashes — and not as nostalgic costume but as the reader's actual habitat. The audience (engineers who work with coding agents) recognises the form on sight; that recognition is the filter, and the filter is the point.
 
-The philosophy is **restraint as authority**. Where the category shouts (gradients, neon, particle backgrounds, hero-metric templates), this site says less. One accent, one font family, three depth tiers. The site itself is the proof of craft for the brownfield AI thesis: if the portfolio cannot ship with the same discipline that's claimed about production AI, the position collapses. Every visual choice serves the position or gets cut.
+The philosophy is **restraint as authority**. Where the category shouts (gradients, neon, particle backgrounds, hero-metric templates), this site says less. One accent, one font family, three depth tiers. The site itself is the proof of craft: if it cannot ship with the same discipline as the tools it shows, the claim collapses. Every visual choice serves what Florian builds or gets cut.
 
 Anti-references, carried over from PRODUCT.md and enforced visually here: gradient-heavy SaaS landing pages, neon-on-black "AI engineer" portfolios, glassmorphism, hero-metric templates, identical card grids, and bootcamp-grad portfolios with decorative SVG illustrations and pastel palettes.
 

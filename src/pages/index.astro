@@ -17,11 +17,13 @@ import Footer from '../components/nav/Footer.astro';
 import SectionHeader from '../components/content/SectionHeader.astro';
 import TerminalWindow from '../components/content/TerminalWindow.astro';
 import ProjectCard from '../components/content/ProjectCard.astro';
+
+import { featured, groups, projects } from '../data/projects';
 ---
 
 <Layout
-  title="Florian Riquelme · Senior Engineer · AI Integration"
-  description="AI integration in production codebases: senior engineer leading AI adoption at digital-masters in Hamburg. Eval-gated rollouts, real teams, real users."
+  title="Florian Riquelme · Software Engineer"
+  description="Senior software engineer at SVO Netz GmbH in Celle. Production software for a regional utility, and open-source tools for working with coding agents."
   image={new URL('/og/index.png', Astro.site).href}
 >
   <!-- Header -->
@@ -46,12 +48,12 @@ import ProjectCard from '../components/content/ProjectCard.astro';
           <div data-type="out" class="h-3 terminal-hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary terminal-hidden">$ cat intro.txt</p>
           <p data-type="out" class="text-sm text-text-secondary terminal-hidden">9+ years shipping saas platforms, e-commerce, and web apps.</p>
-          <p data-type="out" class="text-sm text-text-secondary terminal-hidden">i ship llm features into existing codebases without breaking trust.</p>
+          <p data-type="out" class="text-sm text-text-secondary terminal-hidden">i build open-source tools for working with coding agents.</p>
           <p data-type="out" class="text-sm text-text-secondary terminal-hidden">full-stack across the board, react frontends to aws infrastructure.</p>
-          <p data-type="out" class="text-sm text-text-secondary terminal-hidden">currently building at digital-masters, a full-service digital agency.</p>
+          <p data-type="out" class="text-sm text-text-secondary terminal-hidden">currently at svo netz gmbh, turning team prototypes into production software for a regional utility.</p>
           <div data-type="out" class="h-3 terminal-hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary terminal-hidden">$ echo $current_stack</p>
-          <p data-type="out" class="text-sm text-text-primary terminal-hidden">php · react · typescript · go</p>
+          <p data-type="out" class="text-sm text-text-primary terminal-hidden">php · react · typescript · go · swift</p>
           <div data-type="out" class="h-3 terminal-hidden"></div>
           <p data-type="cmd" class="text-sm font-medium text-green-primary terminal-hidden">$ echo $experience</p>
           <p data-type="out" class="text-sm text-text-primary terminal-hidden">9+ years of experience</p>
@@ -67,14 +69,14 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     <!-- Hero Bottom -->
     <div id="hero-bottom" class="flex flex-col items-center gap-8 w-full max-w-[900px] opacity-0 transition-opacity duration-700">
       <div class="sr-only">
-        <p id="profile-summary">Florian Riquelme is a senior software engineer at digital-masters in Hamburg, Germany, specializing in brownfield AI: integrating LLMs into existing production codebases without breaking trust. He has 9+ years shipping SaaS platforms, e-commerce, and web applications, and works full-stack across PHP, React, TypeScript, Go, and AWS. He maintains open-source tooling for autonomous AI workflows, including nachtschicht and ddev-claude, and writes about eval-gated rollouts, reversibility, and the operational discipline of running AI inside real codebases on real teams.</p>
+        <p id="profile-summary">Florian Riquelme is a senior software engineer based in Celle, Germany. Since October 2026 he works at SVO Netz GmbH, part of SVO-Gruppe, a regional energy and infrastructure provider (power, gas, water, fiber). As the first new hire in a growing team for internal software development, he builds, reviews and operates the group's own software, turns prototypes colleagues built at team offsites into tools they rely on every day, and looks after the group's Statamic-based customer websites svo.de and svo-netz.de. He has 9+ years shipping SaaS platforms, e-commerce, and web applications, works full-stack across PHP, React, TypeScript, Go, Swift, and AWS, and maintains open-source tools for working with coding agents, including screengrab, nachtschicht, claudefuel, and ddev-claude.</p>
       </div>
       {/* H1 stays brand-voice; SEO keywords ride on the <title> tag and Person schema. */}
       <h1 class="text-2xl font-semibold text-text-primary text-center md:text-4xl">
-        shipping products, not just writing code.
+        i build software, and the tools i build it with.
       </h1>
       <p class="text-sm text-text-tertiary text-center">
-        // senior software engineer · full-stack · ai-driven development
+        // senior software engineer · full-stack · agent tooling
       </p>
       <div class="flex flex-col items-center gap-3 w-full sm:flex-row sm:gap-4 sm:w-auto">
         <ButtonPrimary label="read_blog" icon="lucide:file-text" href="/blog/" />
@@ -90,37 +92,39 @@ import ProjectCard from '../components/content/ProjectCard.astro';
     <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
       <SectionHeader
         command="$ ls -la ~/projects"
-        description="// side projects & open source"
+        description="// open-source tooling for working with ai agents"
       />
-      <span class="text-xs text-text-muted">3 active</span>
+      <span class="text-xs text-text-muted">{projects.length} repos</span>
     </div>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <div data-animate class="stagger-1">
-        <ProjectCard
-          title="claudefuel"
-          description="// a fuel gauge for claude code. three-line status bar showing context, session and weekly limits, and reset times. installs by reading a markdown file."
-          link="https://github.com/FlorianRiquelme/claudefuel"
-          postLink="/blog/designing-for-the-operator/"
-          tags={['claude code', 'statusline', 'promptfile']}
-        />
-      </div>
-      <div data-animate class="stagger-2">
-        <ProjectCard
-          title="ddev-claude"
-          description="// ddev plugin for running claude code in sandboxed, firewalled containers"
-          link="https://github.com/FlorianRiquelme/ddev-claude"
-          tags={['ddev', 'docker', 'claude']}
-        />
-      </div>
-      <div data-animate class="stagger-3">
-        <ProjectCard
-          title="nachtschicht"
-          description="// autonomous task queue for claude code with a trust protocol. queue work, sleep, read the morning brief."
-          link="https://github.com/FlorianRiquelme/nachtschicht"
-          tags={['claude code', 'autonomy', 'trust protocol']}
-        />
-      </div>
+    <div data-animate class="stagger-1">
+      <ProjectCard
+        title={featured.title}
+        description={featured.description}
+        link={featured.repo}
+        postLink={featured.postLink}
+        tags={featured.tags}
+        version={featured.version}
+        install={featured.install}
+      />
     </div>
+    {groups.map((group) => (
+      <div class="flex flex-col gap-4">
+        <p class="text-[13px] text-text-tertiary font-mono">// {group.caption}</p>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {group.projects.map((project, i) => (
+            <div data-animate class={`stagger-${(i % 3) + 1}`}>
+              <ProjectCard
+                title={project.title}
+                description={project.description}
+                link={project.repo}
+                postLink={project.postLink}
+                tags={project.tags}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
   </section>
 
   <Divider />
@@ -142,7 +146,7 @@ import ProjectCard from '../components/content/ProjectCard.astro';
           <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre-wrap break-all terminal-hidden">  "email":    "flo@friquelme.dev",</p>
           <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre-wrap break-all terminal-hidden">  "github":   "github.com/FlorianRiquelme",</p>
           <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre-wrap break-all terminal-hidden">  "linkedin": "linkedin.com/in/florian-riquelme-b97756143",</p>
-          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre-wrap break-all terminal-hidden">  "location": "hamburg, germany"</p>
+          <p data-type="out" class="text-[13px] text-text-secondary whitespace-pre-wrap break-all terminal-hidden">  "location": "celle, germany"</p>
           <p data-type="out" class="text-[13px] text-text-muted whitespace-pre-wrap terminal-hidden">{"}"}</p>
           <div data-type="out" class="h-2 terminal-hidden"></div>
           <div id="contact-cursor" class="flex items-center terminal-hidden">
@@ -253,23 +257,29 @@ import ProjectCard from '../components/content/ProjectCard.astro';
         "name": "Florian Riquelme",
         "url": "https://friquelme.dev",
         "jobTitle": "Senior Software Engineer",
-        "description": "Senior software engineer specializing in brownfield AI: integrating LLMs into existing production codebases without breaking trust. 9+ years across SaaS, e-commerce, and web platforms.",
+        "description": "Senior software engineer at SVO Netz GmbH. Builds production software for a regional utility and open-source tools for working with coding agents. 9+ years across SaaS, e-commerce, and web platforms.",
         "image": "https://friquelme.dev/og/index.png",
         "email": "mailto:flo@friquelme.dev",
         "worksFor": {
           "@type": "Organization",
-          "name": "digital-masters"
+          "name": "SVO Netz GmbH",
+          "url": "https://www.svo-netz.de",
+          "parentOrganization": {
+            "@type": "Organization",
+            "name": "SVO-Gruppe",
+            "url": "https://www.svo.de"
+          }
         },
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": "Hamburg",
+          "addressLocality": "Celle",
           "addressCountry": "DE"
         },
         "sameAs": [
           "https://github.com/FlorianRiquelme",
           "https://www.linkedin.com/in/florian-riquelme-b97756143"
         ],
-        "knowsAbout": ["PHP", "React", "TypeScript", "Go", "AWS", "Brownfield AI", "LLM Integration"]
+        "knowsAbout": ["PHP", "React", "TypeScript", "Go", "Swift", "AWS", "LLM Integration", "Coding Agents"]
       },
       {
         "@type": "ProfilePage",
@@ -281,33 +291,15 @@ import ProjectCard from '../components/content/ProjectCard.astro';
           "cssSelector": ["#profile-summary"]
         }
       },
-      {
+      ...projects.map((project) => ({
         "@type": "SoftwareSourceCode",
-        "name": "cashmunk",
-        "description": "privacy-first envelope budgeting app for ios. data stays on device, pay once, own forever.",
-        "url": "https://cashmunk.app/",
-        "programmingLanguage": "Swift",
+        "name": project.title,
+        "description": project.description,
+        "codeRepository": project.repo,
+        "programmingLanguage": project.language,
         "author": { "@id": "https://friquelme.dev/#person" },
-        "keywords": "swift, ios, privacy"
-      },
-      {
-        "@type": "SoftwareSourceCode",
-        "name": "ddev-claude",
-        "description": "ddev plugin for running claude code in sandboxed, firewalled containers.",
-        "codeRepository": "https://github.com/FlorianRiquelme/ddev-claude",
-        "programmingLanguage": "Shell",
-        "author": { "@id": "https://friquelme.dev/#person" },
-        "keywords": "ddev, docker, claude"
-      },
-      {
-        "@type": "SoftwareSourceCode",
-        "name": "nachtschicht",
-        "description": "autonomous task queue for claude code with a trust protocol.",
-        "codeRepository": "https://github.com/FlorianRiquelme/nachtschicht",
-        "programmingLanguage": "TypeScript",
-        "author": { "@id": "https://friquelme.dev/#person" },
-        "keywords": "claude code, autonomy, trust protocol"
-      }
+        "keywords": project.tags.join(", ")
+      }))
     ]
   })} />
 </Layout>

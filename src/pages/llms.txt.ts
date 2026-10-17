@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { getPublishedPosts } from '../utils/blog';
+import { projects } from '../data/projects';
 
 export async function GET(context: APIContext) {
   const posts = getPublishedPosts(await getCollection('blog'));
@@ -10,17 +11,23 @@ export async function GET(context: APIContext) {
   lines.push('# friquelme.dev');
   lines.push('');
   lines.push(
-    '> Personal site of Florian Riquelme, senior software engineer at digital-masters in Hamburg, Germany. Writing about brownfield AI: integrating LLMs into existing production codebases without breaking trust.',
+    '> Personal site of Florian Riquelme, senior software engineer at SVO Netz GmbH, part of SVO-Gruppe, a regional energy and infrastructure provider in Celle, Germany. Open-source tools for working with coding agents, and writing about how they are built.',
   );
   lines.push('');
   lines.push(
-    'Florian is a full-stack engineer (PHP, React, TypeScript, Go, AWS) with 9+ years of experience shipping SaaS platforms, e-commerce, and web applications. He maintains open-source tooling around autonomous AI workflows (nachtschicht, ddev-claude) and writes about the operational reality of running AI inside real codebases: eval-gated rollouts, reversibility, and trust-building patterns.',
+    "Florian is a full-stack engineer (PHP, React, TypeScript, Go, Swift, AWS) with 9+ years of experience shipping SaaS platforms, e-commerce, and web applications. At SVO Netz GmbH he builds, reviews and operates the group's own software, turns prototypes colleagues built at team offsites into tools they rely on every day, and looks after the group's Statamic-based customer websites svo.de and svo-netz.de. He maintains open-source tools for working with coding agents and writes about building them.",
   );
   lines.push('');
   lines.push('## Pages');
   lines.push('');
   lines.push(`- [Homepage](${site}/): About, current work, projects, contact.`);
   lines.push(`- [Blog](${site}/blog/): Index of all posts.`);
+  lines.push('');
+  lines.push('## Projects');
+  lines.push('');
+  for (const project of projects) {
+    lines.push(`- [${project.title}](${project.repo}): ${project.description}`);
+  }
   lines.push('');
   lines.push('## Blog posts');
   lines.push('');

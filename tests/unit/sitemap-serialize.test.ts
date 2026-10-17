@@ -5,7 +5,7 @@ const posts = {
   'designing-for-the-operator': {
     pubDate: new Date('2026-05-15T00:00:00.000Z'),
   },
-  'brownfield-ai': {
+  'screengrab-1-0': {
     pubDate: new Date('2026-04-30T00:00:00.000Z'),
     updatedDate: new Date('2026-05-10T00:00:00.000Z'),
   },
@@ -29,7 +29,7 @@ describe('serializeSitemapEntry', () => {
   });
 
   it('prefers updatedDate over pubDate when both are present', () => {
-    const item = { url: 'https://friquelme.dev/blog/brownfield-ai/' };
+    const item = { url: 'https://friquelme.dev/blog/screengrab-1-0/' };
     const result = serializeSitemapEntry(item, posts);
     expect(result.lastmod).toBe('2026-05-10T00:00:00.000Z');
   });

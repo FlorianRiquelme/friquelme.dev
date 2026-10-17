@@ -9,11 +9,11 @@ async function expectTerminalContent(browser: Browser) {
       'florian riquelme: senior software engineer',
       '$ cat intro.txt',
       '9+ years shipping saas platforms, e-commerce, and web apps.',
-      'i ship llm features into existing codebases without breaking trust.',
+      'i build open-source tools for working with coding agents.',
       'full-stack across the board, react frontends to aws infrastructure.',
-      'currently building at digital-masters, a full-service digital agency.',
+      'currently at svo netz gmbh, turning team prototypes into production software for a regional utility.',
       '$ echo $current_stack',
-      'php · react · typescript · go',
+      'php · react · typescript · go · swift',
       '$ echo $experience',
       '9+ years of experience',
     ],
@@ -23,7 +23,7 @@ async function expectTerminalContent(browser: Browser) {
       '"email": "flo@friquelme.dev",',
       '"github": "github.com/FlorianRiquelme",',
       '"linkedin": "linkedin.com/in/florian-riquelme-b97756143",',
-      '"location": "hamburg, germany"',
+      '"location": "celle, germany"',
       '}',
     ],
   };
@@ -80,9 +80,14 @@ test('homepage navigation, project destinations and contact work', async ({ app,
   await browser.locator('#projects').scrollIntoView();
   expect((await browser.evaluate(() => [...document.querySelectorAll('#projects a')].map(link => link.getAttribute('href') ?? ''))).sort()).toEqual([
     '/blog/designing-for-the-operator/',
+    '/blog/screengrab-1-0/',
     'https://github.com/FlorianRiquelme/claudefuel',
+    'https://github.com/FlorianRiquelme/cmux-workspace-tools',
     'https://github.com/FlorianRiquelme/ddev-claude',
+    'https://github.com/FlorianRiquelme/jev-kit',
     'https://github.com/FlorianRiquelme/nachtschicht',
+    'https://github.com/FlorianRiquelme/openrouter-zdr',
+    'https://github.com/FlorianRiquelme/screengrab',
   ].sort());
 });
 
@@ -153,7 +158,7 @@ test('navigation works with the keyboard and restores focus', async ({ app, brow
   await expect(dialog).toBeVisible();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   const controls = browser.locator('#mobile-menu :is(a, button)');
-  await controls.first().focus();
+  await expect(controls.first()).toBeFocused();
   await browser.keyboard.press('Shift+Tab');
   await expect(controls.last()).toBeFocused();
   await browser.keyboard.press('Tab');

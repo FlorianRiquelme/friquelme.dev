@@ -4,7 +4,7 @@ import ProjectCard from '../../src/components/content/ProjectCard.astro';
 
 const baseProps = {
   title: 'claudefuel',
-  description: '// status bar',
+  description: 'status bar',
   link: 'https://github.com/FlorianRiquelme/claudefuel',
 };
 
@@ -26,4 +26,34 @@ describe('ProjectCard postLink', () => {
     expect(html).not.toContain('read_post');
     expect(html).not.toContain('/blog/');
   });
+});
+
+describe('ProjectCard content', () => {
+  it('prefixes the description with a comment marker once', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCard, { props: baseProps });
+
+    expect(html).toContain('// status bar');
+    expect(html).not.toContain('// // status bar');
+  });
+
+  for (const postLink of [undefined, '/blog/designing-for-the-operator/']) {
+    it(`renders version and install command when given (postLink: ${postLink ?? 'none'})`, async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ProjectCard, {
+        props: { ...baseProps, postLink, version: 'v1.0.0', install: 'brew install --cask FlorianRiquelme/tap/screengrab' },
+      });
+
+      expect(html).toContain('>v1.0.0</span>');
+      expect(html).toContain('brew install --cask FlorianRiquelme/tap/screengrab</code>');
+    });
+
+    it(`omits version and install command when not given (postLink: ${postLink ?? 'none'})`, async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ProjectCard, { props: { ...baseProps, postLink } });
+
+      expect(html).not.toContain('<code');
+      expect(html).not.toContain('v1.0.0');
+    });
+  }
 });
