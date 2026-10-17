@@ -39,9 +39,10 @@ describe('all built pages', () => {
     } finally { await window.happyDOM.abort(); }
   });
   it('has no duplicate sitemap URLs', () => expect(new Set(routes).size).toBe(routes.length));
-  it('the sitemap covers every built HTML page', () => {
+  it('the sitemap covers every built HTML page except redirect pages', () => {
     const builtPages = (readdirSync(dist, { recursive: true }) as string[])
       .filter(file => file === 'index.html' || file.endsWith('/index.html'))
+      .filter(file => !readFileSync(resolve(dist, file), 'utf8').includes('http-equiv="refresh"'))
       .map(file => `/${file.replace(/index\.html$/, '')}`);
     expect([...routes].sort()).toEqual(builtPages.sort());
   });
