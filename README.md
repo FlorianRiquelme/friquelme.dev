@@ -1,12 +1,12 @@
 # friquelme.dev
 
-Personal portfolio site for Florian Riquelme — senior software engineer based in Hamburg, Germany.
+Personal portfolio site for Florian Riquelme, senior software engineer based in Celle, Germany.
 
 **Live:** [friquelme.dev](https://friquelme.dev)
 
 ## Tech Stack
 
-- **Framework:** [Astro 5](https://astro.build) (static output)
+- **Framework:** [Astro 7](https://astro.build) (static output)
 - **Styling:** [Tailwind CSS 4](https://tailwindcss.com) via Vite plugin
 - **Icons:** [astro-icon](https://github.com/natemoo-re/astro-icon) with Lucide
 - **Font:** JetBrains Mono
@@ -27,14 +27,18 @@ pnpm preview      # Preview production build
 
 ```
 src/
-├── assets/images/       # Project card images
+├── assets/images/blog/  # Blog post images
+├── blog/                # MDX posts (content collection)
 ├── components/
-│   ├── content/         # ProjectCard, SkillBar, TerminalWindow, etc.
+│   ├── blog/            # Blog cards, article hero, callout, TOC, etc.
+│   ├── content/         # ProjectCard, TerminalWindow, SectionHeader, etc.
 │   ├── forms/           # InputGroup, SearchField, TextareaGroup
 │   ├── nav/             # HeaderBar, Footer, Logo, NavItem
 │   └── ui/              # Badge, Button variants, Tag, Divider
+├── data/projects.ts     # Project list rendered on the homepage and in llms.txt
 ├── layouts/Layout.astro # Base HTML layout with meta, fonts, analytics
-├── pages/index.astro    # Single-page site (hero, skills, projects, contact)
+├── pages/index.astro    # Homepage (hero, projects, contact)
+├── pages/blog/          # Blog listing and post pages
 └── styles/global.css    # Tailwind theme, animations, base styles
 
 infra/                   # AWS CDK stacks
