@@ -155,6 +155,15 @@ describe('astro build output', () => {
     });
   });
 
+  describe('homepage projects', () => {
+    it('features screengrab with its version and install command', () => {
+      const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+      const projects = html.slice(html.indexOf('id="projects"'), html.indexOf('id="contact"'));
+      expect(projects).toContain('v1.0.0');
+      expect(projects).toContain('brew install --cask FlorianRiquelme/tap/screengrab');
+    });
+  });
+
   describe('MDX rendering', () => {
     it('preserves reading time, heading links, code highlighting, and Astro components', async () => {
       const window = new Window();
