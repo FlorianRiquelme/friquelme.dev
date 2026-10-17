@@ -1,0 +1,19 @@
+# squirrelscan config for the scheduled live-site audit (.github/automation/site-audit.md).
+# All rules stay on; triaged findings live in .github/automation/site-audit-baseline.json,
+# which can suppress single findings instead of whole rules.
+
+[project]
+name = "friquelme-dev"
+domains = ["friquelme.dev"]
+
+[crawler]
+max_pages = 100
+
+[rules]
+enable = ["*"]
+disable = []
+
+[cloud]
+# Runs use --offline: no sign-in, no published reports. Plain HTTP fetches suffice for a static site.
+enabled = false
+publish = false
