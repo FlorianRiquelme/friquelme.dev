@@ -13,9 +13,11 @@ interface Props {
   link?: string;
   postLink?: string;
   tags?: string[];
+  version?: string;
+  install?: string;
 }
 
-const { title, description, image, imageAlt = '', stars = 0, link = '#', postLink, tags = [] } = Astro.props;
+const { title, description, image, imageAlt = '', stars = 0, link = '#', postLink, tags = [], version, install } = Astro.props;
 
 const wrapperClass = 'group flex h-full flex-col overflow-hidden rounded bg-bg-surface border border-border-primary transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-green-primary/20 hover:shadow-lg hover:shadow-green-primary/5';
 ---
@@ -37,8 +39,14 @@ const wrapperClass = 'group flex h-full flex-col overflow-hidden rounded bg-bg-s
       </div>
     )}
     <div class="flex flex-1 flex-col gap-3 p-5">
-      <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
-      <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
+        {version && <span class="text-[11px] text-green-primary font-mono">{version}</span>}
+      </div>
+      <p class="text-xs leading-relaxed text-text-tertiary font-mono">// {description}</p>
+      {install && (
+        <code class="block select-all break-all rounded-sm bg-bg-input px-3 py-2 text-[11px] text-text-primary font-mono">{install}</code>
+      )}
       {tags.length > 0 && (
         <div class="flex flex-wrap gap-2">
           {tags.map((tag) => (
@@ -73,8 +81,14 @@ const wrapperClass = 'group flex h-full flex-col overflow-hidden rounded bg-bg-s
       </div>
     )}
     <div class="flex flex-1 flex-col gap-3 p-5">
-      <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
-      <p class="text-xs leading-relaxed text-text-tertiary font-mono">{description}</p>
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h3 class="text-base font-semibold text-text-primary font-mono">{title}</h3>
+        {version && <span class="text-[11px] text-green-primary font-mono">{version}</span>}
+      </div>
+      <p class="text-xs leading-relaxed text-text-tertiary font-mono">// {description}</p>
+      {install && (
+        <code class="block select-all break-all rounded-sm bg-bg-input px-3 py-2 text-[11px] text-text-primary font-mono">{install}</code>
+      )}
       {tags.length > 0 && (
         <div class="flex flex-wrap gap-2">
           {tags.map((tag) => (

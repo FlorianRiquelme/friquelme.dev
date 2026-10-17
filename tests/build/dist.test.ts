@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import sharp from 'sharp';
@@ -7,6 +7,24 @@ import { Window } from 'happy-dom';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '../../..');
 const DIST = resolve(ROOT, 'dist');
+
+const PROJECTS = [
+  'screengrab',
+  'nachtschicht',
+  'cmux-workspace-tools',
+  'claudefuel',
+  'ddev-claude',
+  'openrouter-zdr',
+  'jev-kit',
+];
+
+function textFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(dir, entry.name);
+    if (entry.isDirectory()) return textFiles(path);
+    return ['.html', '.txt', '.xml', '.json'].includes(extname(path)) ? [path] : [];
+  });
+}
 
 describe('astro build output', () => {
   describe('trailing slash', () => {
@@ -77,7 +95,63 @@ describe('astro build output', () => {
       const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
       const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
       expect(h1Match).not.toBeNull();
-      expect(h1Match![1]).toContain('shipping products');
+      expect(h1Match![1].trim()).toBe('i build software, and the tools i build it with.');
+    });
+  });
+
+  describe('retired positioning', () => {
+    it('no shipped text file mentions the old employer or the old thesis, except the redirect page', () => {
+      const redirect = resolve(DIST, 'blog/brownfield-ai/index.html');
+      const files = textFiles(DIST);
+      expect(files.length).toBeGreaterThan(0);
+      const offenders = files
+        .filter((file) => file !== redirect)
+        .filter((file) => /digital.masters|brownfield/i.test(readFileSync(file, 'utf-8')));
+      expect(offenders).toEqual([]);
+    });
+
+    it('redirects /blog/brownfield-ai/ to /blog/', () => {
+      const html = readFileSync(resolve(DIST, 'blog/brownfield-ai/index.html'), 'utf-8');
+      expect(html).toContain('http-equiv="refresh" content="0;url=/blog/"');
+      expect(html).toContain('<link rel="canonical" href="https://friquelme.dev/blog/">');
+    });
+
+    it('keeps the redirect out of the sitemap', () => {
+      const xml = readFileSync(resolve(DIST, 'sitemap-0.xml'), 'utf-8');
+      expect(xml).not.toContain('brownfield-ai');
+    });
+  });
+
+  describe('llms.txt', () => {
+    it('names the employer and lists the projects', () => {
+      const text = readFileSync(resolve(DIST, 'llms.txt'), 'utf-8');
+      expect(text).toContain('SVO Netz GmbH');
+      expect(text).toContain('screengrab');
+      for (const name of PROJECTS) {
+        expect(text).toContain(`- [${name}](https://github.com/FlorianRiquelme/${name}): `);
+      }
+    });
+  });
+
+  describe('homepage JSON-LD', () => {
+    const graph = (): Array<Record<string, unknown>> => {
+      const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+      const match = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+      expect(match).not.toBeNull();
+      return JSON.parse(match![1])['@graph'];
+    };
+
+    it('has exactly one SoftwareSourceCode per project and no cashmunk', () => {
+      const code = graph().filter((node) => node['@type'] === 'SoftwareSourceCode');
+      expect(code.map((node) => node.name).sort()).toEqual([...PROJECTS].sort());
+      expect(JSON.stringify(graph())).not.toMatch(/cashmunk/i);
+    });
+
+    it('lists SVO Netz GmbH as the employer in Celle', () => {
+      const person = graph().find((node) => node['@type'] === 'Person')!;
+      expect(person.jobTitle).toBe('Senior Software Engineer');
+      expect(person.worksFor).toMatchObject({ name: 'SVO Netz GmbH', parentOrganization: { name: 'SVO-Gruppe' } });
+      expect(person.address).toMatchObject({ addressLocality: 'Celle' });
     });
   });
 
