@@ -7,13 +7,17 @@ tags: ["tooling", "macos", "swift", "claude-code", "screengrab"]
 ---
 
 import Callout from '../components/blog/Callout.astro';
-import demo from '../assets/videos/screengrab-demo.mp4';
+import demoWebm from '../assets/videos/screengrab-demo.webm';
+import demoMp4 from '../assets/videos/screengrab-demo.mp4';
 
 <Callout>
 **tldr:** [screengrab](https://github.com/FlorianRiquelme/screengrab) is a macOS menu bar app for one loop: Cmd+Shift+2, drag, Cmd+C, and the screenshot's file path is on your clipboard. Cmd+V in the terminal and your agent reads the image. v1.0.0 is out today: `brew install --cask FlorianRiquelme/tap/screengrab`.
 </Callout>
 
-<video src={demo} width="1200" height="675" autoplay muted loop playsinline controls preload="metadata" aria-label="Press Cmd+Shift+2, drag, press Cmd+C, paste the path into an agent" class="my-4 h-auto w-full rounded border border-border-primary"></video>
+<video width="1200" height="674" autoplay muted loop playsinline controls preload="metadata" aria-label="Press Cmd+Shift+2, drag, press Cmd+C, paste the path into an agent" class="my-4 h-auto w-full rounded border border-border-primary">
+  <source src={demoWebm} type="video/webm" />
+  <source src={demoMp4} type="video/mp4" />
+</video>
 
 ## the clunky part
 

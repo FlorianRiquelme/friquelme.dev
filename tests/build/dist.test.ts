@@ -167,9 +167,17 @@ describe('astro build output', () => {
   describe('screengrab post', () => {
     it('embeds the demo as a self-hosted video', () => {
       const html = readFileSync(resolve(DIST, 'blog/screengrab-1-0/index.html'), 'utf-8');
-      const src = html.match(/<video src="(\/_astro\/screengrab-demo\.[^"]+\.mp4)"/)?.[1];
-      expect(src).toBeDefined();
-      expect(existsSync(resolve(DIST, src!.slice(1)))).toBe(true);
+      const video = html.match(/<video\b([^>]*)>([\s\S]*?)<\/video>/);
+      expect(video).not.toBeNull();
+      for (const attribute of ['autoplay', 'muted', 'loop', 'playsinline', 'controls']) {
+        expect(video![1]).toMatch(new RegExp(`\\b${attribute}\\b`));
+      }
+      const sources = [...video![2].matchAll(/<source src="([^"]+)" type="([^"]+)"/g)].map(([, src, type]) => ({ src, type }));
+      expect(sources.map(({ type }) => type)).toEqual(['video/webm', 'video/mp4']);
+      for (const { src, type } of sources) {
+        expect(src).toMatch(new RegExp(`^/_astro/screengrab-demo\\.[^/]+\\.${type.split('/')[1]}$`));
+        expect(existsSync(resolve(DIST, src.slice(1)))).toBe(true);
+      }
       expect(html).not.toContain('raw.githubusercontent.com');
     });
   });
