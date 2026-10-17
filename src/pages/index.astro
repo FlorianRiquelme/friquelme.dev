@@ -110,7 +110,7 @@ import { featured, groups, projects } from '../data/projects';
     {groups.map((group) => (
       <div class="flex flex-col gap-4">
         <p class="text-[13px] text-text-tertiary font-mono">// {group.caption}</p>
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {group.projects.map((project, i) => (
             <div data-animate class={`stagger-${(i % 3) + 1}`}>
               <ProjectCard
