@@ -92,7 +92,7 @@
     });
   }
 
-  function closeMenu() {
+  function hideMenu(restoreFocus: boolean) {
     if (!menu || !menuBtn) return;
     menu.classList.add('hidden');
     menu.classList.remove('flex');
@@ -102,8 +102,16 @@
     iconClose?.classList.add('hidden');
     document.body.style.overflow = '';
     document.removeEventListener('keydown', handleKeydown);
-    // Return focus to the trigger that opened the menu.
-    menuBtn.focus();
+    if (restoreFocus) menuBtn.focus();
+  }
+
+  function closeMenu() {
+    hideMenu(true);
+  }
+
+  function resetMenuForDesktop() {
+    if (!menu || menu.hidden) return;
+    hideMenu(false);
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -130,4 +138,8 @@
   menuBtn?.addEventListener('click', openMenu);
   closeBtn?.addEventListener('click', closeMenu);
   navLinks.forEach((link) => link.addEventListener('click', closeMenu));
+  const desktopQuery = window.matchMedia('(min-width: 768px)');
+  desktopQuery.addEventListener('change', (event) => {
+    if (event.matches) resetMenuForDesktop();
+  });
 </script>

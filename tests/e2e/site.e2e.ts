@@ -1,38 +1,5 @@
-import type { Browser } from '@e2e-dev/web';
 import { test, expect, settleRendering, axeViolations, inViewport, viewportWidth } from './fixtures';
 import { articles, routes, siteOrigin } from '../support/site';
-
-async function expectTerminalContent(browser: Browser) {
-  const copy = {
-    'hero-terminal': [
-      '$ whoami',
-      'florian riquelme: senior software engineer',
-      '$ cat intro.txt',
-      '9+ years shipping saas platforms, e-commerce, and web apps.',
-      'i build open-source tools for working with coding agents.',
-      'full-stack across the board, react frontends to aws infrastructure.',
-      'currently at svo netz gmbh, turning team prototypes into production software for a regional utility.',
-      '$ echo $current_stack',
-      'php · react · typescript · go · swift',
-      '$ echo $experience',
-      '9+ years of experience',
-    ],
-    'contact-terminal': [
-      '$ cat contact_info.json',
-      '{',
-      '"email": "flo@friquelme.dev",',
-      '"github": "github.com/FlorianRiquelme",',
-      '"linkedin": "linkedin.com/in/florian-riquelme-b97756143",',
-      '"location": "celle, germany"',
-      '}',
-    ],
-  };
-  for (const [id, text] of Object.entries(copy)) {
-    const lines = browser.locator(`#${id} p[data-type]`);
-    await expect(lines).toHaveText(text);
-    for (const line of await lines.all()) await expect(line).toBeVisible();
-  }
-}
 
 for (const route of routes) {
   test(`${route} renders, loads its images and fits the viewport`, async ({ app, browser, screen }) => {
@@ -76,7 +43,7 @@ test('homepage navigation, project destinations and contact work', async ({ app,
     if (mobile) await expect(browser.locator('#mobile-menu')).toBeHidden();
   }
   await expect(screen.getByRole('link', 'send_message')).toHaveAttribute('href', 'mailto:flo@friquelme.dev');
-  await expect(browser.locator('#contact-terminal')).toContainText('flo@friquelme.dev');
+  await expect(browser.locator('#contact')).toContainText('flo@friquelme.dev');
   await browser.locator('#projects').scrollIntoView();
   expect((await browser.evaluate(() => [...document.querySelectorAll('#projects a')].map(link => link.getAttribute('href') ?? ''))).sort()).toEqual([
     '/blog/designing-for-the-operator/',
@@ -89,6 +56,27 @@ test('homepage navigation, project destinations and contact work', async ({ app,
     'https://github.com/FlorianRiquelme/openrouter-zdr',
     'https://github.com/FlorianRiquelme/screengrab',
   ].sort());
+});
+
+test('profile, project and contact content is visible without enhancement', async ({ app, browser, screen }) => {
+  await app.open('/');
+  await expect(screen.getByRole('heading', { level: 1 })).toHaveText(/software, with the walls off\./);
+  const summary = browser.locator('#profile-summary');
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('senior software engineer at SVO Netz GmbH in Celle');
+  await expect(browser.locator('#about')).toContainText('9+ years');
+  await expect(browser.locator('#about')).toContainText('PHP, React, TypeScript, Go, Swift and AWS');
+  for (const project of ['screengrab', 'nachtschicht', 'cmux-workspace-tools', 'claudefuel', 'ddev-claude', 'openrouter-zdr', 'jev-kit']) {
+    await expect(browser.locator(`#projects a[href="https://github.com/FlorianRiquelme/${project}"]`)).toBeVisible();
+  }
+  await expect(browser.locator('#projects')).toContainText('screenshot to ai agent in three keystrokes');
+  await expect(browser.locator('#projects')).toContainText('brew install --cask FlorianRiquelme/tap/screengrab');
+  await expect(screen.getByRole('link', 'send_message')).toHaveAttribute('href', 'mailto:flo@friquelme.dev');
+  const contact = browser.locator('#contact');
+  await expect(contact).toContainText('flo@friquelme.dev');
+  await expect(contact).toContainText('github.com/FlorianRiquelme');
+  await expect(contact).toContainText('linkedin.com/in/florian-riquelme-b97756143');
+  await expect(contact).toContainText('celle, germany');
 });
 
 test('homepage to blog to the exact pinned essay and back', async ({ app, browser, screen }) => {
@@ -173,26 +161,13 @@ test('navigation works with the keyboard and restores focus', async ({ app, brow
   await expect(browser.locator('#mobile-menu')).toBeHidden();
 });
 
-test('ordinary-motion terminal content finishes rendering', async ({ app, browser, motion }) => {
-  await motion.set('no-preference');
+test('reduced-motion homepage content is visible immediately', async ({ app, browser }) => {
   await app.open('/');
-  await expect(browser.locator('#hero-terminal .terminal-hidden')).toHaveCount(0, { timeout: 15_000 });
-  await browser.evaluate(() => {
-    document.getElementById('contact-terminal-wrapper')!.scrollIntoView({ behavior: 'instant', block: 'center' });
-    return null;
-  });
-  await expect(browser.locator('#contact-terminal .terminal-hidden')).toHaveCount(0, { timeout: 10_000 });
-  await expectTerminalContent(browser);
-});
-
-test('reduced-motion terminal content is available immediately', async ({ app, browser }) => {
-  await app.open('/');
-  await expect(browser.locator('#hero-terminal .terminal-hidden')).toHaveCount(0);
-  await expect(browser.locator('#contact-terminal .terminal-hidden')).toHaveCount(0);
-  await expectTerminalContent(browser);
-  await expect.poll(() => browser.evaluate(() => getComputedStyle(document.getElementById('hero-bottom')!).opacity)).toBe('1');
+  await expect(browser.locator('#profile-summary')).toBeVisible();
+  await expect(browser.locator('#projects')).toContainText('screengrab');
+  await expect(browser.locator('#contact')).toContainText('flo@friquelme.dev');
   await expect.poll(() => browser.evaluate(() => {
-    const animated = [...document.querySelectorAll('[data-animate]')].map(element => getComputedStyle(element));
-    return animated.length > 0 && animated.every(style => style.animationName === 'none' && style.opacity === '1');
+    const projects = [...document.querySelectorAll('#projects article')].map(element => getComputedStyle(element));
+    return projects.length === 7 && projects.every(style => style.animationName === 'none' && style.opacity === '1');
   })).toBe(true);
 });

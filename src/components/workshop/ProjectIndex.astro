@@ -1,0 +1,67 @@
+---
+import { workshopProjects } from '../../lib/workshop/projects';
+
+const [featured, ...rest] = workshopProjects;
+---
+
+<section id="projects" class="projects">
+  <header class="projects-header">
+    <div>
+      <p class="eyebrow">selected work / 07</p>
+      <h2>tools for the workbench.</h2>
+    </div>
+    <p class="projects-intro">
+      The tools I reach for when building with coding agents.
+    </p>
+  </header>
+
+  <article class="project-feature">
+    <div class="project-feature-copy">
+      <div class="project-meta">
+        <span>01 / featured</span>
+        <span>{featured.version}</span>
+      </div>
+      <h3>{featured.title}</h3>
+      <p class="project-description">{featured.description}</p>
+      <div class="project-tags">
+        {featured.tags.map((tag) => <span>{tag}</span>)}
+      </div>
+      <code class="project-install">{featured.install}</code>
+      <div class="project-links">
+        <a href={featured.repo}>repository</a>
+        {featured.postLink && <a href={featured.postLink}>read the release notes</a>}
+      </div>
+    </div>
+    <div class="project-feature-note">
+      <p class="eyebrow">why it exists</p>
+      <p>
+        Screenshots are how most agent sessions begin. screengrab keeps the capture, the markup and the path to the file in one menu bar app, so the next prompt has something real to look at.
+      </p>
+      <dl>
+        <div><dt>platform</dt><dd>macOS</dd></div>
+        <div><dt>language</dt><dd>{featured.language}</dd></div>
+        <div><dt>release</dt><dd>{featured.version}</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <div class="project-grid">
+    {rest.map((project, index) => (
+      <article class="project-card">
+        <div class="project-meta">
+          <span>{String(index + 2).padStart(2, '0')}</span>
+          <span>{project.language}</span>
+        </div>
+        <h3>{project.title}</h3>
+        <p class="project-description">{project.description}</p>
+        <div class="project-tags">
+          {project.tags.map((tag) => <span>{tag}</span>)}
+        </div>
+        <div class="project-links">
+          <a href={project.repo}>repository</a>
+          {project.postLink && <a href={project.postLink}>read the notes</a>}
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
