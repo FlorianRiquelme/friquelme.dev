@@ -1,0 +1,124 @@
+---
+import '../../styles/workshop.css';
+import { workshopProjects } from '../../lib/workshop/projects';
+
+const sceneDescription = 'A concrete architectural model with seven lit workrooms. Stairs and arches connect the rooms around a central shaft. The screengrab room holds a monitor whose screen opens into a miniature copy of the whole workshop.';
+---
+
+<figure
+  id="workshop"
+  class="workshop"
+  data-workshop
+  data-workshop-state="loading"
+  data-workshop-motion="full"
+  data-workshop-view="overview"
+  data-workshop-settled="overview"
+  aria-label="The impossible workshop, a real-time 3D scene with seven project rooms"
+>
+  <div class="workshop-stage">
+    <div class="workshop-viewport">
+      <canvas class="workshop-canvas" data-workshop-canvas aria-hidden="true"></canvas>
+      <img
+        class="workshop-poster"
+        data-workshop-poster
+        src="/workshop/poster.webp"
+        width="1600"
+        height="1100"
+        alt={sceneDescription}
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="workshop-scrim" aria-hidden="true"></div>
+      <div class="workshop-topline">
+        <span class="workshop-kicker">01 / the impossible workshop</span>
+        <span class="workshop-readout" data-workshop-readout aria-hidden="true">overview</span>
+      </div>
+      <div class="workshop-statusline">
+        <span class="workshop-status-dot" aria-hidden="true"></span>
+        <p class="workshop-status" role="status" aria-live="polite" data-workshop-status>
+          Interactive 3D workshop. It loads when JavaScript and WebGL are available.
+        </p>
+      </div>
+      <div class="workshop-nav" data-workshop-controls role="group" aria-label="Workshop view controls">
+        <button type="button" data-workshop-overview disabled aria-label="show workshop overview">overview</button>
+        <button type="button" data-workshop-back disabled aria-label="go back one workshop view">back</button>
+      </div>
+    </div>
+
+    <figcaption id="workshop-caption" class="workshop-caption">
+      <div class="workshop-caption-copy">
+        <p class="eyebrow">a real-time room</p>
+        <p class="workshop-lede">
+          Seven rooms. Seven tools. Find your way in.
+        </p>
+      </div>
+      <div class="workshop-picker" data-workshop-controls>
+        <p class="eyebrow" id="workshop-rooms-label">rooms</p>
+        <div class="workshop-room-list" role="group" aria-labelledby="workshop-rooms-label">
+          {workshopProjects.map((project, index) => (
+            <button
+              type="button"
+              class="workshop-room"
+              data-workshop-room={project.id}
+              data-project-id={project.id}
+              aria-pressed="false"
+              aria-label={`view ${project.title} room`}
+              disabled
+            >
+              <span class="workshop-room-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <span class="workshop-room-name">{project.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </figcaption>
+  </div>
+
+  <div class="workshop-actions" data-workshop-controls role="group" aria-label="Workshop actions">
+    <button type="button" class="workshop-monitor" data-workshop-monitor hidden disabled>
+      enter the monitor
+      <span aria-hidden="true">↗</span>
+    </button>
+    <div class="workshop-rotate" data-workshop-rotate-group hidden>
+      <p class="eyebrow">turn the miniature</p>
+      <div class="workshop-rotate-buttons">
+        <button type="button" data-workshop-rotate="left" aria-label="rotate miniature left" disabled>left</button>
+        <button type="button" data-workshop-rotate="right" aria-label="rotate miniature right" disabled>right</button>
+        <button type="button" data-workshop-rotate="reset" aria-label="reset miniature rotation" disabled>reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="workshop-info-stack">
+    <div class="workshop-info" data-workshop-info="overview">
+      <p class="eyebrow">the workbench</p>
+      <p>
+        Start with screengrab. Its monitor has a room of its own.
+      </p>
+    </div>
+
+    {workshopProjects.map((project) => (
+      <div class="workshop-info" data-workshop-info="room" data-workshop-project={project.id} hidden>
+        <p class="eyebrow">room / {project.title}</p>
+        <p>{project.description}</p>
+        <div class="workshop-tags">
+          {project.tags.map((tag) => <span>{tag}</span>)}
+        </div>
+        {project.install && <code class="workshop-install">{project.install}</code>}
+        <div class="workshop-info-links">
+          <a href={project.repo}>repository</a>
+          {project.postLink && <a href={project.postLink}>read the notes</a>}
+        </div>
+      </div>
+    ))}
+
+    <div class="workshop-info" data-workshop-info="interior" hidden>
+      <p class="eyebrow">inside / the miniature</p>
+      <p>
+        The whole workshop, on a desk inside itself.
+      </p>
+      <p class="workshop-hint">Drag across the scene or use the rotate buttons. Back returns to the screengrab room.</p>
+    </div>
+  </div>
+
+</figure>

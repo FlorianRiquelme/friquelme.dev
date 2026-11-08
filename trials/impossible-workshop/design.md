@@ -32,6 +32,7 @@ Required nodes:
 - `Cam_PortalApproach`, `Aim_PortalApproach`, `Cam_PortalCross`, `Aim_PortalCross`, `Cam_Interior`, `Aim_Interior`.
 - `MonitorAperture`, an empty at the opening centre with width and height numeric extras, facing glTF +Z.
 - `MiniatureWorkshop`, the rotatable interior copy.
+- `Light_Key`, `Light_Rim` and `Light_Interior`, the authored light positions.
 
 The manifest has `schemaVersion: 1`, `asset: '/workshop/workshop.glb'`, `projectIds`, `nodes` as an array of required node names, `stats` containing triangles and file bytes, and `aperture` with width, height and nearPlane. Camera and aim transforms are only in GLB. Use camera vertical FOV 42 degrees and near plane 0.002 metres. Derive portrait framing for overview from aspect ratio. Portal traversal uses the same centreline at all aspect ratios. The opening is wider and taller than the near-plane frustum at the crossing, including the widest supported viewport.
 
@@ -59,3 +60,17 @@ The exterior can be a single mesh per material to bound draw calls. Room markers
 | Project destinations, section navigation, blog journeys, sitemap and metadata | Preserve the exact assertions. |
 
 The new visual direction supersedes the former single-font and purely terminal presentation rules. Infrastructure and article content remain outside this implementation's scope.
+
+## Integration decisions
+
+The Blender preview and browser both use a 42-degree vertical field of view. Overview composition is authored in the asset; the browser only adjusts distance for portrait aspect ratios. Baked vertex ambient shading preserves contact depth. A cached directional shadow map and bounded interior light replace the initial light-layer approach: Three.js light layers filter cameras, not individual illuminated meshes. The rotating miniature receives exterior shadows but does not invalidate the static shadow map.
+
+Rendering is on demand. Camera transitions schedule frames; resizing, miniature rotation and preference changes draw when needed. A settled scene schedules no continuous ambient loop. Project articles are plain visible HTML, including when enhancement scripts are blocked. The public mount function owns the page-lifetime enhancement and releases resources on rendering failure.
+
+The browser gate enables Firefox's documented `webgl.force-enabled` preference through its Playwright launch API. Without it, Firefox in the isolated Linux environment rejects WebGL 2 before the asset loads. TesterArmy 0.11.2 has no launch-preferences option, so the existing process-wide target registry installs this narrowly scoped launch adapter once. This does not change visitors' browsers or weaken the interaction assertions.
+
+## Rebuilding the asset
+
+Use the repository's Node 24 runtime and install dependencies first. Generate the project catalog with `node scripts/export-workshop-catalog.mjs`. Then run Blender 5.2 in background mode with `--python-exit-code 1 --python scripts/build-workshop.py -- --catalog .planning/workshop/catalog.json --out public/workshop --renders reports/workshop`. The script builds and exports geometry, anchors, vertex shading, manifest and reference renders. HIP is used when available; CPU rendering remains available.
+
+Convert `reports/workshop/Overview.png` to `public/workshop/poster.webp` with the installed sharp library at quality 88. `tests/workshop/asset.test.ts` loads the real GLB and checks project identity, required anchors, both directions of the camera paths, portal placement, shared miniature geometry, vertex shading, reported size and triangle count, and poster decoding. The Blender source is the generator; the large intermediate `.blend` stays in the ignored reports directory.

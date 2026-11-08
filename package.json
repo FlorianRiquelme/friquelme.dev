@@ -30,6 +30,7 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/manrope": "5.3.0",
     "@iconify-json/lucide": "^1.2.133",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.3",
@@ -42,6 +43,7 @@
     "satori": "^0.33.4",
     "satori-html": "^0.3.2",
     "tailwindcss": "^4.3.3",
+    "three": "0.187.0",
     "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
@@ -52,6 +54,7 @@
     "@stryker-mutator/vitest-runner": "^9.6.1",
     "@types/node": "24.10.1",
     "@types/picomatch": "4.0.3",
+    "@types/three": "0.187.0",
     "axe-core": "4.13.0",
     "e2e": "0.16.0",
     "happy-dom": "20.14.3",

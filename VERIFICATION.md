@@ -19,7 +19,8 @@ Use `node scripts/pnpm.mjs <pnpm arguments>` for local commands. The launcher se
 | Surface | Deterministic evidence |
 | --- | --- |
 | Every published HTML page | Sitemap-derived cases; one visible H1, exact canonical/OG URL, valid structured data, real image loading, no browser exceptions/local 4xx assets, no horizontal overflow, automated WCAG A/AA rules |
-| Homepage | Section navigation, actual project destinations, contact mail link, terminal completion with ordinary motion and content availability with reduced motion |
+| Homepage | Section navigation, actual project destinations, contact mail link, visible profile and project content, and the workshop GLB camera journey with ordinary motion and immediate content with reduced motion |
+| Workshop | Real GLB load, visible canvas change across overview, room and interior, miniature rotation, rapid input settlement, Escape focus restoration, browser-back recovery, manifest/geometry/context-loss fallback, blocked enhancement scripts and responsive scene layout; exported camera paths, project/anchor identity, shared geometry and poster decoding |
 | Navigation | Homepage → blog → exact pinned article → back; mobile opening/closing, Escape, focus cycling/restoration and body scroll unlock; desktop keyboard activation |
 | Every article | Table of contents target navigation, related and adjacent article links, article schema/body, Open Graph image format/dimensions |
 | Build/link graph | Internal page, anchor and asset existence across every sitemap page; nonempty unique sitemap covering every built HTML page, exact RSS article membership and LLM discovery links; the robots.txt Sitemap line is checked against the built sitemap index (single line, existing file, same origin as its `<loc>` entries) |

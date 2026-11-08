@@ -10,6 +10,12 @@
   --color-border-primary: #1F1F1F;
   --color-border-secondary: #252525;
   --color-green-primary: #22C55E;
+  --color-ivory: #EDE8DE;
+  --color-ivory-dim: #CFC7BA;
+  --color-lime: #C9F26A;
+  --color-warm-line: #27241F;
+  --color-warm-muted: #9A9285;
+  --color-warm-surface: #12110F;
   --color-red-error: #EF4444;
   --color-text-muted: #898989;
   --color-text-primary: #E5E5E5;
@@ -17,15 +23,7 @@
   --color-text-tertiary: #858585;
 
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-@theme {
-  --animate-blink: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  --font-sans: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 @keyframes fadeInUp {
@@ -52,21 +50,6 @@
 .stagger-2 { animation-delay: 0.15s; }
 .stagger-3 { animation-delay: 0.3s; }
 
-/* Layout-preserving hide for terminal lines: occupies final space from t=0 so
-   the surrounding container paints at its final size at FCP and content below
-   doesn't shift as lines reveal sequentially. */
-.terminal-hidden { visibility: hidden; }
-
-.terminal-reveal {
-  visibility: visible;
-  animation: terminal-line-reveal 280ms steps(24, end) forwards;
-}
-
-@keyframes terminal-line-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   [data-animate],
   [data-animate].is-visible {
@@ -75,9 +58,6 @@
     animation: none;
   }
 
-  .terminal-reveal { animation: none; }
-
-  .animate-blink,
   .animate-ping {
     animation: none !important;
   }

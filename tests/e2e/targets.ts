@@ -1,16 +1,25 @@
 import { surfaceOf, web, type BrowserName } from '@e2e-dev/web';
-import type { BrowserContext } from 'playwright';
+import { firefox, type BrowserContext } from 'playwright';
 import { browserTargets } from '../../scripts/browser-targets.mjs';
 
 // e2e loads the config and the test files through separate module instances
 // within one worker, so the engines and the `surfaceOf` that knows them are
 // shared through a process-wide registry instead of a module export.
 const registryKey = Symbol.for('friquelme.dev/browser-targets');
-const created = {
-  surfaceOf,
-  targets: browserTargets.map(({ name, browser, viewport }) => ({ name, engine: web({ browser: browser as BrowserName, viewport }) })),
-};
-const registry: typeof created = ((globalThis as Record<symbol, typeof created>)[registryKey] ??= created);
+function createTargets() {
+  // TesterArmy 0.11 exposes no launch preferences. Firefox needs this preference
+  // for software WebGL 2 on GPU-less runners: https://bugzilla.mozilla.org/show_bug.cgi?id=1970486
+  const launchFirefox = firefox.launch.bind(firefox);
+  firefox.launch = options => launchFirefox({
+    ...options,
+    firefoxUserPrefs: { ...options?.firefoxUserPrefs, 'webgl.force-enabled': true },
+  });
+  return {
+    surfaceOf,
+    targets: browserTargets.map(({ name, browser, viewport }) => ({ name, engine: web({ browser: browser as BrowserName, viewport }) })),
+  };
+}
+const registry = ((globalThis as Record<symbol, ReturnType<typeof createTargets>>)[registryKey] ??= createTargets());
 
 export const targets = registry.targets;
 

@@ -90,12 +90,48 @@ describe('astro build output', () => {
     });
   });
 
-  describe('homepage H1 brand voice', () => {
-    it('keeps the brand-voice H1 (SEO carried by title tag + Person schema, not the H1)', () => {
+  describe('homepage headline', () => {
+    it('keeps the approved workshop headline as the single H1', () => {
       const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
       const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/);
       expect(h1Match).not.toBeNull();
-      expect(h1Match![1].trim()).toBe('i build software, and the tools i build it with.');
+      const text = h1Match![1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      expect(text).toBe('software, with the walls off.');
+    });
+  });
+
+  describe('homepage workshop', () => {
+    const html = () => readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+
+    it('ships a poster-backed canvas with equivalent semantic controls', () => {
+      const page = html();
+      expect(page).toContain('data-workshop-canvas');
+      expect(page).toMatch(/<canvas[^>]*aria-hidden="true"/);
+      expect(page).toContain('src="/workshop/poster.webp"');
+      expect(page).toContain('alt="A concrete architectural model with seven lit workrooms');
+      expect(page).toContain('data-workshop-overview disabled');
+      expect(page).toContain('data-workshop-back disabled');
+      expect(page).toContain('data-workshop-monitor hidden disabled');
+    });
+
+    it('lists every canonical project id as a room control', () => {
+      const page = html();
+      for (const name of PROJECTS) {
+        expect(page).toContain(`data-workshop-room="${name}"`);
+        expect(page).toContain(`aria-label="view ${name} room"`);
+        expect(page).toContain(`data-workshop-project="${name}"`);
+      }
+    });
+
+    it('keeps the profile and contact content visible in the initial HTML', () => {
+      const page = html();
+      expect(page).toContain('id="profile-summary"');
+      expect(page).toContain('senior software engineer at SVO Netz GmbH in Celle');
+      expect(page).toContain('9+ years');
+      expect(page).toContain('PHP, React, TypeScript, Go, Swift and AWS');
+      expect(page).toContain('href="mailto:flo@friquelme.dev"');
+      expect(page).toContain('href="https://github.com/FlorianRiquelme"');
+      expect(page).toContain('href="https://www.linkedin.com/in/florian-riquelme-b97756143"');
     });
   });
 
